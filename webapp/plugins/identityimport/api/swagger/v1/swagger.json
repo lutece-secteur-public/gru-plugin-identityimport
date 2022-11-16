@@ -1,0 +1,310 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Plugin identityimport",
+        "description": "Identityimport API"
+    },
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/batchs": {
+            "get": {
+                "description": "Get Batch list",
+                "tags": [
+                    "Batch"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return the Batch list",
+                        "schema": {
+                            "$ref": "#/definitions/BatchListResult"
+                        }
+                    },
+                    "204": {
+                        "description": "No content",
+                        "schema": {
+                            "$ref": "#/definitions/NoContent"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create Batch",
+                "tags": [
+                    "Batch"
+                ],
+                "parameters": [
+                    {
+                        "name": "date",
+                        "in": "formData",
+                        "description": "date",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "user",
+                        "in": "formData",
+                        "description": "user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "app_code",
+                        "in": "formData",
+                        "description": "app_code",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "comment",
+                        "in": "formData",
+                        "description": "comment",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return the Batch created",
+                        "schema": {
+                            "$ref": "#/definitions/BatchResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Empty parameter",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/batchs/{id}": {
+            "get": {
+                "description": "Get Batch",
+                "tags": [
+                    "Batch"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the Batch",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return the Batch",
+                        "schema": {
+                            "$ref": "#/definitions/BatchResult"
+                        }
+                    },
+                    "404": {
+                        "description": "Resource not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Modify Batch",
+                "tags": [
+                    "Batch"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the Batch to modify",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "date",
+                        "in": "formData",
+                        "description": "date",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "user",
+                        "in": "formData",
+                        "description": "user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "app_code",
+                        "in": "formData",
+                        "description": "app_code",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "comment",
+                        "in": "formData",
+                        "description": "comment",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return the Batch modified",
+                        "schema": {
+                            "$ref": "#/definitions/BatchResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Empty parameter",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Resource not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Batch",
+                "tags": [
+                    "Batch"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the Batch to delete",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return the Batch deleted (No Content)",
+                        "schema": {
+                            "$ref": "#/definitions/NoContent"
+                        }
+                    },
+                    "404": {
+                        "description": "Resource not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "NoContent": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "errorCode": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "BatchListResult": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Batch"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "BatchResult": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "$ref": "#/definitions/Batch"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "Batch": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                },
+                "app_code": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

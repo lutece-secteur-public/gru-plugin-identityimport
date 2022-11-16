@@ -1,0 +1,10 @@
+<#macro tabs2 tab >
+<@tabs>
+	<@tabList>
+			<li <#if tab="batch">class="active"</#if>>
+				<@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp">#i18n{identityimport.manage_batchs.pageTitle}</@aButton>
+			</li>
+	</@tabList>
+</@tabs>
+
+</#macro>

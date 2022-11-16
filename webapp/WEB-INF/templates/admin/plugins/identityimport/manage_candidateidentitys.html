@@ -1,0 +1,46 @@
+<#include "managecandidateidentities_tabs.html" />
+<@tabs2 tab="candidateidentity" />
+
+<@box>
+	<@boxHeader title='#i18n{identityimport.manage_candidateidentity.title}' boxTools=true>
+		<@tform class='form-inline pull-right' name='manage_candidateidentity' action='jsp/admin/plugins/identityimport/ManageCandidateIdentitys.jsp'>
+			<@button type='submit' name='view_createCandidateIdentity' buttonIcon='plus' title='#i18n{identityimport.manage_candidateidentitys.buttonAdd}' />
+		</@tform>
+	</@boxHeader>
+	<@boxBody>    
+    <@messages infos=infos />
+    <@paginationAdmin paginator=paginator combo=1 />
+    <div class="clearfix"></div>
+    <@table>
+        <tr>
+            <th>#i18n{identityimport.manage_candidateidentitys.columnIdBatch}</th>
+            <th>#i18n{identityimport.manage_candidateidentitys.columnConnectionId}</th>
+            <th>#i18n{identityimport.manage_candidateidentitys.columnCustomerId}</th>
+            <th>#i18n{portal.util.labelActions}</th>
+        </tr>
+        <@tableHeadBodySeparator />
+        <#list candidateidentity_list as candidateidentity >
+        <tr>
+            <td>
+				${candidateidentity.idBatch}
+			</td>
+            <td>
+				${candidateidentity.connectionId}
+			</td>
+            <td>
+				${candidateidentity.customerId}
+			</td>
+        	<td>
+				<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentitys.jsp?view=modifyCandidateIdentity&id=${candidateidentity.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
+						
+				<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentitys.jsp?action=confirmRemoveCandidateIdentity&id=${candidateidentity.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
+
+	        </td>
+        </tr>
+        </#list>
+    </@table>
+
+    <@paginationAdmin paginator=paginator />
+
+  </@boxBody>
+</@box>

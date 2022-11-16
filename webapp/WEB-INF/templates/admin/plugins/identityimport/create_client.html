@@ -1,0 +1,25 @@
+<#include "manageclients_tabs.html" />
+<@tabs2 tab="client" />
+<@box>
+	<@boxHeader title='#i18n{identityimport.create_client.title}' />
+	<@boxBody>
+    <@tform name='create_client' action='jsp/admin/plugins/identityimport/ManageClients.jsp' >
+
+        <@messages errors=errors />
+        <@input type="hidden" id="id" name="id"/>
+        <@input type="hidden" value="${token}" name="token" />
+
+		<@formGroup labelFor='name' labelKey='#i18n{identityimport.modify_client.labelName}' mandatory=true>
+			<@input type='text' id='name' name='name'  maxlength=255 value='${client.name!\'\'}' tabIndex='0' />
+		</@formGroup>
+		<@formGroup labelFor='app_code' labelKey='#i18n{identityimport.modify_client.labelAppCode}' mandatory=true>
+			<@input type='text' id='app_code' name='app_code'  maxlength=50 value='${client.appCode!\'\'}' tabIndex='1' />
+		</@formGroup>
+		<@formGroup labelFor='token' labelKey='#i18n{identityimport.modify_client.labelToken}' mandatory=true>
+			<@input type='text' id='token' name='token'  value='${client.token!\'\'}' tabIndex='2' />
+		</@formGroup>
+				
+		<@actionButtons button1Name="action_createClient" button2Name="view_manageClient"/>
+    </@tform>
+	</@boxBody>
+</@box>

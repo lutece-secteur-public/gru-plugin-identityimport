@@ -1,0 +1,50 @@
+<#include "managebatchs_tabs.html" />
+<@tabs2 tab="batch" />
+
+<@box>
+	<@boxHeader title='#i18n{identityimport.manage_batch.title}' boxTools=true>
+		<@tform class='form-inline pull-right' name='manage_batch' action='jsp/admin/plugins/identityimport/ManageBatchs.jsp'>
+			<@button type='submit' name='view_createBatch' buttonIcon='plus' title='#i18n{identityimport.manage_batchs.buttonAdd}' />
+		</@tform>
+	</@boxHeader>
+	<@boxBody>    
+    <@messages infos=infos />
+    <@paginationAdmin paginator=paginator combo=1 />
+    <div class="clearfix"></div>
+    <@table>
+        <tr>
+            <th>#i18n{identityimport.manage_batchs.columnDate}</th>
+            <th>#i18n{identityimport.manage_batchs.columnUser}</th>
+            <th>#i18n{identityimport.manage_batchs.columnAppCode}</th>
+            <th>#i18n{identityimport.manage_batchs.columnComment}</th>
+            <th>#i18n{portal.util.labelActions}</th>
+        </tr>
+        <@tableHeadBodySeparator />
+        <#list batch_list as batch >
+        <tr>
+            <td>
+				${batch.date}
+			</td>
+            <td>
+				${batch.user}
+			</td>
+            <td>
+				${batch.appCode}
+			</td>
+            <td>
+				${batch.comment}
+			</td>
+        	<td>
+				<@aButton href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=modifyBatch&id=${batch.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
+						
+				<@aButton href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=confirmRemoveBatch&id=${batch.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
+
+	        </td>
+        </tr>
+        </#list>
+    </@table>
+
+    <@paginationAdmin paginator=paginator />
+
+  </@boxBody>
+</@box>

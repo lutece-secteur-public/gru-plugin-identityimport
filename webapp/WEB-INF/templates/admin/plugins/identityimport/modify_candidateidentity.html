@@ -1,0 +1,25 @@
+<#include "managecandidateidentities_tabs.html" />
+<@tabs2 tab="candidateidentity" />
+
+
+<@box>
+	<@boxHeader title='#i18n{identityimport.modify_candidateidentity.title}' />
+	<@boxBody>
+    <@tform class="form-horizontal" method="post" name="modify_candidateidentity" action="jsp/admin/plugins/identityimport/ManageCandidateIdentitys.jsp" >
+			<@messages errors=errors />
+			<@input type="hidden" id="id" name="id" value="${candidateidentity.id}"/>
+			<@input type="hidden" value="${token}" name="token" />
+			
+			<@formGroup labelFor='id_batch' labelKey='#i18n{identityimport.modify_candidateidentity.labelIdBatch}' mandatory=true>
+				<@input type='text' id='id_batch' name='id_batch'  maxlength=255 value='${candidateidentity.idBatch!\'\'}' tabIndex='0' />
+			</@formGroup>
+			<@formGroup labelFor='connection_id' labelKey='#i18n{identityimport.modify_candidateidentity.labelConnectionId}' mandatory=true>
+				<@input type='text' id='connection_id' name='connection_id'  maxlength=255 value='${candidateidentity.connectionId!\'\'}' tabIndex='1' />
+			</@formGroup>
+			<@formGroup labelFor='customer_id' labelKey='#i18n{identityimport.modify_candidateidentity.labelCustomerId}' mandatory=true>
+				<@input type='text' id='customer_id' name='customer_id'  maxlength=255 value='${candidateidentity.customerId!\'\'}' tabIndex='2' />
+			</@formGroup>
+        <@actionButtons button1Name="action_modifyCandidateIdentity" button2Name="view_manageCandidateIdentity"/>
+    </@tform>
+	</@boxBody>
+</@box>
