@@ -32,14 +32,12 @@
  * License 1.0
  */
 
-
- package fr.paris.lutece.plugins.identityimport.business;
+package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.ReferenceList;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -56,14 +54,16 @@ public final class BatchHome
     /**
      * Private constructor - this class need not be instantiated
      */
-    private BatchHome(  )
+    private BatchHome( )
     {
     }
 
     /**
      * Create an instance of the batch class
-     * @param batch The instance of the Batch which contains the informations to store
-     * @return The  instance of batch which has been created with its primary key.
+     * 
+     * @param batch
+     *            The instance of the Batch which contains the informations to store
+     * @return The instance of batch which has been created with its primary key.
      */
     public static Batch create( Batch batch )
     {
@@ -74,8 +74,10 @@ public final class BatchHome
 
     /**
      * Update of the batch which is specified in parameter
-     * @param batch The instance of the Batch which contains the data to store
-     * @return The instance of the  batch which has been updated
+     * 
+     * @param batch
+     *            The instance of the Batch which contains the data to store
+     * @return The instance of the batch which has been updated
      */
     public static Batch update( Batch batch )
     {
@@ -86,7 +88,9 @@ public final class BatchHome
 
     /**
      * Remove the batch whose identifier is specified in parameter
-     * @param nKey The batch Id
+     * 
+     * @param nKey
+     *            The batch Id
      */
     public static void remove( int nKey )
     {
@@ -95,7 +99,9 @@ public final class BatchHome
 
     /**
      * Returns an instance of a batch whose identifier is specified in parameter
-     * @param nKey The batch primary key
+     * 
+     * @param nKey
+     *            The batch primary key
      * @return an instance of Batch
      */
     public static Optional<Batch> findByPrimaryKey( int nKey )
@@ -105,35 +111,39 @@ public final class BatchHome
 
     /**
      * Load the data of all the batch objects and returns them as a list
+     * 
      * @return the list which contains the data of all the batch objects
      */
     public static List<Batch> getBatchsList( )
     {
         return _dao.selectBatchsList( _plugin );
     }
-    
+
     /**
      * Load the id of all the batch objects and returns them as a list
+     * 
      * @return the list which contains the id of all the batch objects
      */
     public static List<Integer> getIdBatchsList( )
     {
         return _dao.selectIdBatchsList( _plugin );
     }
-    
+
     /**
      * Load the data of all the batch objects and returns them as a referenceList
+     * 
      * @return the referenceList which contains the data of all the batch objects
      */
     public static ReferenceList getBatchsReferenceList( )
     {
         return _dao.selectBatchsReferenceList( _plugin );
     }
-    
-	
+
     /**
      * Load the data of all the avant objects and returns them as a list
-     * @param listIds liste of ids
+     * 
+     * @param listIds
+     *            liste of ids
      * @return the list which contains the data of all the avant objects
      */
     public static List<Batch> getBatchsListByIds( List<Integer> listIds )
@@ -142,4 +152,3 @@ public final class BatchHome
     }
 
 }
-

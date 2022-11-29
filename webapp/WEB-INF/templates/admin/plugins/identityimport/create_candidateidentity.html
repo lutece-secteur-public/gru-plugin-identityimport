@@ -1,9 +1,8 @@
-<#include "managecandidateidentities_tabs.html" />
-<@tabs2 tab="candidateidentity" />
+
 <@box>
 	<@boxHeader title='#i18n{identityimport.create_candidateidentity.title}' />
 	<@boxBody>
-    <@tform name='create_candidateidentity' action='jsp/admin/plugins/identityimport/ManageCandidateIdentitys.jsp' >
+    <@tform name='create_candidateidentity' action='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp' >
 
         <@messages errors=errors />
         <@input type="hidden" id="id" name="id"/>
@@ -12,11 +11,14 @@
 		<@formGroup labelFor='id_batch' labelKey='#i18n{identityimport.modify_candidateidentity.labelIdBatch}' mandatory=true>
 			<@input type='text' id='id_batch' name='id_batch'  maxlength=255 value='${candidateidentity.idBatch!\'\'}' tabIndex='0' />
 		</@formGroup>
-		<@formGroup labelFor='connection_id' labelKey='#i18n{identityimport.modify_candidateidentity.labelConnectionId}' mandatory=true>
+		<@formGroup labelFor='connection_id' labelKey='#i18n{identityimport.modify_candidateidentity.labelConnectionId}' >
 			<@input type='text' id='connection_id' name='connection_id'  maxlength=255 value='${candidateidentity.connectionId!\'\'}' tabIndex='1' />
 		</@formGroup>
 		<@formGroup labelFor='customer_id' labelKey='#i18n{identityimport.modify_candidateidentity.labelCustomerId}' mandatory=true>
 			<@input type='text' id='customer_id' name='customer_id'  maxlength=255 value='${candidateidentity.customerId!\'\'}' tabIndex='2' />
+		</@formGroup>
+		<@formGroup labelFor='status' labelKey='#i18n{identityimport.modify_candidateidentity.labelStatus}' >
+			<@input type='text' id='status' name='status'  maxlength=255 value='${candidateidentity.status!\'\'}' tabIndex='3' />
 		</@formGroup>
 				
 		<@actionButtons button1Name="action_createCandidateIdentity" button2Name="view_manageCandidateIdentity"/>

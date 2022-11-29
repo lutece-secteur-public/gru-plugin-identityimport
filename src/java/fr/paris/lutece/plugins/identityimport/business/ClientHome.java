@@ -32,14 +32,12 @@
  * License 1.0
  */
 
-
- package fr.paris.lutece.plugins.identityimport.business;
+package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.ReferenceList;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -56,14 +54,16 @@ public final class ClientHome
     /**
      * Private constructor - this class need not be instantiated
      */
-    private ClientHome(  )
+    private ClientHome( )
     {
     }
 
     /**
      * Create an instance of the client class
-     * @param client The instance of the Client which contains the informations to store
-     * @return The  instance of client which has been created with its primary key.
+     * 
+     * @param client
+     *            The instance of the Client which contains the informations to store
+     * @return The instance of client which has been created with its primary key.
      */
     public static Client create( Client client )
     {
@@ -74,8 +74,10 @@ public final class ClientHome
 
     /**
      * Update of the client which is specified in parameter
-     * @param client The instance of the Client which contains the data to store
-     * @return The instance of the  client which has been updated
+     * 
+     * @param client
+     *            The instance of the Client which contains the data to store
+     * @return The instance of the client which has been updated
      */
     public static Client update( Client client )
     {
@@ -86,7 +88,9 @@ public final class ClientHome
 
     /**
      * Remove the client whose identifier is specified in parameter
-     * @param nKey The client Id
+     * 
+     * @param nKey
+     *            The client Id
      */
     public static void remove( int nKey )
     {
@@ -95,7 +99,9 @@ public final class ClientHome
 
     /**
      * Returns an instance of a client whose identifier is specified in parameter
-     * @param nKey The client primary key
+     * 
+     * @param nKey
+     *            The client primary key
      * @return an instance of Client
      */
     public static Optional<Client> findByPrimaryKey( int nKey )
@@ -105,35 +111,39 @@ public final class ClientHome
 
     /**
      * Load the data of all the client objects and returns them as a list
+     * 
      * @return the list which contains the data of all the client objects
      */
     public static List<Client> getClientsList( )
     {
         return _dao.selectClientsList( _plugin );
     }
-    
+
     /**
      * Load the id of all the client objects and returns them as a list
+     * 
      * @return the list which contains the id of all the client objects
      */
     public static List<Integer> getIdClientsList( )
     {
         return _dao.selectIdClientsList( _plugin );
     }
-    
+
     /**
      * Load the data of all the client objects and returns them as a referenceList
+     * 
      * @return the referenceList which contains the data of all the client objects
      */
     public static ReferenceList getClientsReferenceList( )
     {
         return _dao.selectClientsReferenceList( _plugin );
     }
-    
-	
+
     /**
      * Load the data of all the avant objects and returns them as a list
-     * @param listIds liste of ids
+     * 
+     * @param listIds
+     *            liste of ids
      * @return the list which contains the data of all the avant objects
      */
     public static List<Client> getClientsListByIds( List<Integer> listIds )
@@ -142,4 +152,3 @@ public final class ClientHome
     }
 
 }
-

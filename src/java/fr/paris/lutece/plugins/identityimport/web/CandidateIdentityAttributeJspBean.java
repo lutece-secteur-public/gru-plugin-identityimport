@@ -31,8 +31,7 @@
  *
  * License 1.0
  */
- 	
- 
+
 package fr.paris.lutece.plugins.identityimport.web;
 
 import fr.paris.lutece.portal.service.message.AdminMessage;
@@ -59,16 +58,21 @@ import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribut
 /**
  * This class provides the user interface to manage CandidateIdentityAttribute features ( manage, create, modify, remove )
  */
-@Controller( controllerJsp = "ManageCandidateIdentityAttributes.jsp", controllerPath = "jsp/admin/plugins/identityimport/", right = "IDENTITYIMPORT_CANDIDATE_IDENTITY_ATTRIBUTE_MANAGEMENT" )
-public class CandidateIdentityAttributeJspBean extends AbstractManageCandidateIdentitiesAttributesJspBean <Integer, CandidateIdentityAttribute>
+@Controller( controllerJsp = "ManageCandidateIdentityAttributes.jsp", controllerPath = "jsp/admin/plugins/identityimport/", right = "IDENTITYIMPORT_BATCH_MANAGEMENT" )
+public class CandidateIdentityAttributeJspBean extends AbstractManageItemsJspBean<Integer, CandidateIdentityAttribute>
 {
-    // Templates
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9007725551001629387L;
+	// Templates
     private static final String TEMPLATE_MANAGE_CANDIDATEIDENTITYATTRIBUTES = "/admin/plugins/identityimport/manage_candidateidentityattributes.html";
     private static final String TEMPLATE_CREATE_CANDIDATEIDENTITYATTRIBUTE = "/admin/plugins/identityimport/create_candidateidentityattribute.html";
     private static final String TEMPLATE_MODIFY_CANDIDATEIDENTITYATTRIBUTE = "/admin/plugins/identityimport/modify_candidateidentityattribute.html";
 
     // Parameters
     private static final String PARAMETER_ID_CANDIDATEIDENTITYATTRIBUTE = "id";
+    private static final String PARAMETER_IDENTITY_ID = "identity_id";
 
     // Properties for page titles
     private static final String PROPERTY_PAGE_TITLE_MANAGE_CANDIDATEIDENTITYATTRIBUTES = "identityimport.manage_candidateidentityattributes.pageTitle";
@@ -102,70 +106,76 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageCandidateId
     private static final String INFO_CANDIDATEIDENTITYATTRIBUTE_CREATED = "identityimport.info.candidateidentityattribute.created";
     private static final String INFO_CANDIDATEIDENTITYATTRIBUTE_UPDATED = "identityimport.info.candidateidentityattribute.updated";
     private static final String INFO_CANDIDATEIDENTITYATTRIBUTE_REMOVED = "identityimport.info.candidateidentityattribute.removed";
-    
+
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
-    
+
     // Session variable to store working values
     private CandidateIdentityAttribute _candidateidentityattribute;
     private List<Integer> _listIdCandidateIdentityAttributes;
+    private int _currentIdentityId;
     
     /**
      * Build the Manage View
-     * @param request The HTTP request
+     * 
+     * @param request
+     *            The HTTP request
      * @return The page
      */
     @View( value = VIEW_MANAGE_CANDIDATEIDENTITYATTRIBUTES, defaultView = true )
     public String getManageCandidateIdentityAttributes( HttpServletRequest request )
     {
         _candidateidentityattribute = null;
-        
-        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX) == null || _listIdCandidateIdentityAttributes.isEmpty( ) )
+
+        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX ) == null || _listIdCandidateIdentityAttributes.isEmpty( ) )
         {
-        	_listIdCandidateIdentityAttributes = CandidateIdentityAttributeHome.getIdCandidateIdentityAttributesList(  );
+        	_currentIdentityId = Integer.parseInt( request.getParameter( PARAMETER_IDENTITY_ID ) );
+            _listIdCandidateIdentityAttributes = CandidateIdentityAttributeHome.getIdCandidateIdentityAttributesList( _currentIdentityId );
         }
-        
-        Map<String, Object> model = getPaginatedListModel( request, MARK_CANDIDATEIDENTITYATTRIBUTE_LIST, _listIdCandidateIdentityAttributes, JSP_MANAGE_CANDIDATEIDENTITYATTRIBUTES );
+
+        Map<String, Object> model = getPaginatedListModel( request, MARK_CANDIDATEIDENTITYATTRIBUTE_LIST, _listIdCandidateIdentityAttributes,
+                JSP_MANAGE_CANDIDATEIDENTITYATTRIBUTES );
 
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_CANDIDATEIDENTITYATTRIBUTES, TEMPLATE_MANAGE_CANDIDATEIDENTITYATTRIBUTES, model );
     }
 
-	/**
+    /**
      * Get Items from Ids list
+     * 
      * @param listIds
      * @return the populated list of items corresponding to the id List
      */
-	@Override
-	List<CandidateIdentityAttribute> getItemsFromIds( List<Integer> listIds ) 
-	{
-		List<CandidateIdentityAttribute> listCandidateIdentityAttribute = CandidateIdentityAttributeHome.getCandidateIdentityAttributesListByIds( listIds );
-		
-		// keep original order
-        return listCandidateIdentityAttribute.stream()
-                 .sorted(Comparator.comparingInt( notif -> listIds.indexOf( notif.getId())))
-                 .collect(Collectors.toList());
-	}
-    
+    @Override
+    List<CandidateIdentityAttribute> getItemsFromIds( List<Integer> listIds )
+    {
+        List<CandidateIdentityAttribute> listCandidateIdentityAttribute = CandidateIdentityAttributeHome.getCandidateIdentityAttributesListByIds( listIds );
+
+        // keep original order
+        return listCandidateIdentityAttribute.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) )
+                .collect( Collectors.toList( ) );
+    }
+
     /**
-    * reset the _listIdCandidateIdentityAttributes list
-    */
+     * reset the _listIdCandidateIdentityAttributes list
+     */
     public void resetListId( )
     {
-    	_listIdCandidateIdentityAttributes = new ArrayList<>( );
+        _listIdCandidateIdentityAttributes = new ArrayList<>( );
     }
 
     /**
      * Returns the form to create a candidateidentityattribute
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return the html code of the candidateidentityattribute form
      */
     @View( VIEW_CREATE_CANDIDATEIDENTITYATTRIBUTE )
     public String getCreateCandidateIdentityAttribute( HttpServletRequest request )
     {
-        _candidateidentityattribute = ( _candidateidentityattribute != null ) ? _candidateidentityattribute : new CandidateIdentityAttribute(  );
+        _candidateidentityattribute = ( _candidateidentityattribute != null ) ? _candidateidentityattribute : new CandidateIdentityAttribute( );
 
-        Map<String, Object> model = getModel(  );
+        Map<String, Object> model = getModel( );
         model.put( MARK_CANDIDATEIDENTITYATTRIBUTE, _candidateidentityattribute );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_CANDIDATEIDENTITYATTRIBUTE ) );
 
@@ -175,7 +185,8 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageCandidateId
     /**
      * Process the data capture form of a new candidateidentityattribute
      *
-     * @param request The Http Request
+     * @param request
+     *            The Http Request
      * @return The Jsp URL of the process result
      * @throws AccessDeniedException
      */
@@ -183,11 +194,10 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageCandidateId
     public String doCreateCandidateIdentityAttribute( HttpServletRequest request ) throws AccessDeniedException
     {
         populate( _candidateidentityattribute, request, getLocale( ) );
-        
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_CANDIDATEIDENTITYATTRIBUTE ) )
         {
-            throw new AccessDeniedException ( "Invalid security token" );
+            throw new AccessDeniedException( "Invalid security token" );
         }
 
         // Check constraints
@@ -197,17 +207,17 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageCandidateId
         }
 
         CandidateIdentityAttributeHome.create( _candidateidentityattribute );
-        addInfo( INFO_CANDIDATEIDENTITYATTRIBUTE_CREATED, getLocale(  ) );
+        addInfo( INFO_CANDIDATEIDENTITYATTRIBUTE_CREATED, getLocale( ) );
         resetListId( );
 
         return redirectView( request, VIEW_MANAGE_CANDIDATEIDENTITYATTRIBUTES );
     }
 
     /**
-     * Manages the removal form of a candidateidentityattribute whose identifier is in the http
-     * request
+     * Manages the removal form of a candidateidentityattribute whose identifier is in the http request
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return the html code to confirm
      */
     @Action( ACTION_CONFIRM_REMOVE_CANDIDATEIDENTITYATTRIBUTE )
@@ -217,7 +227,8 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageCandidateId
         UrlItem url = new UrlItem( getActionUrl( ACTION_REMOVE_CANDIDATEIDENTITYATTRIBUTE ) );
         url.addParameter( PARAMETER_ID_CANDIDATEIDENTITYATTRIBUTE, nId );
 
-        String strMessageUrl = AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_CANDIDATEIDENTITYATTRIBUTE, url.getUrl(  ), AdminMessage.TYPE_CONFIRMATION );
+        String strMessageUrl = AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_CANDIDATEIDENTITYATTRIBUTE, url.getUrl( ),
+                AdminMessage.TYPE_CONFIRMATION );
 
         return redirect( request, strMessageUrl );
     }
@@ -225,17 +236,17 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageCandidateId
     /**
      * Handles the removal form of a candidateidentityattribute
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return the jsp URL to display the form to manage candidateidentityattributes
      */
     @Action( ACTION_REMOVE_CANDIDATEIDENTITYATTRIBUTE )
     public String doRemoveCandidateIdentityAttribute( HttpServletRequest request )
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITYATTRIBUTE ) );
-        
-        
+
         CandidateIdentityAttributeHome.remove( nId );
-        addInfo( INFO_CANDIDATEIDENTITYATTRIBUTE_REMOVED, getLocale(  ) );
+        addInfo( INFO_CANDIDATEIDENTITYATTRIBUTE_REMOVED, getLocale( ) );
         resetListId( );
 
         return redirectView( request, VIEW_MANAGE_CANDIDATEIDENTITYATTRIBUTES );
@@ -244,7 +255,8 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageCandidateId
     /**
      * Returns the form to update info about a candidateidentityattribute
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return The HTML form to update info
      */
     @View( VIEW_MODIFY_CANDIDATEIDENTITYATTRIBUTE )
@@ -252,14 +264,13 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageCandidateId
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITYATTRIBUTE ) );
 
-        if ( _candidateidentityattribute == null || ( _candidateidentityattribute.getId(  ) != nId ) )
+        if ( _candidateidentityattribute == null || ( _candidateidentityattribute.getId( ) != nId ) )
         {
             Optional<CandidateIdentityAttribute> optCandidateIdentityAttribute = CandidateIdentityAttributeHome.findByPrimaryKey( nId );
-            _candidateidentityattribute = optCandidateIdentityAttribute.orElseThrow( ( ) -> new AppException(ERROR_RESOURCE_NOT_FOUND ) );
+            _candidateidentityattribute = optCandidateIdentityAttribute.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
         }
 
-
-        Map<String, Object> model = getModel(  );
+        Map<String, Object> model = getModel( );
         model.put( MARK_CANDIDATEIDENTITYATTRIBUTE, _candidateidentityattribute );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_CANDIDATEIDENTITYATTRIBUTE ) );
 
@@ -269,19 +280,19 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageCandidateId
     /**
      * Process the change form of a candidateidentityattribute
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return The Jsp URL of the process result
      * @throws AccessDeniedException
      */
     @Action( ACTION_MODIFY_CANDIDATEIDENTITYATTRIBUTE )
     public String doModifyCandidateIdentityAttribute( HttpServletRequest request ) throws AccessDeniedException
-    {   
+    {
         populate( _candidateidentityattribute, request, getLocale( ) );
-		
-		
+
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_MODIFY_CANDIDATEIDENTITYATTRIBUTE ) )
         {
-            throw new AccessDeniedException ( "Invalid security token" );
+            throw new AccessDeniedException( "Invalid security token" );
         }
 
         // Check constraints
@@ -291,7 +302,7 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageCandidateId
         }
 
         CandidateIdentityAttributeHome.update( _candidateidentityattribute );
-        addInfo( INFO_CANDIDATEIDENTITYATTRIBUTE_UPDATED, getLocale(  ) );
+        addInfo( INFO_CANDIDATEIDENTITYATTRIBUTE_UPDATED, getLocale( ) );
         resetListId( );
 
         return redirectView( request, VIEW_MANAGE_CANDIDATEIDENTITYATTRIBUTES );

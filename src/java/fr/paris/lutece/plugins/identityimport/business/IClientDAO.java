@@ -31,7 +31,7 @@
  *
  * License 1.0
  */
- 
+
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -46,22 +46,31 @@ public interface IClientDAO
 {
     /**
      * Insert a new record in the table.
-     * @param client instance of the Client object to insert
-     * @param plugin the Plugin
+     * 
+     * @param client
+     *            instance of the Client object to insert
+     * @param plugin
+     *            the Plugin
      */
     void insert( Client client, Plugin plugin );
 
     /**
      * Update the record in the table
-     * @param client the reference of the Client
-     * @param plugin the Plugin
+     * 
+     * @param client
+     *            the reference of the Client
+     * @param plugin
+     *            the Plugin
      */
     void store( Client client, Plugin plugin );
 
     /**
      * Delete a record from the table
-     * @param nKey The identifier of the Client to delete
-     * @param plugin the Plugin
+     * 
+     * @param nKey
+     *            The identifier of the Client to delete
+     * @param plugin
+     *            the Plugin
      */
     void delete( int nKey, Plugin plugin );
 
@@ -70,38 +79,50 @@ public interface IClientDAO
 
     /**
      * Load the data from the table
-     * @param nKey The identifier of the client
-     * @param plugin the Plugin
+     * 
+     * @param nKey
+     *            The identifier of the client
+     * @param plugin
+     *            the Plugin
      * @return The instance of the client
      */
     Optional<Client> load( int nKey, Plugin plugin );
 
     /**
      * Load the data of all the client objects and returns them as a list
-     * @param plugin the Plugin
+     * 
+     * @param plugin
+     *            the Plugin
      * @return The list which contains the data of all the client objects
      */
     List<Client> selectClientsList( Plugin plugin );
-    
+
     /**
      * Load the id of all the client objects and returns them as a list
-     * @param plugin the Plugin
+     * 
+     * @param plugin
+     *            the Plugin
      * @return The list which contains the id of all the client objects
      */
     List<Integer> selectIdClientsList( Plugin plugin );
-    
+
     /**
      * Load the data of all the client objects and returns them as a referenceList
-     * @param plugin the Plugin
+     * 
+     * @param plugin
+     *            the Plugin
      * @return The referenceList which contains the data of all the client objects
      */
     ReferenceList selectClientsReferenceList( Plugin plugin );
-    
+
     /**
      * Load the data of all the avant objects and returns them as a list
-     * @param plugin the Plugin
-     * @param listIds liste of ids
+     * 
+     * @param plugin
+     *            the Plugin
+     * @param listIds
+     *            liste of ids
      * @return The list which contains the data of all the avant objects
      */
-	List<Client> selectClientsListByIds( Plugin _plugin, List<Integer> listIds );
+    List<Client> selectClientsListByIds( Plugin _plugin, List<Integer> listIds );
 }

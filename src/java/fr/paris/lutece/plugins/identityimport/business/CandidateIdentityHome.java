@@ -32,14 +32,12 @@
  * License 1.0
  */
 
-
- package fr.paris.lutece.plugins.identityimport.business;
+package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.ReferenceList;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -56,14 +54,16 @@ public final class CandidateIdentityHome
     /**
      * Private constructor - this class need not be instantiated
      */
-    private CandidateIdentityHome(  )
+    private CandidateIdentityHome( )
     {
     }
 
     /**
      * Create an instance of the candidateIdentity class
-     * @param candidateIdentity The instance of the CandidateIdentity which contains the informations to store
-     * @return The  instance of candidateIdentity which has been created with its primary key.
+     * 
+     * @param candidateIdentity
+     *            The instance of the CandidateIdentity which contains the informations to store
+     * @return The instance of candidateIdentity which has been created with its primary key.
      */
     public static CandidateIdentity create( CandidateIdentity candidateIdentity )
     {
@@ -74,8 +74,10 @@ public final class CandidateIdentityHome
 
     /**
      * Update of the candidateIdentity which is specified in parameter
-     * @param candidateIdentity The instance of the CandidateIdentity which contains the data to store
-     * @return The instance of the  candidateIdentity which has been updated
+     * 
+     * @param candidateIdentity
+     *            The instance of the CandidateIdentity which contains the data to store
+     * @return The instance of the candidateIdentity which has been updated
      */
     public static CandidateIdentity update( CandidateIdentity candidateIdentity )
     {
@@ -86,7 +88,9 @@ public final class CandidateIdentityHome
 
     /**
      * Remove the candidateIdentity whose identifier is specified in parameter
-     * @param nKey The candidateIdentity Id
+     * 
+     * @param nKey
+     *            The candidateIdentity Id
      */
     public static void remove( int nKey )
     {
@@ -95,7 +99,9 @@ public final class CandidateIdentityHome
 
     /**
      * Returns an instance of a candidateIdentity whose identifier is specified in parameter
-     * @param nKey The candidateIdentity primary key
+     * 
+     * @param nKey
+     *            The candidateIdentity primary key
      * @return an instance of CandidateIdentity
      */
     public static Optional<CandidateIdentity> findByPrimaryKey( int nKey )
@@ -105,41 +111,34 @@ public final class CandidateIdentityHome
 
     /**
      * Load the data of all the candidateIdentity objects and returns them as a list
+     * 
      * @return the list which contains the data of all the candidateIdentity objects
      */
-    public static List<CandidateIdentity> getCandidateIdentitysList( )
+    public static List<CandidateIdentity> getCandidateIdentitiesList( )
     {
-        return _dao.selectCandidateIdentitysList( _plugin );
+        return _dao.selectCandidateIdentitiesList( _plugin );
     }
-    
+
     /**
      * Load the id of all the candidateIdentity objects and returns them as a list
+     * 
      * @return the list which contains the id of all the candidateIdentity objects
      */
-    public static List<Integer> getIdCandidateIdentitysList( )
+    public static List<Integer> getIdCandidateIdentitiesList( int nBatchId )
     {
-        return _dao.selectIdCandidateIdentitysList( _plugin );
+        return _dao.selectIdCandidateIdentitiesList( nBatchId, _plugin );
     }
-    
-    /**
-     * Load the data of all the candidateIdentity objects and returns them as a referenceList
-     * @return the referenceList which contains the data of all the candidateIdentity objects
-     */
-    public static ReferenceList getCandidateIdentitysReferenceList( )
-    {
-        return _dao.selectCandidateIdentitysReferenceList( _plugin );
-    }
-    
-	
+
     /**
      * Load the data of all the avant objects and returns them as a list
-     * @param listIds liste of ids
+     * 
+     * @param listIds
+     *            liste of ids
      * @return the list which contains the data of all the avant objects
      */
-    public static List<CandidateIdentity> getCandidateIdentitysListByIds( List<Integer> listIds )
+    public static List<CandidateIdentity> getCandidateIdentitiesListByIds( List<Integer> listIds )
     {
-        return _dao.selectCandidateIdentitysListByIds( _plugin, listIds );
+        return _dao.selectCandidateIdentitiesListByIds( _plugin, listIds );
     }
 
 }
-

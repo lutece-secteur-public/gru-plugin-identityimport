@@ -28,16 +28,14 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *"
+ *
  * License 1.0
  */
-
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.test.LuteceTestCase;
 
 import java.util.Optional;
-
 
 /**
  * This is the business class test for the object CandidateIdentity
@@ -51,13 +49,13 @@ public class CandidateIdentityBusinessTest extends LuteceTestCase
     private static final String CUSTOMERID1 = "CustomerId1";
     private static final String CUSTOMERID2 = "CustomerId2";
 
-	/**
-	* test CandidateIdentity
-	*/
-    public void testBusiness(  )
+    /**
+     * test CandidateIdentity
+     */
+    public void testBusiness( )
     {
         // Initialize an object
-        CandidateIdentity candidateIdentity = new CandidateIdentity();
+        CandidateIdentity candidateIdentity = new CandidateIdentity( );
         candidateIdentity.setIdBatch( IDBATCH1 );
         candidateIdentity.setConnectionId( CONNECTIONID1 );
         candidateIdentity.setCustomerId( CUSTOMERID1 );
@@ -65,10 +63,10 @@ public class CandidateIdentityBusinessTest extends LuteceTestCase
         // Create test
         CandidateIdentityHome.create( candidateIdentity );
         Optional<CandidateIdentity> optCandidateIdentityStored = CandidateIdentityHome.findByPrimaryKey( candidateIdentity.getId( ) );
-        CandidateIdentity candidateIdentityStored = optCandidateIdentityStored.orElse( new CandidateIdentity ( ) );
-        assertEquals( candidateIdentityStored.getIdBatch( ) , candidateIdentity.getIdBatch( ) );
-        assertEquals( candidateIdentityStored.getConnectionId( ) , candidateIdentity.getConnectionId( ) );
-        assertEquals( candidateIdentityStored.getCustomerId( ) , candidateIdentity.getCustomerId( ) );
+        CandidateIdentity candidateIdentityStored = optCandidateIdentityStored.orElse( new CandidateIdentity( ) );
+        assertEquals( candidateIdentityStored.getIdBatch( ), candidateIdentity.getIdBatch( ) );
+        assertEquals( candidateIdentityStored.getConnectionId( ), candidateIdentity.getConnectionId( ) );
+        assertEquals( candidateIdentityStored.getCustomerId( ), candidateIdentity.getCustomerId( ) );
 
         // Update test
         candidateIdentity.setIdBatch( IDBATCH2 );
@@ -76,24 +74,21 @@ public class CandidateIdentityBusinessTest extends LuteceTestCase
         candidateIdentity.setCustomerId( CUSTOMERID2 );
         CandidateIdentityHome.update( candidateIdentity );
         optCandidateIdentityStored = CandidateIdentityHome.findByPrimaryKey( candidateIdentity.getId( ) );
-        candidateIdentityStored = optCandidateIdentityStored.orElse( new CandidateIdentity ( ) );
-        
-        assertEquals( candidateIdentityStored.getIdBatch( ) , candidateIdentity.getIdBatch( ) );
-        assertEquals( candidateIdentityStored.getConnectionId( ) , candidateIdentity.getConnectionId( ) );
-        assertEquals( candidateIdentityStored.getCustomerId( ) , candidateIdentity.getCustomerId( ) );
+        candidateIdentityStored = optCandidateIdentityStored.orElse( new CandidateIdentity( ) );
+
+        assertEquals( candidateIdentityStored.getIdBatch( ), candidateIdentity.getIdBatch( ) );
+        assertEquals( candidateIdentityStored.getConnectionId( ), candidateIdentity.getConnectionId( ) );
+        assertEquals( candidateIdentityStored.getCustomerId( ), candidateIdentity.getCustomerId( ) );
 
         // List test
-        CandidateIdentityHome.getCandidateIdentitysList( );
+        CandidateIdentityHome.getCandidateIdentitiesList( );
 
         // Delete test
         CandidateIdentityHome.remove( candidateIdentity.getId( ) );
         optCandidateIdentityStored = CandidateIdentityHome.findByPrimaryKey( candidateIdentity.getId( ) );
         candidateIdentityStored = optCandidateIdentityStored.orElse( null );
         assertNull( candidateIdentityStored );
-        
+
     }
-    
-    
-     
 
 }

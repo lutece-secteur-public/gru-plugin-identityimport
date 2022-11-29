@@ -1,0 +1,140 @@
+
+<@box>
+	<@boxHeader title='#i18n{identityimport.modify_candidateidentity.title}' />
+	<@boxBody>
+	
+			<@messages errors=errors />
+   <@row >
+
+   <@columns >
+   		<@input type="hidden" id="id" name="id" value="${candidateidentity.resource.id}"/>
+			
+   		<@table >
+   		<@tr><@td>
+			
+		#i18n{identityimport.modify_candidateidentity.labelIdBatch} : 
+				${candidateidentity.resource.idBatch!''}
+				
+   		</@td></@tr>
+   		<@tr><@td>
+		
+        #i18n{identityimport.modify_candidateidentity.labelConnectionId}' : 
+               ${candidateidentity.resource.connectionId!''}
+		
+		
+   		</@td></@tr>
+   		<@tr><@td>
+		
+		#i18n{identityimport.modify_candidateidentity.labelCustomerId}' : 
+				${candidateidentity.resource.customerId!}
+			
+		</@td></@tr>
+   		<@tr><@td>
+   		attributes ...
+   		
+   		</@td></@tr>
+   		</@table>
+			
+	</@columns >
+	
+			
+	<@columns >
+   		<@input type="hidden" id="id" name="id" value="${candidateidentity.resource.id}"/>
+			
+   		<@table >
+   		<@tr><@td>
+			
+		#i18n{identityimport.modify_candidateidentity.labelIdBatch} : 
+				${candidateidentity.resource.idBatch!''}
+				
+   		</@td></@tr>
+   		<@tr><@td>
+		
+        #i18n{identityimport.modify_candidateidentity.labelConnectionId}' : 
+               ${candidateidentity.resource.connectionId!''}
+		
+		
+   		</@td></@tr>
+   		<@tr><@td>
+		
+		#i18n{identityimport.modify_candidateidentity.labelCustomerId}' : 
+				${candidateidentity.resource.customerId!}
+			
+		</@td></@tr>
+   		<@tr><@td>
+   		attributes ...
+   		
+   		</@td></@tr>
+   		</@table>
+			
+	</@columns >
+	<@columns >
+   		<@input type="hidden" id="id" name="id" value="${candidateidentity.resource.id}"/>
+			
+   		<@table >
+   		<@tr><@td>
+			
+		#i18n{identityimport.modify_candidateidentity.labelIdBatch} : 
+				${candidateidentity.resource.idBatch!''}
+				
+   		</@td></@tr>
+   		<@tr><@td>
+		
+        #i18n{identityimport.modify_candidateidentity.labelConnectionId}' : 
+               ${candidateidentity.resource.connectionId!''}
+		
+		
+   		</@td></@tr>
+   		<@tr><@td>
+		
+		#i18n{identityimport.modify_candidateidentity.labelCustomerId}' : 
+				${candidateidentity.resource.customerId!}
+			
+		</@td></@tr>
+   		<@tr><@td>
+   		attributes ...
+   		
+   		</@td></@tr>
+   		
+   		<@tr><@td>
+   		SELECT
+   		   		
+   		</@td></@tr>
+   		
+   		</@table>
+			
+	</@columns >
+	
+	
+	
+        
+        </@row>
+    
+	</@boxBody>
+</@box>
+
+
+<@box>
+	<@boxHeader title='Workflow' />
+	<@boxBody>
+        
+        statut : <#if candidateidentity.state??><@tag  color='warning'>${candidateidentity.state.name}</@tag><#else> not set</#if>   
+
+        <br>
+        <br>
+        
+        <#if candidateidentity.actions??>actions : 
+        <#list candidateidentity.actions as action >
+            <@aButton href="jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=processWorkflowAction&action_id=${action.id}&id=${candidateidentity.resource.id}"
+                        title="${action.name}" alt="${action.name}"/>
+            <!--  img src="image?resource_type=workflow_icon_img&id=${action.icon.id}" -->
+		     </a>
+		</#list>
+		<#else>no action
+		</#if>
+		
+		<br><br>
+		History : ${candidateidentity.history! }
+
+	</@boxBody>
+</@box>

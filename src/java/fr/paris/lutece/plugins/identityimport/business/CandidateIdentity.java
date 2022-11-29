@@ -35,27 +35,43 @@ package fr.paris.lutece.plugins.identityimport.business;
 
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import fr.paris.lutece.plugins.identityimport.wf.IResource;
+
 import java.io.Serializable;
+import java.util.List;
+
 /**
  * This is the business class for the object CandidateIdentity
- */ 
+ */
 public class CandidateIdentity implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    // Variables declarations 
+	private static final String CONSTANT_RESOURCE_IDENTITY_CANDIDATE = "IDENTITYIMPORT_CANDIDATE_RESOURCE";
+
+    // Variables declarations
     private int _nId;
-    
+
     private int _nIdBatch;
-    
-    @Size( max = 255 , message = "#i18n{identityimport.validation.candidateidentity.ConnectionId.size}" ) 
+
+    @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.ConnectionId.size}" )
     private String _strConnectionId;
-    
-    @Size( max = 255 , message = "#i18n{identityimport.validation.candidateidentity.CustomerId.size}" ) 
+
+    @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.CustomerId.size}" )
     private String _strCustomerId;
+
+    @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.ClientId.size}" )
+    private String _strClientId;
+
+    @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.Status.size}" )
+    private String strStatus;
+    
+	private List<CandidateIdentityAttribute> _listAttributes;
 
     /**
      * Returns the Id
+     * 
      * @return The Id
      */
     public int getId( )
@@ -65,15 +81,18 @@ public class CandidateIdentity implements Serializable
 
     /**
      * Sets the Id
-     * @param nId The Id
-     */ 
+     * 
+     * @param nId
+     *            The Id
+     */
     public void setId( int nId )
     {
         _nId = nId;
     }
-    
+
     /**
      * Returns the IdBatch
+     * 
      * @return The IdBatch
      */
     public int getIdBatch( )
@@ -83,16 +102,18 @@ public class CandidateIdentity implements Serializable
 
     /**
      * Sets the IdBatch
-     * @param nIdBatch The IdBatch
-     */ 
+     * 
+     * @param nIdBatch
+     *            The IdBatch
+     */
     public void setIdBatch( int nIdBatch )
     {
         _nIdBatch = nIdBatch;
     }
-    
-    
+
     /**
      * Returns the ConnectionId
+     * 
      * @return The ConnectionId
      */
     public String getConnectionId( )
@@ -102,16 +123,18 @@ public class CandidateIdentity implements Serializable
 
     /**
      * Sets the ConnectionId
-     * @param strConnectionId The ConnectionId
-     */ 
+     * 
+     * @param strConnectionId
+     *            The ConnectionId
+     */
     public void setConnectionId( String strConnectionId )
     {
         _strConnectionId = strConnectionId;
     }
-    
-    
+
     /**
      * Returns the CustomerId
+     * 
      * @return The CustomerId
      */
     public String getCustomerId( )
@@ -121,11 +144,73 @@ public class CandidateIdentity implements Serializable
 
     /**
      * Sets the CustomerId
-     * @param strCustomerId The CustomerId
-     */ 
+     * 
+     * @param strCustomerId
+     *            The CustomerId
+     */
     public void setCustomerId( String strCustomerId )
     {
         _strCustomerId = strCustomerId;
     }
-    
+
+
+    /**
+     * Returns the ClientId
+     * 
+     * @return The ClientId
+     */
+    public String getClientId( )
+    {
+        return _strClientId;
+    }
+
+    /**
+     * Sets the ClientId
+     * 
+     * @param strClientId
+     *            The ClientId
+     */
+    public void setClientId( String strClientId )
+    {
+        _strClientId = strClientId;
+    }
+
+    /**
+     * set attributes 
+     * 
+     * @param list
+     */
+	public void setAttributes( List<CandidateIdentityAttribute> list ) 
+	{
+		_listAttributes = list;
+		
+	}
+
+    /**
+     * get attributes 
+     * 
+     * @param list
+     */
+	public  List<CandidateIdentityAttribute> getAttributes( ) 
+	{
+		return _listAttributes;		
+	}
+
+	/**
+	 * get status
+	 * 
+	 * @return the status
+	 */
+	public String getStatus() {
+		return strStatus;
+	}
+
+	/**
+	 * set Status
+	 * 
+	 * @param strStatus
+	 */
+	public void setStatus(String strStatus) {
+		this.strStatus = strStatus;
+	}
 }

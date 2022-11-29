@@ -1,0 +1,65 @@
+
+<@box>
+	<@boxHeader title='#i18n{identityimport.manage_candidateidentity.title}' boxTools=true>
+		<@tform class='form-inline pull-right' name='manage_candidateidentity' action='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp'>
+		
+			<@aButton href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=modifyBatch&id=${batch_id!}' 
+			title='#i18n{identityimport.modify_batch.title}' buttonIcon='eye' />
+				
+			<@button type='submit' name='view_createCandidateIdentity' buttonIcon='plus' title='#i18n{identityimport.manage_candidateidentities.buttonAdd}' />
+			
+		</@tform>
+	</@boxHeader>
+	<@boxBody>    
+    <@messages infos=infos />
+    <@paginationAdmin paginator=paginator combo=1 />
+    <div class="clearfix"></div>
+    <@table>
+        <tr>
+            <th>#i18n{identityimport.manage_candidateidentities.columnIdBatch}</th>
+            <th>#i18n{identityimport.manage_candidateidentities.columnClientId}</th>
+            <th>#i18n{identityimport.manage_candidateidentities.columnConnectionId}</th>
+            <th>#i18n{identityimport.manage_candidateidentities.columnCustomerId}</th>
+            <th>#i18n{identityimport.manage_batchs.columnStatus}</th>
+            <th>#i18n{identityimport.manage_candidateidentities.columnAPIStatus}</th>
+            <th>#i18n{portal.util.labelActions}</th>
+        </tr>
+        <@tableHeadBodySeparator />
+        <#list candidateidentity_list as candidateidentity >
+        <tr>
+            <td>
+				${candidateidentity.resource.idBatch}
+			</td>
+            <td>
+				${candidateidentity.resource.clientId!}
+			</td>
+            <td>
+				${candidateidentity.resource.connectionId!}
+			</td>
+            <td>
+				${candidateidentity.resource.customerId!}
+			</td>
+        	<td>
+        	  <#if candidateidentity.state??><@tag color='warning'>${candidateidentity.state.name}</@tag><#else> not set</#if>
+        	</td>
+        	<td>
+        	  ${candidateidentity.resource.status!}
+        	</td>
+        	<td>
+        		<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?view=importCandidateIdentity&id=${candidateidentity.resource.id}' title='#i18n{portal.util.labelUpload}' hideTitle=['all'] buttonIcon='upload' />
+				
+        	    <@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentityAttributes.jsp?identity_id=${candidateidentity.resource.id}' title='#i18n{identityimport.manage_candidateidentityattributes.title}' hideTitle=['all'] buttonIcon='list' />
+				
+				<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?view=modifyCandidateIdentity&id=${candidateidentity.resource.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
+						
+				<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=confirmRemoveCandidateIdentity&id=${candidateidentity.resource.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
+
+	        </td>
+        </tr>
+        </#list>
+    </@table>
+
+    <@paginationAdmin paginator=paginator />
+
+  </@boxBody>
+</@box>

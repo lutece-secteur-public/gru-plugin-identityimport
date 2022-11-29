@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,16 +42,17 @@ import fr.paris.lutece.util.url.UrlItem;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * ManageCandidateIdentities JSP Bean abstract class for JSP Bean
+ * ManageProject JSP Bean abstract class for JSP Bean
  */
-public abstract class AbstractManageCandidateIdentitiesJspBean <S, T> extends MVCAdminJspBean
+public abstract class AbstractManageItemsJspBean<S,T> extends MVCAdminJspBean
 {
-    // Rights
-    public static final String RIGHT_MANAGECANDIDATEIDENTITIES = "IDENTITYIMPORT_CANDIDATE_IDENTITY_MANAGEMENT";
-    
+
+	private static final long serialVersionUID = 1L;
+
     // Properties
     private static final String PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE = "identityimport.listItems.itemsPerPage";
     
@@ -74,7 +75,7 @@ public abstract class AbstractManageCandidateIdentitiesJspBean <S, T> extends MV
      * @param strManageJsp The JSP
      * @return The model
      */
-    protected <T> Map<String, Object> getPaginatedListModel( HttpServletRequest request, String strBookmark, List<S> list,
+    protected Map<String, Object> getPaginatedListModel( HttpServletRequest request, String strBookmark, List<S> list,
         String strManageJsp )
     {
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 50 );
@@ -87,7 +88,7 @@ public abstract class AbstractManageCandidateIdentitiesJspBean <S, T> extends MV
         // PAGINATOR
         LocalizedPaginator<S> paginator = new LocalizedPaginator<>( list, _nItemsPerPage, strUrl, PARAMETER_PAGE_INDEX, _strCurrentPageIndex, getLocale(  ) );
 
-        Map<String, Object> model = getModel(  );
+        Map<String, Object> model = getModel( );
 
         model.put( MARK_NB_ITEMS_PER_PAGE, String.valueOf( _nItemsPerPage ) );
         model.put( MARK_PAGINATOR, paginator );
@@ -98,13 +99,11 @@ public abstract class AbstractManageCandidateIdentitiesJspBean <S, T> extends MV
     
     /**
      * Get Items from Ids list
-     * @param <T>
-     *
+     * 
      * @param <S> the generic type of the Ids
      * @param <T> the generic type of the items
-     * @param <S>
      * @param listIds
      * @return the populated list of items corresponding to the id List
      */
-     abstract  List<T> getItemsFromIds ( List<S> listIds ) ;
+    abstract  List<T> getItemsFromIds ( List<S> listIds ) ;
 }

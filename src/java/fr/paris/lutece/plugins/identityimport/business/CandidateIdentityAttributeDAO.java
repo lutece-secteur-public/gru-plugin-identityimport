@@ -32,7 +32,6 @@
  * License 1.0
  */
 
-
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -50,13 +49,13 @@ import java.util.Optional;
 public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAttributeDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id_candidate_identity_attribute, key, value, cert_process, cert_date FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_candidate_identity_attribute ( key, value, cert_process, cert_date ) VALUES ( ?, ?, ?, ? ) ";
+	private static final String SQL_QUERY_SELECT = "SELECT id_candidate_identity_attribute, id_candidate_identity, code, value, cert_process, cert_date FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute = ?";
+	private static final String SQL_QUERY_SELECT_ALL = "SELECT id_candidate_identity_attribute, id_candidate_identity, code, value, cert_process, cert_date FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_candidate_identity_attribute ( id_candidate_identity, code, value, cert_process, cert_date ) VALUES ( ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity_attribute SET id_candidate_identity_attribute = ?, key = ?, value = ?, cert_process = ?, cert_date = ? WHERE id_candidate_identity_attribute = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_candidate_identity_attribute, key, value, cert_process, cert_date FROM identityimport_candidate_identity_attribute";
-    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_candidate_identity_attribute FROM identityimport_candidate_identity_attribute";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_candidate_identity_attribute, key, value, cert_process, cert_date FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute IN (  ";
+    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity_attribute SET code = ?, value = ?, cert_process = ?, cert_date = ? WHERE id_candidate_identity_attribute = ?";
+    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_candidate_identity_attribute FROM identityimport_candidate_identity_attribute where id_candidate_identity = ? ";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_candidate_identity_attribute, id_candidate_identity, code, value, cert_process, cert_date FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute IN (  ";
 
     /**
      * {@inheritDoc }
@@ -64,21 +63,22 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
     @Override
     public void insert( CandidateIdentityAttribute candidateIdentityAttribute, Plugin plugin )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
             int nIndex = 1;
-            daoUtil.setString( nIndex++ , candidateIdentityAttribute.getKey( ) );
-            daoUtil.setString( nIndex++ , candidateIdentityAttribute.getValue( ) );
-            daoUtil.setString( nIndex++ , candidateIdentityAttribute.getCertProcess( ) );
-            daoUtil.setDate( nIndex++ , candidateIdentityAttribute.getCertDate( ) );
-            
+            daoUtil.setInt( nIndex++, candidateIdentityAttribute.getIdentityId( ) );
+            daoUtil.setString( nIndex++, candidateIdentityAttribute.getCode( ) );
+            daoUtil.setString( nIndex++, candidateIdentityAttribute.getValue( ) );
+            daoUtil.setString( nIndex++, candidateIdentityAttribute.getCertProcess( ) );
+            daoUtil.setDate( nIndex++, candidateIdentityAttribute.getCertDate( ) );
+
             daoUtil.executeUpdate( );
-            if ( daoUtil.nextGeneratedKey( ) ) 
+            if ( daoUtil.nextGeneratedKey( ) )
             {
                 candidateIdentityAttribute.setId( daoUtil.getGeneratedKeyInt( 1 ) );
             }
         }
-        
+
     }
 
     /**
@@ -87,25 +87,26 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
     @Override
     public Optional<CandidateIdentityAttribute> load( int nKey, Plugin plugin )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-	        daoUtil.setInt( 1 , nKey );
-	        daoUtil.executeQuery( );
-	        CandidateIdentityAttribute candidateIdentityAttribute = null;
-	
-	        if ( daoUtil.next( ) )
-	        {
-	            candidateIdentityAttribute = new CandidateIdentityAttribute();
-	            int nIndex = 1;
-	            
-	            candidateIdentityAttribute.setId( daoUtil.getInt( nIndex++ ) );
-			    candidateIdentityAttribute.setKey( daoUtil.getString( nIndex++ ) );
-			    candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
-			    candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex++ ) );
-			    candidateIdentityAttribute.setCertDate( daoUtil.getDate( nIndex ) );
-	        }
-	
-	        return Optional.ofNullable( candidateIdentityAttribute );
+            daoUtil.setInt( 1, nKey );
+            daoUtil.executeQuery( );
+            CandidateIdentityAttribute candidateIdentityAttribute = null;
+
+            if ( daoUtil.next( ) )
+            {
+                candidateIdentityAttribute = new CandidateIdentityAttribute( );
+                int nIndex = 1;
+
+                candidateIdentityAttribute.setId( daoUtil.getInt( nIndex++ ) );
+                candidateIdentityAttribute.setIdentityId( daoUtil.getInt( nIndex++ ) );
+                candidateIdentityAttribute.setCode( daoUtil.getString( nIndex++ ) );
+                candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
+                candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex++ ) );
+                candidateIdentityAttribute.setCertDate( daoUtil.getDate( nIndex ) );
+            }
+
+            return Optional.ofNullable( candidateIdentityAttribute );
         }
     }
 
@@ -115,10 +116,10 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
     @Override
     public void delete( int nKey, Plugin plugin )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
         {
-	        daoUtil.setInt( 1 , nKey );
-	        daoUtil.executeUpdate( );
+            daoUtil.setInt( 1, nKey );
+            daoUtil.executeUpdate( );
         }
     }
 
@@ -128,18 +129,18 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
     @Override
     public void store( CandidateIdentityAttribute candidateIdentityAttribute, Plugin plugin )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
         {
-	        int nIndex = 1;
-	        
-	        daoUtil.setInt( nIndex++ , candidateIdentityAttribute.getId( ) );
-            	daoUtil.setString( nIndex++ , candidateIdentityAttribute.getKey( ) );
-            	daoUtil.setString( nIndex++ , candidateIdentityAttribute.getValue( ) );
-            	daoUtil.setString( nIndex++ , candidateIdentityAttribute.getCertProcess( ) );
-            	daoUtil.setDate( nIndex++ , candidateIdentityAttribute.getCertDate( ) );
-	        daoUtil.setInt( nIndex , candidateIdentityAttribute.getId( ) );
-	
-	        daoUtil.executeUpdate( );
+            int nIndex = 1;
+
+            daoUtil.setInt( nIndex++, candidateIdentityAttribute.getIdentityId( ) );
+            daoUtil.setString( nIndex++, candidateIdentityAttribute.getCode( ) );
+            daoUtil.setString( nIndex++, candidateIdentityAttribute.getValue( ) );
+            daoUtil.setString( nIndex++, candidateIdentityAttribute.getCertProcess( ) );
+            daoUtil.setDate( nIndex++, candidateIdentityAttribute.getCertDate( ) );
+            daoUtil.setInt( nIndex, candidateIdentityAttribute.getId( ) );
+
+            daoUtil.executeUpdate( );
         }
     }
 
@@ -147,117 +148,103 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
      * {@inheritDoc }
      */
     @Override
-    public List<CandidateIdentityAttribute> selectCandidateIdentityAttributesList( Plugin plugin )
+    public List<CandidateIdentityAttribute> selectCandidateIdentityAttributesList( int idIdentity, Plugin plugin )
     {
-        List<CandidateIdentityAttribute> candidateIdentityAttributeList = new ArrayList<>(  );
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
+        List<CandidateIdentityAttribute> candidateIdentityAttributeList = new ArrayList<>( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL, plugin ) )
         {
-	        daoUtil.executeQuery(  );
-	
-	        while ( daoUtil.next(  ) )
-	        {
-	            CandidateIdentityAttribute candidateIdentityAttribute = new CandidateIdentityAttribute(  );
-	            int nIndex = 1;
-	            
-	            candidateIdentityAttribute.setId( daoUtil.getInt( nIndex++ ) );
-			    candidateIdentityAttribute.setKey( daoUtil.getString( nIndex++ ) );
-			    candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
-			    candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex++ ) );
-			    candidateIdentityAttribute.setCertDate( daoUtil.getDate( nIndex ) );
-	
-	            candidateIdentityAttributeList.add( candidateIdentityAttribute );
-	        }
-	
-	        return candidateIdentityAttributeList;
+        	daoUtil.setInt( 1, idIdentity);
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+            	CandidateIdentityAttribute candidateIdentityAttribute = new CandidateIdentityAttribute( );
+                int nIndex = 1;
+
+                candidateIdentityAttribute.setId( daoUtil.getInt( nIndex++ ) );
+                candidateIdentityAttribute.setIdentityId( daoUtil.getInt( nIndex++ ) );
+                candidateIdentityAttribute.setCode( daoUtil.getString( nIndex++ ) );
+                candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
+                candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex++ ) );
+                candidateIdentityAttribute.setCertDate( daoUtil.getDate( nIndex ) );
+
+                candidateIdentityAttributeList.add( candidateIdentityAttribute );
+            }
+
+            return candidateIdentityAttributeList;
         }
     }
+
     
     /**
      * {@inheritDoc }
      */
     @Override
-    public List<Integer> selectIdCandidateIdentityAttributesList( Plugin plugin )
+    public List<Integer> selectIdCandidateIdentityAttributesList( int idIdentity, Plugin plugin )
     {
         List<Integer> candidateIdentityAttributeList = new ArrayList<>( );
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
         {
-	        daoUtil.executeQuery(  );
-	
-	        while ( daoUtil.next(  ) )
-	        {
-	            candidateIdentityAttributeList.add( daoUtil.getInt( 1 ) );
-	        }
-	
-	        return candidateIdentityAttributeList;
+        	daoUtil.setInt( 0, idIdentity);
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                candidateIdentityAttributeList.add( daoUtil.getInt( 1 ) );
+            }
+
+            return candidateIdentityAttributeList;
         }
     }
-    
+
     /**
      * {@inheritDoc }
      */
     @Override
-    public ReferenceList selectCandidateIdentityAttributesReferenceList( Plugin plugin )
+    public List<CandidateIdentityAttribute> selectCandidateIdentityAttributesListByIds( Plugin plugin, List<Integer> listIds )
     {
-        ReferenceList candidateIdentityAttributeList = new ReferenceList();
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
-        {
-	        daoUtil.executeQuery(  );
-	
-	        while ( daoUtil.next(  ) )
-	        {
-	            candidateIdentityAttributeList.addItem( daoUtil.getInt( 1 ) , daoUtil.getString( 2 ) );
-	        }
-	
-	        return candidateIdentityAttributeList;
-    	}
-    }
-    
-    /**
-     * {@inheritDoc }
-     */
-	@Override
-	public List<CandidateIdentityAttribute> selectCandidateIdentityAttributesListByIds( Plugin plugin, List<Integer> listIds ) {
-		List<CandidateIdentityAttribute> candidateIdentityAttributeList = new ArrayList<>(  );
-		
-		StringBuilder builder = new StringBuilder( );
+        List<CandidateIdentityAttribute> candidateIdentityAttributeList = new ArrayList<>( );
 
-		if ( !listIds.isEmpty( ) )
-		{
-			for( int i = 0 ; i < listIds.size(); i++ ) {
-			    builder.append( "?," );
-			}
-	
-			String placeHolders =  builder.deleteCharAt( builder.length( ) -1 ).toString( );
-			String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ")";
-			
-			
-	        try ( DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
-	        {
-	        	int index = 1;
-				for( Integer n : listIds ) {
-					daoUtil.setInt(  index++, n ); 
-				}
-	        	
-	        	daoUtil.executeQuery(  );
-	        	while ( daoUtil.next(  ) )
-		        {
-		        	CandidateIdentityAttribute candidateIdentityAttribute = new CandidateIdentityAttribute(  );
-		            int nIndex = 1;
-		            
-		            candidateIdentityAttribute.setId( daoUtil.getInt( nIndex++ ) );
-				    candidateIdentityAttribute.setKey( daoUtil.getString( nIndex++ ) );
-				    candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
-				    candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex++ ) );
-				    candidateIdentityAttribute.setCertDate( daoUtil.getDate( nIndex ) );
-		            
-		            candidateIdentityAttributeList.add( candidateIdentityAttribute );
-		        }
-		
-		        daoUtil.free( );
-		        
-	        }
-	    }
-		return candidateIdentityAttributeList;
-		
-	}
+        StringBuilder builder = new StringBuilder( );
+
+        if ( !listIds.isEmpty( ) )
+        {
+            for ( int i = 0; i < listIds.size( ); i++ )
+            {
+                builder.append( "?," );
+            }
+
+            String placeHolders = builder.deleteCharAt( builder.length( ) - 1 ).toString( );
+            String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ")";
+
+            try ( DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
+            {
+                int index = 1;
+                for ( Integer n : listIds )
+                {
+                    daoUtil.setInt( index++, n );
+                }
+
+                daoUtil.executeQuery( );
+                while ( daoUtil.next( ) )
+                {
+                    CandidateIdentityAttribute candidateIdentityAttribute = new CandidateIdentityAttribute( );
+                    int nIndex = 1;
+
+                    candidateIdentityAttribute.setId( daoUtil.getInt( nIndex++ ) );
+                    candidateIdentityAttribute.setCode( daoUtil.getString( nIndex++ ) );
+                    candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
+                    candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex++ ) );
+                    candidateIdentityAttribute.setCertDate( daoUtil.getDate( nIndex ) );
+
+                    candidateIdentityAttributeList.add( candidateIdentityAttribute );
+                }
+
+                daoUtil.free( );
+
+            }
+        }
+        return candidateIdentityAttributeList;
+
+    }
 }

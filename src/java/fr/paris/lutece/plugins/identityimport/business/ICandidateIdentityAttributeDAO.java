@@ -31,7 +31,7 @@
  *
  * License 1.0
  */
- 
+
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -46,22 +46,31 @@ public interface ICandidateIdentityAttributeDAO
 {
     /**
      * Insert a new record in the table.
-     * @param candidateIdentityAttribute instance of the CandidateIdentityAttribute object to insert
-     * @param plugin the Plugin
+     * 
+     * @param candidateIdentityAttribute
+     *            instance of the CandidateIdentityAttribute object to insert
+     * @param plugin
+     *            the Plugin
      */
     void insert( CandidateIdentityAttribute candidateIdentityAttribute, Plugin plugin );
 
     /**
      * Update the record in the table
-     * @param candidateIdentityAttribute the reference of the CandidateIdentityAttribute
-     * @param plugin the Plugin
+     * 
+     * @param candidateIdentityAttribute
+     *            the reference of the CandidateIdentityAttribute
+     * @param plugin
+     *            the Plugin
      */
     void store( CandidateIdentityAttribute candidateIdentityAttribute, Plugin plugin );
 
     /**
      * Delete a record from the table
-     * @param nKey The identifier of the CandidateIdentityAttribute to delete
-     * @param plugin the Plugin
+     * 
+     * @param nKey
+     *            The identifier of the CandidateIdentityAttribute to delete
+     * @param plugin
+     *            the Plugin
      */
     void delete( int nKey, Plugin plugin );
 
@@ -70,38 +79,43 @@ public interface ICandidateIdentityAttributeDAO
 
     /**
      * Load the data from the table
-     * @param nKey The identifier of the candidateIdentityAttribute
-     * @param plugin the Plugin
+     * 
+     * @param nKey
+     *            The identifier of the candidateIdentityAttribute
+     * @param plugin
+     *            the Plugin
      * @return The instance of the candidateIdentityAttribute
      */
     Optional<CandidateIdentityAttribute> load( int nKey, Plugin plugin );
 
     /**
-     * Load the data of all the candidateIdentityAttribute objects and returns them as a list
-     * @param plugin the Plugin
-     * @return The list which contains the data of all the candidateIdentityAttribute objects
-     */
-    List<CandidateIdentityAttribute> selectCandidateIdentityAttributesList( Plugin plugin );
-    
-    /**
      * Load the id of all the candidateIdentityAttribute objects and returns them as a list
-     * @param plugin the Plugin
+     * 
+     * @param plugin
+     *            the Plugin
      * @return The list which contains the id of all the candidateIdentityAttribute objects
      */
-    List<Integer> selectIdCandidateIdentityAttributesList( Plugin plugin );
-    
+    List<Integer> selectIdCandidateIdentityAttributesList( int idIdentity, Plugin plugin );
+
+
     /**
-     * Load the data of all the candidateIdentityAttribute objects and returns them as a referenceList
-     * @param plugin the Plugin
-     * @return The referenceList which contains the data of all the candidateIdentityAttribute objects
+     * Load  all the candidateIdentityAttribute objects and returns them as a list
+     * 
+     * @param plugin
+     *            the Plugin
+     * @return The list which contains  the candidateIdentityAttribute objects
      */
-    ReferenceList selectCandidateIdentityAttributesReferenceList( Plugin plugin );
+    List<CandidateIdentityAttribute> selectCandidateIdentityAttributesList( int idIdentity, Plugin plugin );
+
     
     /**
      * Load the data of all the avant objects and returns them as a list
-     * @param plugin the Plugin
-     * @param listIds liste of ids
+     * 
+     * @param plugin
+     *            the Plugin
+     * @param listIds
+     *            liste of ids
      * @return The list which contains the data of all the avant objects
      */
-	List<CandidateIdentityAttribute> selectCandidateIdentityAttributesListByIds( Plugin _plugin, List<Integer> listIds );
+    List<CandidateIdentityAttribute> selectCandidateIdentityAttributesListByIds( Plugin _plugin, List<Integer> listIds );
 }

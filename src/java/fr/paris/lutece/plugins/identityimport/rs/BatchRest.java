@@ -64,10 +64,12 @@ import javax.ws.rs.core.Response;
 public class BatchRest
 {
     private static final int VERSION_1 = 1;
-    
+
     /**
      * Get Batch List
-     * @param nVersion the API version
+     * 
+     * @param nVersion
+     *            the API version
      * @return the Batch List
      */
     @GET
@@ -81,64 +83,67 @@ public class BatchRest
         }
         AppLogService.error( Constants.ERROR_NOT_FOUND_VERSION );
         return Response.status( Response.Status.NOT_FOUND )
-                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_VERSION ) ) )
-                .build( );
+                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_VERSION ) ) ).build( );
     }
-    
+
     /**
      * Get Batch List V1
+     * 
      * @return the Batch List for the version 1
      */
     private Response getBatchListV1( )
     {
         List<Batch> listBatchs = BatchHome.getBatchsList( );
-        
+
         if ( listBatchs.isEmpty( ) )
         {
-            return Response.status( Response.Status.NO_CONTENT )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( Constants.EMPTY_OBJECT ) ) )
-                .build( );
+            return Response.status( Response.Status.NO_CONTENT ).entity( JsonUtil.buildJsonResponse( new JsonResponse( Constants.EMPTY_OBJECT ) ) ).build( );
         }
-        return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( listBatchs ) ) )
-                .build( );
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( listBatchs ) ) ).build( );
     }
-    
+
     /**
      * Create Batch
-     * @param nVersion the API version
-     * @param date the date
-     * @param user the user
-     * @param app_code the app_code
-     * @param comment the comment
+     * 
+     * @param nVersion
+     *            the API version
+     * @param date
+     *            the date
+     * @param user
+     *            the user
+     * @param app_code
+     *            the app_code
+     * @param comment
+     *            the comment
      * @return the Batch if created
      */
     @POST
     @Path( StringUtils.EMPTY )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response createBatch(
-    @FormParam( Constants.BATCH_ATTRIBUTE_DATE ) String date,
-    @FormParam( Constants.BATCH_ATTRIBUTE_USER ) String user,
-    @FormParam( Constants.BATCH_ATTRIBUTE_APP_CODE ) String app_code,
-    @FormParam( Constants.BATCH_ATTRIBUTE_COMMENT ) String comment,
-    @PathParam( Constants.VERSION ) Integer nVersion )
+    public Response createBatch( @FormParam( Constants.BATCH_ATTRIBUTE_DATE ) String date, @FormParam( Constants.BATCH_ATTRIBUTE_USER ) String user,
+            @FormParam( Constants.BATCH_ATTRIBUTE_APP_CODE ) String app_code, @FormParam( Constants.BATCH_ATTRIBUTE_COMMENT ) String comment,
+            @PathParam( Constants.VERSION ) Integer nVersion )
     {
-		if ( nVersion == VERSION_1 )
-		{
-		    return createBatchV1( date, user, app_code, comment );
-		}
+        if ( nVersion == VERSION_1 )
+        {
+            return createBatchV1( date, user, app_code, comment );
+        }
         AppLogService.error( Constants.ERROR_NOT_FOUND_VERSION );
         return Response.status( Response.Status.NOT_FOUND )
-                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_VERSION ) ) )
-                .build( );
+                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_VERSION ) ) ).build( );
     }
-    
+
     /**
      * Create Batch V1
-     * @param date the date
-     * @param user the user
-     * @param app_code the app_code
-     * @param comment the comment
+     * 
+     * @param date
+     *            the date
+     * @param user
+     *            the user
+     * @param app_code
+     *            the app_code
+     * @param comment
+     *            the comment
      * @return the Batch if created for the version 1
      */
     private Response createBatchV1( String date, String user, String app_code, String comment )
@@ -147,42 +152,44 @@ public class BatchRest
         {
             AppLogService.error( Constants.ERROR_BAD_REQUEST_EMPTY_PARAMETER );
             return Response.status( Response.Status.BAD_REQUEST )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), Constants.ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
+                    .entity( JsonUtil
+                            .buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), Constants.ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
                     .build( );
         }
-        
+
         Batch batch = new Batch( );
-	    batch.setDate( Date.valueOf( date ) );
-    	batch.setUser( user );
-    	batch.setAppCode( app_code );
-    	batch.setComment( comment );
+        batch.setDate( Date.valueOf( date ) );
+        batch.setUser( user );
+        batch.setAppCode( app_code );
+        batch.setComment( comment );
         BatchHome.create( batch );
-        
-        return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( batch ) ) )
-                .build( );
+
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( batch ) ) ).build( );
     }
-    
+
     /**
      * Modify Batch
-     * @param nVersion the API version
-     * @param id the id
-     * @param date the date
-     * @param user the user
-     * @param app_code the app_code
-     * @param comment the comment
+     * 
+     * @param nVersion
+     *            the API version
+     * @param id
+     *            the id
+     * @param date
+     *            the date
+     * @param user
+     *            the user
+     * @param app_code
+     *            the app_code
+     * @param comment
+     *            the comment
      * @return the Batch if modified
      */
     @PUT
     @Path( Constants.ID_PATH )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response modifyBatch(
-    @PathParam( Constants.ID ) Integer id,
-    @FormParam( Constants.BATCH_ATTRIBUTE_DATE ) String date,
-    @FormParam( Constants.BATCH_ATTRIBUTE_USER ) String user,
-    @FormParam( Constants.BATCH_ATTRIBUTE_APP_CODE ) String app_code,
-    @FormParam( Constants.BATCH_ATTRIBUTE_COMMENT ) String comment,
-    @PathParam( Constants.VERSION ) Integer nVersion )
+    public Response modifyBatch( @PathParam( Constants.ID ) Integer id, @FormParam( Constants.BATCH_ATTRIBUTE_DATE ) String date,
+            @FormParam( Constants.BATCH_ATTRIBUTE_USER ) String user, @FormParam( Constants.BATCH_ATTRIBUTE_APP_CODE ) String app_code,
+            @FormParam( Constants.BATCH_ATTRIBUTE_COMMENT ) String comment, @PathParam( Constants.VERSION ) Integer nVersion )
     {
         if ( nVersion == VERSION_1 )
         {
@@ -190,17 +197,22 @@ public class BatchRest
         }
         AppLogService.error( Constants.ERROR_NOT_FOUND_VERSION );
         return Response.status( Response.Status.NOT_FOUND )
-                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_VERSION ) ) )
-                .build( );
+                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_VERSION ) ) ).build( );
     }
-    
+
     /**
      * Modify Batch V1
-     * @param id the id
-     * @param date the date
-     * @param user the user
-     * @param app_code the app_code
-     * @param comment the comment
+     * 
+     * @param id
+     *            the id
+     * @param date
+     *            the date
+     * @param user
+     *            the user
+     * @param app_code
+     *            the app_code
+     * @param comment
+     *            the comment
      * @return the Batch if modified for the version 1
      */
     private Response modifyBatchV1( Integer id, String date, String user, String app_code, String comment )
@@ -209,10 +221,11 @@ public class BatchRest
         {
             AppLogService.error( Constants.ERROR_BAD_REQUEST_EMPTY_PARAMETER );
             return Response.status( Response.Status.BAD_REQUEST )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), Constants.ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
+                    .entity( JsonUtil
+                            .buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), Constants.ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
                     .build( );
         }
-        
+
         Optional<Batch> optBatch = BatchHome.findByPrimaryKey( id );
         if ( !optBatch.isPresent( ) )
         {
@@ -223,31 +236,30 @@ public class BatchRest
         }
         else
         {
-        	Batch batch = optBatch.get( );
-		    batch.setDate( Date.valueOf( date ) );
-	    	batch.setUser( user );
-	    	batch.setAppCode( app_code );
-	    	batch.setComment( comment );
-	        BatchHome.update( batch );
-	        
-	        return Response.status( Response.Status.OK )
-	                .entity( JsonUtil.buildJsonResponse( new JsonResponse( batch ) ) )
-	                .build( );
+            Batch batch = optBatch.get( );
+            batch.setDate( Date.valueOf( date ) );
+            batch.setUser( user );
+            batch.setAppCode( app_code );
+            batch.setComment( comment );
+            BatchHome.update( batch );
+
+            return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( batch ) ) ).build( );
         }
     }
-    
+
     /**
      * Delete Batch
-     * @param nVersion the API version
-     * @param id the id
+     * 
+     * @param nVersion
+     *            the API version
+     * @param id
+     *            the id
      * @return the Batch List if deleted
      */
     @DELETE
     @Path( Constants.ID_PATH )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response deleteBatch(
-    @PathParam( Constants.VERSION ) Integer nVersion,
-    @PathParam( Constants.ID ) Integer id )
+    public Response deleteBatch( @PathParam( Constants.VERSION ) Integer nVersion, @PathParam( Constants.ID ) Integer id )
     {
         if ( nVersion == VERSION_1 )
         {
@@ -255,13 +267,14 @@ public class BatchRest
         }
         AppLogService.error( Constants.ERROR_NOT_FOUND_VERSION );
         return Response.status( Response.Status.NOT_FOUND )
-                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_VERSION ) ) )
-                .build( );
+                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_VERSION ) ) ).build( );
     }
-    
+
     /**
      * Delete Batch V1
-     * @param id the id
+     * 
+     * @param id
+     *            the id
      * @return the Batch List if deleted for the version 1
      */
     private Response deleteBatchV1( Integer id )
@@ -274,26 +287,25 @@ public class BatchRest
                     .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_RESOURCE ) ) )
                     .build( );
         }
-        
+
         BatchHome.remove( id );
-        
-        return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( Constants.EMPTY_OBJECT ) ) )
-                .build( );
+
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( Constants.EMPTY_OBJECT ) ) ).build( );
     }
-    
+
     /**
      * Get Batch
-     * @param nVersion the API version
-     * @param id the id
+     * 
+     * @param nVersion
+     *            the API version
+     * @param id
+     *            the id
      * @return the Batch
      */
     @GET
     @Path( Constants.ID_PATH )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response getBatch(
-    @PathParam( Constants.VERSION ) Integer nVersion,
-    @PathParam( Constants.ID ) Integer id )
+    public Response getBatch( @PathParam( Constants.VERSION ) Integer nVersion, @PathParam( Constants.ID ) Integer id )
     {
         if ( nVersion == VERSION_1 )
         {
@@ -301,13 +313,14 @@ public class BatchRest
         }
         AppLogService.error( Constants.ERROR_NOT_FOUND_VERSION );
         return Response.status( Response.Status.NOT_FOUND )
-                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_VERSION ) ) )
-                .build( );
+                .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_VERSION ) ) ).build( );
     }
-    
+
     /**
      * Get Batch V1
-     * @param id the id
+     * 
+     * @param id
+     *            the id
      * @return the Batch for the version 1
      */
     private Response getBatchV1( Integer id )
@@ -320,9 +333,7 @@ public class BatchRest
                     .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_RESOURCE ) ) )
                     .build( );
         }
-        
-        return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( optBatch.get( ) ) ) )
-                .build( );
+
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( optBatch.get( ) ) ) ).build( );
     }
 }

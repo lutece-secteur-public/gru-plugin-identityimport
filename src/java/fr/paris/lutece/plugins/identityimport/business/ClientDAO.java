@@ -32,7 +32,6 @@
  * License 1.0
  */
 
-
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -64,20 +63,20 @@ public final class ClientDAO implements IClientDAO
     @Override
     public void insert( Client client, Plugin plugin )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
             int nIndex = 1;
-            daoUtil.setString( nIndex++ , client.getName( ) );
-            daoUtil.setString( nIndex++ , client.getAppCode( ) );
-            daoUtil.setString( nIndex++ , client.getToken( ) );
-            
+            daoUtil.setString( nIndex++, client.getName( ) );
+            daoUtil.setString( nIndex++, client.getAppCode( ) );
+            daoUtil.setString( nIndex++, client.getToken( ) );
+
             daoUtil.executeUpdate( );
-            if ( daoUtil.nextGeneratedKey( ) ) 
+            if ( daoUtil.nextGeneratedKey( ) )
             {
                 client.setId( daoUtil.getGeneratedKeyInt( 1 ) );
             }
         }
-        
+
     }
 
     /**
@@ -86,24 +85,24 @@ public final class ClientDAO implements IClientDAO
     @Override
     public Optional<Client> load( int nKey, Plugin plugin )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-	        daoUtil.setInt( 1 , nKey );
-	        daoUtil.executeQuery( );
-	        Client client = null;
-	
-	        if ( daoUtil.next( ) )
-	        {
-	            client = new Client();
-	            int nIndex = 1;
-	            
-	            client.setId( daoUtil.getInt( nIndex++ ) );
-			    client.setName( daoUtil.getString( nIndex++ ) );
-			    client.setAppCode( daoUtil.getString( nIndex++ ) );
-			    client.setToken( daoUtil.getString( nIndex ) );
-	        }
-	
-	        return Optional.ofNullable( client );
+            daoUtil.setInt( 1, nKey );
+            daoUtil.executeQuery( );
+            Client client = null;
+
+            if ( daoUtil.next( ) )
+            {
+                client = new Client( );
+                int nIndex = 1;
+
+                client.setId( daoUtil.getInt( nIndex++ ) );
+                client.setName( daoUtil.getString( nIndex++ ) );
+                client.setAppCode( daoUtil.getString( nIndex++ ) );
+                client.setToken( daoUtil.getString( nIndex ) );
+            }
+
+            return Optional.ofNullable( client );
         }
     }
 
@@ -113,10 +112,10 @@ public final class ClientDAO implements IClientDAO
     @Override
     public void delete( int nKey, Plugin plugin )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
         {
-	        daoUtil.setInt( 1 , nKey );
-	        daoUtil.executeUpdate( );
+            daoUtil.setInt( 1, nKey );
+            daoUtil.executeUpdate( );
         }
     }
 
@@ -126,17 +125,17 @@ public final class ClientDAO implements IClientDAO
     @Override
     public void store( Client client, Plugin plugin )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
         {
-	        int nIndex = 1;
-	        
-	        daoUtil.setInt( nIndex++ , client.getId( ) );
-            	daoUtil.setString( nIndex++ , client.getName( ) );
-            	daoUtil.setString( nIndex++ , client.getAppCode( ) );
-            	daoUtil.setString( nIndex++ , client.getToken( ) );
-	        daoUtil.setInt( nIndex , client.getId( ) );
-	
-	        daoUtil.executeUpdate( );
+            int nIndex = 1;
+
+            daoUtil.setInt( nIndex++, client.getId( ) );
+            daoUtil.setString( nIndex++, client.getName( ) );
+            daoUtil.setString( nIndex++, client.getAppCode( ) );
+            daoUtil.setString( nIndex++, client.getToken( ) );
+            daoUtil.setInt( nIndex, client.getId( ) );
+
+            daoUtil.executeUpdate( );
         }
     }
 
@@ -146,28 +145,28 @@ public final class ClientDAO implements IClientDAO
     @Override
     public List<Client> selectClientsList( Plugin plugin )
     {
-        List<Client> clientList = new ArrayList<>(  );
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
+        List<Client> clientList = new ArrayList<>( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-	        daoUtil.executeQuery(  );
-	
-	        while ( daoUtil.next(  ) )
-	        {
-	            Client client = new Client(  );
-	            int nIndex = 1;
-	            
-	            client.setId( daoUtil.getInt( nIndex++ ) );
-			    client.setName( daoUtil.getString( nIndex++ ) );
-			    client.setAppCode( daoUtil.getString( nIndex++ ) );
-			    client.setToken( daoUtil.getString( nIndex ) );
-	
-	            clientList.add( client );
-	        }
-	
-	        return clientList;
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                Client client = new Client( );
+                int nIndex = 1;
+
+                client.setId( daoUtil.getInt( nIndex++ ) );
+                client.setName( daoUtil.getString( nIndex++ ) );
+                client.setAppCode( daoUtil.getString( nIndex++ ) );
+                client.setToken( daoUtil.getString( nIndex ) );
+
+                clientList.add( client );
+            }
+
+            return clientList;
         }
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -175,84 +174,86 @@ public final class ClientDAO implements IClientDAO
     public List<Integer> selectIdClientsList( Plugin plugin )
     {
         List<Integer> clientList = new ArrayList<>( );
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
         {
-	        daoUtil.executeQuery(  );
-	
-	        while ( daoUtil.next(  ) )
-	        {
-	            clientList.add( daoUtil.getInt( 1 ) );
-	        }
-	
-	        return clientList;
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                clientList.add( daoUtil.getInt( 1 ) );
+            }
+
+            return clientList;
         }
     }
-    
+
     /**
      * {@inheritDoc }
      */
     @Override
     public ReferenceList selectClientsReferenceList( Plugin plugin )
     {
-        ReferenceList clientList = new ReferenceList();
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
+        ReferenceList clientList = new ReferenceList( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-	        daoUtil.executeQuery(  );
-	
-	        while ( daoUtil.next(  ) )
-	        {
-	            clientList.addItem( daoUtil.getInt( 1 ) , daoUtil.getString( 2 ) );
-	        }
-	
-	        return clientList;
-    	}
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                clientList.addItem( daoUtil.getInt( 1 ), daoUtil.getString( 2 ) );
+            }
+
+            return clientList;
+        }
     }
-    
+
     /**
      * {@inheritDoc }
      */
-	@Override
-	public List<Client> selectClientsListByIds( Plugin plugin, List<Integer> listIds ) {
-		List<Client> clientList = new ArrayList<>(  );
-		
-		StringBuilder builder = new StringBuilder( );
+    @Override
+    public List<Client> selectClientsListByIds( Plugin plugin, List<Integer> listIds )
+    {
+        List<Client> clientList = new ArrayList<>( );
 
-		if ( !listIds.isEmpty( ) )
-		{
-			for( int i = 0 ; i < listIds.size(); i++ ) {
-			    builder.append( "?," );
-			}
-	
-			String placeHolders =  builder.deleteCharAt( builder.length( ) -1 ).toString( );
-			String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ")";
-			
-			
-	        try ( DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
-	        {
-	        	int index = 1;
-				for( Integer n : listIds ) {
-					daoUtil.setInt(  index++, n ); 
-				}
-	        	
-	        	daoUtil.executeQuery(  );
-	        	while ( daoUtil.next(  ) )
-		        {
-		        	Client client = new Client(  );
-		            int nIndex = 1;
-		            
-		            client.setId( daoUtil.getInt( nIndex++ ) );
-				    client.setName( daoUtil.getString( nIndex++ ) );
-				    client.setAppCode( daoUtil.getString( nIndex++ ) );
-				    client.setToken( daoUtil.getString( nIndex ) );
-		            
-		            clientList.add( client );
-		        }
-		
-		        daoUtil.free( );
-		        
-	        }
-	    }
-		return clientList;
-		
-	}
+        StringBuilder builder = new StringBuilder( );
+
+        if ( !listIds.isEmpty( ) )
+        {
+            for ( int i = 0; i < listIds.size( ); i++ )
+            {
+                builder.append( "?," );
+            }
+
+            String placeHolders = builder.deleteCharAt( builder.length( ) - 1 ).toString( );
+            String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ")";
+
+            try ( DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
+            {
+                int index = 1;
+                for ( Integer n : listIds )
+                {
+                    daoUtil.setInt( index++, n );
+                }
+
+                daoUtil.executeQuery( );
+                while ( daoUtil.next( ) )
+                {
+                    Client client = new Client( );
+                    int nIndex = 1;
+
+                    client.setId( daoUtil.getInt( nIndex++ ) );
+                    client.setName( daoUtil.getString( nIndex++ ) );
+                    client.setAppCode( daoUtil.getString( nIndex++ ) );
+                    client.setToken( daoUtil.getString( nIndex ) );
+
+                    clientList.add( client );
+                }
+
+                daoUtil.free( );
+
+            }
+        }
+        return clientList;
+
+    }
 }

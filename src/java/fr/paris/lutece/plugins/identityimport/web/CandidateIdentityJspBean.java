@@ -31,15 +31,16 @@
  *
  * License 1.0
  */
- 	
- 
+
 package fr.paris.lutece.plugins.identityimport.web;
 
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.security.SecurityTokenService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.util.AppException;
+import fr.paris.lutece.portal.service.workflow.WorkflowService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
@@ -53,33 +54,47 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+
+import fr.paris.lutece.api.user.User;
+import fr.paris.lutece.plugins.identityimport.business.Batch;
+import fr.paris.lutece.plugins.identityimport.business.BatchHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentity;
+import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
+import fr.paris.lutece.plugins.identityimport.wf.WorkflowBean;
+import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
 
 /**
  * This class provides the user interface to manage CandidateIdentity features ( manage, create, modify, remove )
  */
-@Controller( controllerJsp = "ManageCandidateIdentitys.jsp", controllerPath = "jsp/admin/plugins/identityimport/", right = "IDENTITYIMPORT_CANDIDATE_IDENTITY_MANAGEMENT" )
-public class CandidateIdentityJspBean extends AbstractManageCandidateIdentitiesJspBean <Integer, CandidateIdentity>
+@Controller( controllerJsp = "ManageCandidateIdentities.jsp", controllerPath = "jsp/admin/plugins/identityimport/", right = "IDENTITYIMPORT_BATCH_MANAGEMENT" )
+public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBean<CandidateIdentity>>
 {
-    // Templates
-    private static final String TEMPLATE_MANAGE_CANDIDATEIDENTITYS = "/admin/plugins/identityimport/manage_candidateidentitys.html";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8102266671918797492L;
+	// Templates
+    private static final String TEMPLATE_MANAGE_CANDIDATEIDENTITIES = "/admin/plugins/identityimport/manage_candidateidentities.html";
     private static final String TEMPLATE_CREATE_CANDIDATEIDENTITY = "/admin/plugins/identityimport/create_candidateidentity.html";
     private static final String TEMPLATE_MODIFY_CANDIDATEIDENTITY = "/admin/plugins/identityimport/modify_candidateidentity.html";
+    private static final String TEMPLATE_IMPORT_CANDIDATEIDENTITY = "/admin/plugins/identityimport/import_candidateidentity.html";
 
     // Parameters
     private static final String PARAMETER_ID_CANDIDATEIDENTITY = "id";
+    private static final String PARAMETER_BATCH_ID = "batch_id";
 
     // Properties for page titles
-    private static final String PROPERTY_PAGE_TITLE_MANAGE_CANDIDATEIDENTITYS = "identityimport.manage_candidateidentitys.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MANAGE_CANDIDATEIDENTITIES = "identityimport.manage_candidateidentities.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_MODIFY_CANDIDATEIDENTITY = "identityimport.modify_candidateidentity.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_CREATE_CANDIDATEIDENTITY = "identityimport.create_candidateidentity.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_IMPORT_CANDIDATEIDENTITY = "identityimport.import_candidateidentity.pageTitle";
 
     // Markers
     private static final String MARK_CANDIDATEIDENTITY_LIST = "candidateidentity_list";
     private static final String MARK_CANDIDATEIDENTITY = "candidateidentity";
 
-    private static final String JSP_MANAGE_CANDIDATEIDENTITYS = "jsp/admin/plugins/identityimport/ManageCandidateIdentitys.jsp";
+    private static final String JSP_MANAGE_CANDIDATEIDENTITIES = "jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp";
 
     // Properties
     private static final String MESSAGE_CONFIRM_REMOVE_CANDIDATEIDENTITY = "identityimport.message.confirmRemoveCandidateIdentity";
@@ -88,84 +103,105 @@ public class CandidateIdentityJspBean extends AbstractManageCandidateIdentitiesJ
     private static final String VALIDATION_ATTRIBUTES_PREFIX = "identityimport.model.entity.candidateidentity.attribute.";
 
     // Views
-    private static final String VIEW_MANAGE_CANDIDATEIDENTITYS = "manageCandidateIdentitys";
+    private static final String VIEW_MANAGE_CANDIDATEIDENTITIES = "manageCandidateIdentities";
     private static final String VIEW_CREATE_CANDIDATEIDENTITY = "createCandidateIdentity";
     private static final String VIEW_MODIFY_CANDIDATEIDENTITY = "modifyCandidateIdentity";
+    private static final String VIEW_IMPORT_CANDIDATEIDENTITY = "importCandidateIdentity";
 
     // Actions
     private static final String ACTION_CREATE_CANDIDATEIDENTITY = "createCandidateIdentity";
     private static final String ACTION_MODIFY_CANDIDATEIDENTITY = "modifyCandidateIdentity";
     private static final String ACTION_REMOVE_CANDIDATEIDENTITY = "removeCandidateIdentity";
+    private static final String ACTION_IMPORT_CANDIDATEIDENTITY = "importCandidateIdentity";
     private static final String ACTION_CONFIRM_REMOVE_CANDIDATEIDENTITY = "confirmRemoveCandidateIdentity";
+	private static final String ACTION_PROCESS_WORKFLOW_ACTION = WorkflowBeanService.CONSTANT_PROCESS_WORKFLOW_ACTION;
 
     // Infos
     private static final String INFO_CANDIDATEIDENTITY_CREATED = "identityimport.info.candidateidentity.created";
     private static final String INFO_CANDIDATEIDENTITY_UPDATED = "identityimport.info.candidateidentity.updated";
     private static final String INFO_CANDIDATEIDENTITY_REMOVED = "identityimport.info.candidateidentity.removed";
-    
+    private static final String INFO_CANDIDATEIDENTITY_IMPORTED = "identityimport.info.candidateidentity.imported";
+
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
     
+    // Constants
+	private static final int WORKFLOW_KEY = 2; // todo: search in properties
+
+    // Workflow
+    private static final String CANDIDATEIDENTITY_WFBEANSERVICE = "identityimport.candidateidentity.wfbeanservice";
+
+    private WorkflowBeanService<CandidateIdentity> _wfBeanService = SpringContextService.getBean( CANDIDATEIDENTITY_WFBEANSERVICE );
+
     // Session variable to store working values
     private CandidateIdentity _candidateidentity;
-    private List<Integer> _listIdCandidateIdentitys;
+    WorkflowBean<CandidateIdentity> _wfBean;
     
+    private int _currentBatchId;
+    private List<Integer> _listIdCandidateIdentities;
+
     /**
      * Build the Manage View
-     * @param request The HTTP request
+     * 
+     * @param request
+     *            The HTTP request
      * @return The page
      */
-    @View( value = VIEW_MANAGE_CANDIDATEIDENTITYS, defaultView = true )
-    public String getManageCandidateIdentitys( HttpServletRequest request )
+    @View( value = VIEW_MANAGE_CANDIDATEIDENTITIES, defaultView = true )
+    public String getManageCandidateIdentities( HttpServletRequest request )
     {
         _candidateidentity = null;
-        
-        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX) == null || _listIdCandidateIdentitys.isEmpty( ) )
-        {
-        	_listIdCandidateIdentitys = CandidateIdentityHome.getIdCandidateIdentitysList(  );
-        }
-        
-        Map<String, Object> model = getPaginatedListModel( request, MARK_CANDIDATEIDENTITY_LIST, _listIdCandidateIdentitys, JSP_MANAGE_CANDIDATEIDENTITYS );
 
-        return getPage( PROPERTY_PAGE_TITLE_MANAGE_CANDIDATEIDENTITYS, TEMPLATE_MANAGE_CANDIDATEIDENTITYS, model );
+        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX ) == null || _listIdCandidateIdentities.isEmpty( ) )
+        {
+        	_currentBatchId = Integer.parseInt( request.getParameter( PARAMETER_BATCH_ID ) );
+            _listIdCandidateIdentities = CandidateIdentityHome.getIdCandidateIdentitiesList( _currentBatchId );
+        }
+
+        Map<String, Object> model = getPaginatedListModel( request, MARK_CANDIDATEIDENTITY_LIST, _listIdCandidateIdentities, JSP_MANAGE_CANDIDATEIDENTITIES );
+
+        return getPage( PROPERTY_PAGE_TITLE_MANAGE_CANDIDATEIDENTITIES, TEMPLATE_MANAGE_CANDIDATEIDENTITIES, model );
     }
 
-	/**
+    /**
      * Get Items from Ids list
+     * 
      * @param listIds
      * @return the populated list of items corresponding to the id List
      */
-	@Override
-	List<CandidateIdentity> getItemsFromIds( List<Integer> listIds ) 
-	{
-		List<CandidateIdentity> listCandidateIdentity = CandidateIdentityHome.getCandidateIdentitysListByIds( listIds );
-		
-		// keep original order
-        return listCandidateIdentity.stream()
-                 .sorted(Comparator.comparingInt( notif -> listIds.indexOf( notif.getId())))
-                 .collect(Collectors.toList());
-	}
-    
+    @Override
+    List<WorkflowBean<CandidateIdentity>> getItemsFromIds( List<Integer> listIds )
+    {
+        List<CandidateIdentity> listCandidateIdentity = CandidateIdentityHome.getCandidateIdentitiesListByIds( listIds );
+
+        // keep original order
+        return listCandidateIdentity.stream( )
+        		.sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) )
+        		.map( b -> _wfBeanService.createWorkflowBean( b, b.getId( ), b.getIdBatch( ), getUser( ) ) )
+        		.collect( Collectors.toList( ) );
+    }
+
     /**
-    * reset the _listIdCandidateIdentitys list
-    */
+     * reset the _listIdCandidateIdentities list
+     */
     public void resetListId( )
     {
-    	_listIdCandidateIdentitys = new ArrayList<>( );
+        _listIdCandidateIdentities = new ArrayList<>( );
     }
 
     /**
      * Returns the form to create a candidateidentity
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return the html code of the candidateidentity form
      */
     @View( VIEW_CREATE_CANDIDATEIDENTITY )
     public String getCreateCandidateIdentity( HttpServletRequest request )
     {
-        _candidateidentity = ( _candidateidentity != null ) ? _candidateidentity : new CandidateIdentity(  );
+        _candidateidentity = ( _candidateidentity != null ) ? _candidateidentity : new CandidateIdentity( );
 
-        Map<String, Object> model = getModel(  );
+        Map<String, Object> model = getModel( );
         model.put( MARK_CANDIDATEIDENTITY, _candidateidentity );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_CANDIDATEIDENTITY ) );
 
@@ -175,7 +211,8 @@ public class CandidateIdentityJspBean extends AbstractManageCandidateIdentitiesJ
     /**
      * Process the data capture form of a new candidateidentity
      *
-     * @param request The Http Request
+     * @param request
+     *            The Http Request
      * @return The Jsp URL of the process result
      * @throws AccessDeniedException
      */
@@ -183,11 +220,10 @@ public class CandidateIdentityJspBean extends AbstractManageCandidateIdentitiesJ
     public String doCreateCandidateIdentity( HttpServletRequest request ) throws AccessDeniedException
     {
         populate( _candidateidentity, request, getLocale( ) );
-        
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_CANDIDATEIDENTITY ) )
         {
-            throw new AccessDeniedException ( "Invalid security token" );
+            throw new AccessDeniedException( "Invalid security token" );
         }
 
         // Check constraints
@@ -197,17 +233,21 @@ public class CandidateIdentityJspBean extends AbstractManageCandidateIdentitiesJ
         }
 
         CandidateIdentityHome.create( _candidateidentity );
-        addInfo( INFO_CANDIDATEIDENTITY_CREATED, getLocale(  ) );
+        addInfo( INFO_CANDIDATEIDENTITY_CREATED, getLocale( ) );
         resetListId( );
 
-        return redirectView( request, VIEW_MANAGE_CANDIDATEIDENTITYS );
+        _wfBean = _wfBeanService.createWorkflowBean( _candidateidentity,
+        		_candidateidentity.getId( ), _candidateidentity.getIdBatch( ), getUser( ) );
+
+        
+        return redirect( request, VIEW_MANAGE_CANDIDATEIDENTITIES, PARAMETER_BATCH_ID, _candidateidentity.getIdBatch( ) );
     }
 
     /**
-     * Manages the removal form of a candidateidentity whose identifier is in the http
-     * request
+     * Manages the removal form of a candidateidentity whose identifier is in the http request
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return the html code to confirm
      */
     @Action( ACTION_CONFIRM_REMOVE_CANDIDATEIDENTITY )
@@ -217,7 +257,8 @@ public class CandidateIdentityJspBean extends AbstractManageCandidateIdentitiesJ
         UrlItem url = new UrlItem( getActionUrl( ACTION_REMOVE_CANDIDATEIDENTITY ) );
         url.addParameter( PARAMETER_ID_CANDIDATEIDENTITY, nId );
 
-        String strMessageUrl = AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_CANDIDATEIDENTITY, url.getUrl(  ), AdminMessage.TYPE_CONFIRMATION );
+        String strMessageUrl = AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_CANDIDATEIDENTITY, url.getUrl( ),
+                AdminMessage.TYPE_CONFIRMATION );
 
         return redirect( request, strMessageUrl );
     }
@@ -225,26 +266,30 @@ public class CandidateIdentityJspBean extends AbstractManageCandidateIdentitiesJ
     /**
      * Handles the removal form of a candidateidentity
      *
-     * @param request The Http request
-     * @return the jsp URL to display the form to manage candidateidentitys
+     * @param request
+     *            The Http request
+     * @return the jsp URL to display the form to manage candidateidentities
      */
     @Action( ACTION_REMOVE_CANDIDATEIDENTITY )
     public String doRemoveCandidateIdentity( HttpServletRequest request )
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
-        
-        
+
         CandidateIdentityHome.remove( nId );
-        addInfo( INFO_CANDIDATEIDENTITY_REMOVED, getLocale(  ) );
+        addInfo( INFO_CANDIDATEIDENTITY_REMOVED, getLocale( ) );
         resetListId( );
 
-        return redirectView( request, VIEW_MANAGE_CANDIDATEIDENTITYS );
+        _candidateidentity = null;
+        _wfBean = null;
+        
+        return redirectView( request, VIEW_MANAGE_CANDIDATEIDENTITIES );
     }
 
     /**
      * Returns the form to update info about a candidateidentity
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return The HTML form to update info
      */
     @View( VIEW_MODIFY_CANDIDATEIDENTITY )
@@ -252,15 +297,19 @@ public class CandidateIdentityJspBean extends AbstractManageCandidateIdentitiesJ
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
 
-        if ( _candidateidentity == null || ( _candidateidentity.getId(  ) != nId ) )
+        if ( _candidateidentity == null || ( _candidateidentity.getId( ) != nId ) )
         {
             Optional<CandidateIdentity> optCandidateIdentity = CandidateIdentityHome.findByPrimaryKey( nId );
-            _candidateidentity = optCandidateIdentity.orElseThrow( ( ) -> new AppException(ERROR_RESOURCE_NOT_FOUND ) );
+            _candidateidentity = optCandidateIdentity.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+            
+            _wfBean = _wfBeanService.createWorkflowBean( _candidateidentity, 
+            		_candidateidentity.getId( ), _candidateidentity.getIdBatch( ), getUser( ) );
         }
 
-
-        Map<String, Object> model = getModel(  );
-        model.put( MARK_CANDIDATEIDENTITY, _candidateidentity );
+        _wfBeanService.addHistory(_wfBean, request, getLocale( ) );
+        
+        Map<String, Object> model = getModel( );
+        model.put( MARK_CANDIDATEIDENTITY, _wfBean );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_CANDIDATEIDENTITY ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_CANDIDATEIDENTITY, TEMPLATE_MODIFY_CANDIDATEIDENTITY, model );
@@ -269,19 +318,19 @@ public class CandidateIdentityJspBean extends AbstractManageCandidateIdentitiesJ
     /**
      * Process the change form of a candidateidentity
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return The Jsp URL of the process result
      * @throws AccessDeniedException
      */
     @Action( ACTION_MODIFY_CANDIDATEIDENTITY )
     public String doModifyCandidateIdentity( HttpServletRequest request ) throws AccessDeniedException
-    {   
+    {
         populate( _candidateidentity, request, getLocale( ) );
-		
-		
+
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_MODIFY_CANDIDATEIDENTITY ) )
         {
-            throw new AccessDeniedException ( "Invalid security token" );
+            throw new AccessDeniedException( "Invalid security token" );
         }
 
         // Check constraints
@@ -291,9 +340,97 @@ public class CandidateIdentityJspBean extends AbstractManageCandidateIdentitiesJ
         }
 
         CandidateIdentityHome.update( _candidateidentity );
-        addInfo( INFO_CANDIDATEIDENTITY_UPDATED, getLocale(  ) );
+        addInfo( INFO_CANDIDATEIDENTITY_UPDATED, getLocale( ) );
         resetListId( );
 
-        return redirectView( request, VIEW_MANAGE_CANDIDATEIDENTITYS );
+        return redirect( request, VIEW_MANAGE_CANDIDATEIDENTITIES, PARAMETER_BATCH_ID, _candidateidentity.getIdBatch( ) );
+    }
+    
+    /**
+     * process a workflow action
+     *
+     * @param request
+     *            The Http request
+     * @return the jsp URL to display the form to manage batchs
+     */
+    @Action( ACTION_PROCESS_WORKFLOW_ACTION )
+    public String doProcessAction( HttpServletRequest request )
+    {
+    	int nResourceId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_RESOURCE_ID ) );
+		int nActionId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_ACTION_ID ) );
+		
+		// check and refresh resource if necessary
+    	if ( _candidateidentity == null || ( _candidateidentity.getId( ) != nResourceId ) )
+        {
+            Optional<CandidateIdentity> optIdentity = CandidateIdentityHome.findByPrimaryKey( nResourceId );
+            _candidateidentity = optIdentity.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+
+            _wfBean = _wfBeanService.createWorkflowBean( _candidateidentity, 
+            		_candidateidentity.getId( ), _candidateidentity.getIdBatch( ), getUser( ) );
+        }
+
+    	// Process the action, and redirect,
+    	// or redirect to the task form if exists
+    	
+    	if ( !_wfBeanService.existsTaskForm( nActionId, getLocale( ) ) ) 
+    	{
+    		// The task does not need a form
+    		_wfBeanService.processAction( _wfBean, nActionId, request, getLocale( ) );
+    		
+    		return redirect( request, VIEW_IMPORT_CANDIDATEIDENTITY, PARAMETER_ID_CANDIDATEIDENTITY, _wfBean.getResourceId( ) );
+    	}
+    	else if ( request.getParameter( WorkflowBeanService.PARAMETER_SUBMITTED_TASK_FORM ) == null )
+    	{
+    		// A task form should be displayed 
+    		return _wfBeanService.getTaskForm( _wfBean, nActionId, request, getLocale( ), JSP_MANAGE_CANDIDATEIDENTITIES );
+    	}
+    	else 
+    	{
+    		// The task form was submitted    		
+    		String errMsg = _wfBeanService.validateTaskForm( _wfBean, nActionId, request, getLocale( ) );
+    		if ( errMsg == null )
+    		{
+    			return redirect( request, VIEW_IMPORT_CANDIDATEIDENTITY, PARAMETER_ID_CANDIDATEIDENTITY, _wfBean.getResourceId( ) );
+    		}
+    		else
+    		{
+    			// error message
+    			return redirect ( request, errMsg );
+    		}	
+    	}
+    }
+    
+    /**
+     * Returns the form to update info about a candidateidentity
+     *
+     * @param request
+     *            The Http request
+     * @return The HTML form to update info
+     */
+    @View( VIEW_IMPORT_CANDIDATEIDENTITY )
+    public String getImportCandidateIdentity( HttpServletRequest request )
+    {
+        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
+
+        if ( _candidateidentity == null || ( _candidateidentity.getId( ) != nId ) )
+        {
+            Optional<CandidateIdentity> optCandidateIdentity = CandidateIdentityHome.findByPrimaryKey( nId );
+            _candidateidentity = optCandidateIdentity.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+            
+            _candidateidentity.setAttributes( CandidateIdentityAttributeHome.getCandidateIdentityAttributesList( nId ) );
+            
+            _wfBean =  _wfBeanService.createWorkflowBean( _candidateidentity,
+            		_candidateidentity.getId( ), _candidateidentity.getIdBatch( ), getUser( ) );
+            
+            
+        }
+
+        _wfBeanService.addHistory(_wfBean, request, getLocale( ) );
+
+        Map<String, Object> model = getModel( );
+        model.put( MARK_CANDIDATEIDENTITY, _wfBean );
+        model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_CANDIDATEIDENTITY ) );
+
+        return getPage( PROPERTY_PAGE_TITLE_IMPORT_CANDIDATEIDENTITY, TEMPLATE_IMPORT_CANDIDATEIDENTITY, model );
     }
 }

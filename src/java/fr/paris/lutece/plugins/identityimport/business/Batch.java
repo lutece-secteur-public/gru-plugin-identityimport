@@ -33,35 +33,42 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
-import javax.validation.constraints.Size;
-import org.hibernate.validator.constraints.NotEmpty;
 import java.io.Serializable;
 import java.sql.Date;
+
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import fr.paris.lutece.plugins.identityimport.wf.IResource;
+
 /**
  * This is the business class for the object Batch
- */ 
+ */
 public class Batch implements Serializable
 {
+
+    private static final String RESOURCE_TYPE = "IDENTITYIMPORT_BATCH_RESOURCE";
     private static final long serialVersionUID = 1L;
 
-    // Variables declarations 
+    // Variables declarations
     private int _nId;
     @NotNull( message = "#i18n{portal.validation.message.notEmpty}" )
     private Date _dateDate;
-    
+
     @NotEmpty( message = "#i18n{identityimport.validation.batch.User.notEmpty}" )
-    @Size( max = 255 , message = "#i18n{identityimport.validation.batch.User.size}" ) 
+    @Size( max = 255, message = "#i18n{identityimport.validation.batch.User.size}" )
     private String _strUser;
-    
+
     @NotEmpty( message = "#i18n{identityimport.validation.batch.AppCode.notEmpty}" )
-    @Size( max = 50 , message = "#i18n{identityimport.validation.batch.AppCode.size}" ) 
+    @Size( max = 50, message = "#i18n{identityimport.validation.batch.AppCode.size}" )
     private String _strAppCode;
-    
+
     private String _strComment;
 
     /**
      * Returns the Id
+     * 
      * @return The Id
      */
     public int getId( )
@@ -71,15 +78,18 @@ public class Batch implements Serializable
 
     /**
      * Sets the Id
-     * @param nId The Id
-     */ 
+     * 
+     * @param nId
+     *            The Id
+     */
     public void setId( int nId )
     {
         _nId = nId;
     }
-    
+
     /**
      * Returns the Date
+     * 
      * @return The Date
      */
     public Date getDate( )
@@ -89,16 +99,18 @@ public class Batch implements Serializable
 
     /**
      * Sets the Date
-     * @param dateDate The Date
-     */ 
+     * 
+     * @param dateDate
+     *            The Date
+     */
     public void setDate( Date dateDate )
     {
         _dateDate = dateDate;
     }
-    
-    
+
     /**
      * Returns the User
+     * 
      * @return The User
      */
     public String getUser( )
@@ -108,16 +120,18 @@ public class Batch implements Serializable
 
     /**
      * Sets the User
-     * @param strUser The User
-     */ 
+     * 
+     * @param strUser
+     *            The User
+     */
     public void setUser( String strUser )
     {
         _strUser = strUser;
     }
-    
-    
+
     /**
      * Returns the AppCode
+     * 
      * @return The AppCode
      */
     public String getAppCode( )
@@ -127,16 +141,18 @@ public class Batch implements Serializable
 
     /**
      * Sets the AppCode
-     * @param strAppCode The AppCode
-     */ 
+     * 
+     * @param strAppCode
+     *            The AppCode
+     */
     public void setAppCode( String strAppCode )
     {
         _strAppCode = strAppCode;
     }
-    
-    
+
     /**
      * Returns the Comment
+     * 
      * @return The Comment
      */
     public String getComment( )
@@ -146,11 +162,12 @@ public class Batch implements Serializable
 
     /**
      * Sets the Comment
-     * @param strComment The Comment
-     */ 
+     * 
+     * @param strComment
+     *            The Comment
+     */
     public void setComment( String strComment )
     {
         _strComment = strComment;
     }
-    
 }

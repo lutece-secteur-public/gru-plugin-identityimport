@@ -31,7 +31,7 @@
  *
  * License 1.0
  */
- 
+
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -46,22 +46,31 @@ public interface IBatchDAO
 {
     /**
      * Insert a new record in the table.
-     * @param batch instance of the Batch object to insert
-     * @param plugin the Plugin
+     * 
+     * @param batch
+     *            instance of the Batch object to insert
+     * @param plugin
+     *            the Plugin
      */
     void insert( Batch batch, Plugin plugin );
 
     /**
      * Update the record in the table
-     * @param batch the reference of the Batch
-     * @param plugin the Plugin
+     * 
+     * @param batch
+     *            the reference of the Batch
+     * @param plugin
+     *            the Plugin
      */
     void store( Batch batch, Plugin plugin );
 
     /**
      * Delete a record from the table
-     * @param nKey The identifier of the Batch to delete
-     * @param plugin the Plugin
+     * 
+     * @param nKey
+     *            The identifier of the Batch to delete
+     * @param plugin
+     *            the Plugin
      */
     void delete( int nKey, Plugin plugin );
 
@@ -70,38 +79,50 @@ public interface IBatchDAO
 
     /**
      * Load the data from the table
-     * @param nKey The identifier of the batch
-     * @param plugin the Plugin
+     * 
+     * @param nKey
+     *            The identifier of the batch
+     * @param plugin
+     *            the Plugin
      * @return The instance of the batch
      */
     Optional<Batch> load( int nKey, Plugin plugin );
 
     /**
      * Load the data of all the batch objects and returns them as a list
-     * @param plugin the Plugin
+     * 
+     * @param plugin
+     *            the Plugin
      * @return The list which contains the data of all the batch objects
      */
     List<Batch> selectBatchsList( Plugin plugin );
-    
+
     /**
      * Load the id of all the batch objects and returns them as a list
-     * @param plugin the Plugin
+     * 
+     * @param plugin
+     *            the Plugin
      * @return The list which contains the id of all the batch objects
      */
     List<Integer> selectIdBatchsList( Plugin plugin );
-    
+
     /**
      * Load the data of all the batch objects and returns them as a referenceList
-     * @param plugin the Plugin
+     * 
+     * @param plugin
+     *            the Plugin
      * @return The referenceList which contains the data of all the batch objects
      */
     ReferenceList selectBatchsReferenceList( Plugin plugin );
-    
+
     /**
      * Load the data of all the avant objects and returns them as a list
-     * @param plugin the Plugin
-     * @param listIds liste of ids
+     * 
+     * @param plugin
+     *            the Plugin
+     * @param listIds
+     *            liste of ids
      * @return The list which contains the data of all the avant objects
      */
-	List<Batch> selectBatchsListByIds( Plugin _plugin, List<Integer> listIds );
+    List<Batch> selectBatchsListByIds( Plugin _plugin, List<Integer> listIds );
 }

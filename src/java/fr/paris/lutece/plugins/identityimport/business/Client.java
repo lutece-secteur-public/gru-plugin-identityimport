@@ -36,28 +36,30 @@ package fr.paris.lutece.plugins.identityimport.business;
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
 import java.io.Serializable;
+
 /**
  * This is the business class for the object Client
- */ 
+ */
 public class Client implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    // Variables declarations 
+    // Variables declarations
     private int _nId;
-    
+
     @NotEmpty( message = "#i18n{identityimport.validation.client.Name.notEmpty}" )
-    @Size( max = 255 , message = "#i18n{identityimport.validation.client.Name.size}" ) 
+    @Size( max = 255, message = "#i18n{identityimport.validation.client.Name.size}" )
     private String _strName;
-    
+
     @NotEmpty( message = "#i18n{identityimport.validation.client.AppCode.notEmpty}" )
-    @Size( max = 50 , message = "#i18n{identityimport.validation.client.AppCode.size}" ) 
+    @Size( max = 50, message = "#i18n{identityimport.validation.client.AppCode.size}" )
     private String _strAppCode;
-    
+
     private String _strToken;
 
     /**
      * Returns the Id
+     * 
      * @return The Id
      */
     public int getId( )
@@ -67,15 +69,18 @@ public class Client implements Serializable
 
     /**
      * Sets the Id
-     * @param nId The Id
-     */ 
+     * 
+     * @param nId
+     *            The Id
+     */
     public void setId( int nId )
     {
         _nId = nId;
     }
-    
+
     /**
      * Returns the Name
+     * 
      * @return The Name
      */
     public String getName( )
@@ -85,16 +90,18 @@ public class Client implements Serializable
 
     /**
      * Sets the Name
-     * @param strName The Name
-     */ 
+     * 
+     * @param strName
+     *            The Name
+     */
     public void setName( String strName )
     {
         _strName = strName;
     }
-    
-    
+
     /**
      * Returns the AppCode
+     * 
      * @return The AppCode
      */
     public String getAppCode( )
@@ -104,16 +111,18 @@ public class Client implements Serializable
 
     /**
      * Sets the AppCode
-     * @param strAppCode The AppCode
-     */ 
+     * 
+     * @param strAppCode
+     *            The AppCode
+     */
     public void setAppCode( String strAppCode )
     {
         _strAppCode = strAppCode;
     }
-    
-    
+
     /**
      * Returns the Token
+     * 
      * @return The Token
      */
     public String getToken( )
@@ -123,11 +132,13 @@ public class Client implements Serializable
 
     /**
      * Sets the Token
-     * @param strToken The Token
-     */ 
+     * 
+     * @param strToken
+     *            The Token
+     */
     public void setToken( String strToken )
     {
         _strToken = strToken;
     }
-    
+
 }

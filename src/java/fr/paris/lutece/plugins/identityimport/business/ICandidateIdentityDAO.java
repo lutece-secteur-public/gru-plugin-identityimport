@@ -31,7 +31,7 @@
  *
  * License 1.0
  */
- 
+
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -46,22 +46,31 @@ public interface ICandidateIdentityDAO
 {
     /**
      * Insert a new record in the table.
-     * @param candidateIdentity instance of the CandidateIdentity object to insert
-     * @param plugin the Plugin
+     * 
+     * @param candidateIdentity
+     *            instance of the CandidateIdentity object to insert
+     * @param plugin
+     *            the Plugin
      */
     void insert( CandidateIdentity candidateIdentity, Plugin plugin );
 
     /**
      * Update the record in the table
-     * @param candidateIdentity the reference of the CandidateIdentity
-     * @param plugin the Plugin
+     * 
+     * @param candidateIdentity
+     *            the reference of the CandidateIdentity
+     * @param plugin
+     *            the Plugin
      */
     void store( CandidateIdentity candidateIdentity, Plugin plugin );
 
     /**
      * Delete a record from the table
-     * @param nKey The identifier of the CandidateIdentity to delete
-     * @param plugin the Plugin
+     * 
+     * @param nKey
+     *            The identifier of the CandidateIdentity to delete
+     * @param plugin
+     *            the Plugin
      */
     void delete( int nKey, Plugin plugin );
 
@@ -70,38 +79,41 @@ public interface ICandidateIdentityDAO
 
     /**
      * Load the data from the table
-     * @param nKey The identifier of the candidateIdentity
-     * @param plugin the Plugin
+     * 
+     * @param nKey
+     *            The identifier of the candidateIdentity
+     * @param plugin
+     *            the Plugin
      * @return The instance of the candidateIdentity
      */
     Optional<CandidateIdentity> load( int nKey, Plugin plugin );
 
     /**
      * Load the data of all the candidateIdentity objects and returns them as a list
-     * @param plugin the Plugin
+     * 
+     * @param plugin
+     *            the Plugin
      * @return The list which contains the data of all the candidateIdentity objects
      */
-    List<CandidateIdentity> selectCandidateIdentitysList( Plugin plugin );
-    
+    List<CandidateIdentity> selectCandidateIdentitiesList( Plugin plugin );
+
     /**
      * Load the id of all the candidateIdentity objects and returns them as a list
-     * @param plugin the Plugin
+     * 
+     * @param plugin
+     *            the Plugin
      * @return The list which contains the id of all the candidateIdentity objects
      */
-    List<Integer> selectIdCandidateIdentitysList( Plugin plugin );
-    
-    /**
-     * Load the data of all the candidateIdentity objects and returns them as a referenceList
-     * @param plugin the Plugin
-     * @return The referenceList which contains the data of all the candidateIdentity objects
-     */
-    ReferenceList selectCandidateIdentitysReferenceList( Plugin plugin );
-    
+    List<Integer> selectIdCandidateIdentitiesList( int nBatchId, Plugin plugin );
+
     /**
      * Load the data of all the avant objects and returns them as a list
-     * @param plugin the Plugin
-     * @param listIds liste of ids
+     * 
+     * @param plugin
+     *            the Plugin
+     * @param listIds
+     *            liste of ids
      * @return The list which contains the data of all the avant objects
      */
-	List<CandidateIdentity> selectCandidateIdentitysListByIds( Plugin _plugin, List<Integer> listIds );
+    List<CandidateIdentity> selectCandidateIdentitiesListByIds( Plugin _plugin, List<Integer> listIds );
 }

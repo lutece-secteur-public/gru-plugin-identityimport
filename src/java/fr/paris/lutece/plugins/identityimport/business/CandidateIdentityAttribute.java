@@ -34,33 +34,38 @@
 package fr.paris.lutece.plugins.identityimport.business;
 
 import javax.validation.constraints.Size;
-import org.hibernate.validator.constraints.NotEmpty;
 import java.io.Serializable;
 import java.sql.Date;
+
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+
 /**
  * This is the business class for the object CandidateIdentityAttribute
- */ 
+ */
 public class CandidateIdentityAttribute implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    // Variables declarations 
+    // Variables declarations
     private int _nId;
     
+    private int _nIdIdentity;
+
     @NotEmpty( message = "#i18n{identityimport.validation.candidateidentityattribute.Key.notEmpty}" )
-    @Size( max = 255 , message = "#i18n{identityimport.validation.candidateidentityattribute.Key.size}" ) 
-    private String _strKey;
-    
+    @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentityattribute.Key.size}" )
+    private String _strCode;
+
     private String _strValue;
-    
-    @Size( max = 255 , message = "#i18n{identityimport.validation.candidateidentityattribute.CertProcess.size}" ) 
+
+    @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentityattribute.CertProcess.size}" )
     private String _strCertProcess;
     @NotNull( message = "#i18n{portal.validation.message.notEmpty}" )
     private Date _dateCertDate;
 
     /**
      * Returns the Id
+     * 
      * @return The Id
      */
     public int getId( )
@@ -70,34 +75,39 @@ public class CandidateIdentityAttribute implements Serializable
 
     /**
      * Sets the Id
-     * @param nId The Id
-     */ 
+     * 
+     * @param nId
+     *            The Id
+     */
     public void setId( int nId )
     {
         _nId = nId;
     }
-    
+
     /**
      * Returns the Key
+     * 
      * @return The Key
      */
-    public String getKey( )
+    public String getCode( )
     {
-        return _strKey;
+        return _strCode;
     }
 
     /**
      * Sets the Key
-     * @param strKey The Key
-     */ 
-    public void setKey( String strKey )
+     * 
+     * @param strKey
+     *            The Key
+     */
+    public void setCode( String strKey )
     {
-        _strKey = strKey;
+        _strCode = strKey;
     }
-    
-    
+
     /**
      * Returns the Value
+     * 
      * @return The Value
      */
     public String getValue( )
@@ -107,16 +117,18 @@ public class CandidateIdentityAttribute implements Serializable
 
     /**
      * Sets the Value
-     * @param strValue The Value
-     */ 
+     * 
+     * @param strValue
+     *            The Value
+     */
     public void setValue( String strValue )
     {
         _strValue = strValue;
     }
-    
-    
+
     /**
      * Returns the CertProcess
+     * 
      * @return The CertProcess
      */
     public String getCertProcess( )
@@ -126,16 +138,18 @@ public class CandidateIdentityAttribute implements Serializable
 
     /**
      * Sets the CertProcess
-     * @param strCertProcess The CertProcess
-     */ 
+     * 
+     * @param strCertProcess
+     *            The CertProcess
+     */
     public void setCertProcess( String strCertProcess )
     {
         _strCertProcess = strCertProcess;
     }
-    
-    
+
     /**
      * Returns the CertDate
+     * 
      * @return The CertDate
      */
     public Date getCertDate( )
@@ -145,11 +159,31 @@ public class CandidateIdentityAttribute implements Serializable
 
     /**
      * Sets the CertDate
-     * @param dateCertDate The CertDate
-     */ 
+     * 
+     * @param dateCertDate
+     *            The CertDate
+     */
     public void setCertDate( Date dateCertDate )
     {
         _dateCertDate = dateCertDate;
     }
-    
+
+    /**
+     * get identity id
+     * 
+     * @return the id
+     */
+	public int getIdentityId() {
+		return _nIdIdentity;
+	}
+
+	/**
+	 * set identity id
+	 * 
+	 * @param _nIdIdentity
+	 */
+	public void setIdentityId(int _nIdIdentity) {
+		this._nIdIdentity = _nIdIdentity;
+	}
+
 }

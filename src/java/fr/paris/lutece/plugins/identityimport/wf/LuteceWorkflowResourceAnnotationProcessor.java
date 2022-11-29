@@ -31,40 +31,49 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.identityimport.rs;
+package fr.paris.lutece.plugins.identityimport.wf;
 
-/**
- * Rest Constants
- */
-public final class Constants
+import java.util.Set;
+
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic.Kind;
+
+@SupportedAnnotationTypes( value = {
+        "*"
+} )
+@SupportedSourceVersion( SourceVersion.RELEASE_8 )
+public class LuteceWorkflowResourceAnnotationProcessor extends AbstractProcessor
 {
-    public static final String API_PATH = "identityimport/api";
-    public static final String VERSION_PATH = "/v{" + Constants.VERSION + "}";
-    public static final String ID_PATH = "/{" + Constants.ID + "}";
-    public static final String VERSION = "version";
-    public static final String ID = "id";
 
-    public static final String SWAGGER_DIRECTORY_PATH = "/plugins/";
-    public static final String SWAGGER_PATH = "/swagger";
-    public static final String SWAGGER_VERSION_PATH = "/v";
-    public static final String SWAGGER_REST_PATH = "rest/";
-    public static final String SWAGGER_JSON = "/swagger.json";
-
-    public static final String EMPTY_OBJECT = "{}";
-    public static final String ERROR_NOT_FOUND_VERSION = "Version not found";
-    public static final String ERROR_NOT_FOUND_RESOURCE = "Resource not found";
-    public static final String ERROR_BAD_REQUEST_EMPTY_PARAMETER = "Empty parameter";
-
-    public static final String BATCH_PATH = "/batchs";
-    public static final String BATCH_ATTRIBUTE_DATE = "date";
-    public static final String BATCH_ATTRIBUTE_USER = "user";
-    public static final String BATCH_ATTRIBUTE_APP_CODE = "app_code";
-    public static final String BATCH_ATTRIBUTE_COMMENT = "comment";
-
-    /**
-     * Private constructor
-     */
-    private Constants( )
+    @Override
+    public boolean process( Set<? extends TypeElement> annotations, RoundEnvironment roundEnv )
     {
+
+        Messager messager = processingEnv.getMessager( );
+
+        for ( TypeElement te : annotations )
+        {
+            messager.printMessage( Kind.NOTE, "Traitement annotation " + te.getQualifiedName( ) );
+
+            for ( Element element : roundEnv.getElementsAnnotatedWith( te ) )
+            {
+                messager.printMessage( Kind.NOTE, "  Traitement élément " + element.getSimpleName( ) );
+                LuteceWorkflowResource lfr = element.getAnnotation( LuteceWorkflowResource.class );
+
+                if ( lfr != null )
+                {
+                    messager.printMessage( Kind.NOTE, " LuteceWorkflowResource : type " + lfr.resource_type( ) + ", wfKey  " + lfr.workflow_key( ) );
+                }
+            }
+        }
+
+        return true;
     }
 }

@@ -67,13 +67,17 @@ public class SwaggerRest
     private static final String BASE_INFOS_SCHEMES = "schemes";
     private static final String BASE_INFOS_HOST = "host";
     private static final String BASE_INFOS_BASE_PATH = "basePath";
-    
+
     /**
      * Get Swagger.json
-     * @param request the request
-     * @param strVersion the version
+     * 
+     * @param request
+     *            the request
+     * @param strVersion
+     *            the version
      * @return the swagger.json
-     * @throws java.io.IOException {@link java.io.IOException}
+     * @throws java.io.IOException
+     *             {@link java.io.IOException}
      */
     @GET
     @Path( Constants.SWAGGER_PATH )
@@ -86,7 +90,7 @@ public class SwaggerRest
             Map<String, String> mapBaseInfos = getBaseInfos( AppPathService.getBaseUrl( request ), strVersion );
 
             ObjectMapper mapper = new ObjectMapper( );
-            ObjectNode objectNode = mapper.readValue( fileJson, ObjectNode.class );
+            ObjectNode objectNode = (ObjectNode) mapper.readTree( fileJson );
 
             if ( objectNode.path( BASE_INFOS_HOST ).isMissingNode( ) )
             {
@@ -101,63 +105,59 @@ public class SwaggerRest
                 objectNode.put( BASE_INFOS_BASE_PATH, mapBaseInfos.get( BASE_INFOS_BASE_PATH ) );
             }
             String strSwaggerJson = mapper.writerWithDefaultPrettyPrinter( ).writeValueAsString( objectNode );
-            return Response.status( Response.Status.OK )
-                    .entity( strSwaggerJson )
-                    .build( );
+            return Response.status( Response.Status.OK ).entity( strSwaggerJson ).build( );
         }
         AppLogService.error( Constants.ERROR_NOT_FOUND_RESOURCE );
         return Response.status( Response.Status.NOT_FOUND )
                 .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), Constants.ERROR_NOT_FOUND_RESOURCE ) ) )
                 .build( );
     }
-    
+
     /**
      * Get the swagger.json file path
-     * @param strVersion version of file path
+     * 
+     * @param strVersion
+     *            version of file path
      * @return the swagger.json file path
      */
     private String getJsonFilePath( String strVersion )
     {
-        return AppPathService.getWebAppPath( )
-                + Constants.SWAGGER_DIRECTORY_PATH
-                + Constants.API_PATH
-                + Constants.SWAGGER_PATH
-                + Constants.SWAGGER_VERSION_PATH + strVersion
-                + Constants.SWAGGER_JSON;
+        return AppPathService.getWebAppPath( ) + Constants.SWAGGER_DIRECTORY_PATH + Constants.API_PATH + Constants.SWAGGER_PATH + Constants.SWAGGER_VERSION_PATH
+                + strVersion + Constants.SWAGGER_JSON;
     }
-    
+
     /**
      * Get the base informations (host, scheme, baseUrl)
-     * @param strBaseUrl base url
-     * @param strVersion version
+     * 
+     * @param strBaseUrl
+     *            base url
+     * @param strVersion
+     *            version
      * @return the base informations (host, scheme, baseUrl)
-     * @throws MalformedURLException {@link java.net.MalformedURLException}
+     * @throws MalformedURLException
+     *             {@link java.net.MalformedURLException}
      */
     private Map<String, String> getBaseInfos( String strBaseUrl, String strVersion ) throws MalformedURLException
     {
-        Map<String, String> map = new HashMap<>();
-        URL url = new URL( strBaseUrl );   
-        
+        Map<String, String> map = new HashMap<>( );
+        URL url = new URL( strBaseUrl );
+
         String strScheme = url.getProtocol( );
         String strHost = url.getHost( );
         String strBasePath = url.getPath( );
         int nPort = url.getPort( );
-        
+
         if ( nPort != -1 )
         {
             strHost += ":" + nPort;
         }
-        
-        strBasePath = strBasePath
-                    + Constants.SWAGGER_REST_PATH
-                    + Constants.API_PATH
-                    + Constants.SWAGGER_VERSION_PATH
-                    + strVersion;
-        
+
+        strBasePath = strBasePath + Constants.SWAGGER_REST_PATH + Constants.API_PATH + Constants.SWAGGER_VERSION_PATH + strVersion;
+
         map.put( BASE_INFOS_SCHEMES, strScheme );
         map.put( BASE_INFOS_HOST, strHost );
         map.put( BASE_INFOS_BASE_PATH, strBasePath );
-        
+
         return map;
     }
 }

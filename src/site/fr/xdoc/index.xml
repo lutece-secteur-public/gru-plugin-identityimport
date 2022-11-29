@@ -10,19 +10,22 @@
     </head>
     <body>
         <section name="Plugin identityimport">
-            <!--
+  <!--
             <p>
                 <img src="images/identityimport.png" />
             </p>
             -->
             <subsection name="Introduction">
-                <p></p>
+                <p>L'objectif de ce plugin est d'importer des identités par lots dans un serveur IdentityStore.</p>
+                <p>Les identités peuvent être importées en lot via un webservice, et elles seront automatiquement traitées pour être importées dans la base IDS.</p>
+                <p>Les identités seront automatiquement insérées, ou rejetées s'il existe une suspiscion de doublon, ou traitées manuellement.</p>
+                <p>L'identifiant unique (CUID) de l'identité insérée ou sélectionnée sera retournée en réponse du lot.</p>
             </subsection>
             <subsection name="Configuration">
-                <p></p>
+                <p>L'accès aux services de IDS doit être configuré, ainsi que les clients ayant autorisation à utiliser ce service.</p>
             </subsection>
             <subsection name="Usage">
-                <p></p>
+                <p>Utiliser le menu "Gestion des lots".</p>
             </subsection>
         </section>
     </body>

@@ -28,10 +28,9 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *"
+ *
  * License 1.0
  */
-
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.test.LuteceTestCase;
@@ -51,56 +50,51 @@ public class CandidateIdentityAttributeBusinessTest extends LuteceTestCase
     private static final String VALUE2 = "Value2";
     private static final String CERTPROCESS1 = "CertProcess1";
     private static final String CERTPROCESS2 = "CertProcess2";
-	private static final Date CERTDATE1 = new Date( 1000000l );
+    private static final Date CERTDATE1 = new Date( 1000000l );
     private static final Date CERTDATE2 = new Date( 2000000l );
 
-	/**
-	* test CandidateIdentityAttribute
-	*/
-    public void testBusiness(  )
+    /**
+     * test CandidateIdentityAttribute
+     */
+    public void testBusiness( )
     {
         // Initialize an object
-        CandidateIdentityAttribute candidateIdentityAttribute = new CandidateIdentityAttribute();
-        candidateIdentityAttribute.setKey( KEY1 );
+        CandidateIdentityAttribute candidateIdentityAttribute = new CandidateIdentityAttribute( );
+        candidateIdentityAttribute.setCode( KEY1 );
         candidateIdentityAttribute.setValue( VALUE1 );
         candidateIdentityAttribute.setCertProcess( CERTPROCESS1 );
         candidateIdentityAttribute.setCertDate( CERTDATE1 );
 
         // Create test
         CandidateIdentityAttributeHome.create( candidateIdentityAttribute );
-        Optional<CandidateIdentityAttribute> optCandidateIdentityAttributeStored = CandidateIdentityAttributeHome.findByPrimaryKey( candidateIdentityAttribute.getId( ) );
-        CandidateIdentityAttribute candidateIdentityAttributeStored = optCandidateIdentityAttributeStored.orElse( new CandidateIdentityAttribute ( ) );
-        assertEquals( candidateIdentityAttributeStored.getKey( ) , candidateIdentityAttribute.getKey( ) );
-        assertEquals( candidateIdentityAttributeStored.getValue( ) , candidateIdentityAttribute.getValue( ) );
-        assertEquals( candidateIdentityAttributeStored.getCertProcess( ) , candidateIdentityAttribute.getCertProcess( ) );
-        assertEquals( candidateIdentityAttributeStored.getCertDate( ).toString() , candidateIdentityAttribute.getCertDate( ).toString( ) );
+        Optional<CandidateIdentityAttribute> optCandidateIdentityAttributeStored = CandidateIdentityAttributeHome
+                .findByPrimaryKey( candidateIdentityAttribute.getId( ) );
+        CandidateIdentityAttribute candidateIdentityAttributeStored = optCandidateIdentityAttributeStored.orElse( new CandidateIdentityAttribute( ) );
+        assertEquals( candidateIdentityAttributeStored.getCode( ), candidateIdentityAttribute.getCode( ) );
+        assertEquals( candidateIdentityAttributeStored.getValue( ), candidateIdentityAttribute.getValue( ) );
+        assertEquals( candidateIdentityAttributeStored.getCertProcess( ), candidateIdentityAttribute.getCertProcess( ) );
+        assertEquals( candidateIdentityAttributeStored.getCertDate( ).toString( ), candidateIdentityAttribute.getCertDate( ).toString( ) );
 
         // Update test
-        candidateIdentityAttribute.setKey( KEY2 );
+        candidateIdentityAttribute.setCode( KEY2 );
         candidateIdentityAttribute.setValue( VALUE2 );
         candidateIdentityAttribute.setCertProcess( CERTPROCESS2 );
         candidateIdentityAttribute.setCertDate( CERTDATE2 );
         CandidateIdentityAttributeHome.update( candidateIdentityAttribute );
         optCandidateIdentityAttributeStored = CandidateIdentityAttributeHome.findByPrimaryKey( candidateIdentityAttribute.getId( ) );
-        candidateIdentityAttributeStored = optCandidateIdentityAttributeStored.orElse( new CandidateIdentityAttribute ( ) );
-        
-        assertEquals( candidateIdentityAttributeStored.getKey( ) , candidateIdentityAttribute.getKey( ) );
-        assertEquals( candidateIdentityAttributeStored.getValue( ) , candidateIdentityAttribute.getValue( ) );
-        assertEquals( candidateIdentityAttributeStored.getCertProcess( ) , candidateIdentityAttribute.getCertProcess( ) );
-        assertEquals( candidateIdentityAttributeStored.getCertDate( ).toString( ) , candidateIdentityAttribute.getCertDate( ).toString( ) );
+        candidateIdentityAttributeStored = optCandidateIdentityAttributeStored.orElse( new CandidateIdentityAttribute( ) );
 
-        // List test
-        CandidateIdentityAttributeHome.getCandidateIdentityAttributesList( );
+        assertEquals( candidateIdentityAttributeStored.getCode( ), candidateIdentityAttribute.getCode( ) );
+        assertEquals( candidateIdentityAttributeStored.getValue( ), candidateIdentityAttribute.getValue( ) );
+        assertEquals( candidateIdentityAttributeStored.getCertProcess( ), candidateIdentityAttribute.getCertProcess( ) );
+        assertEquals( candidateIdentityAttributeStored.getCertDate( ).toString( ), candidateIdentityAttribute.getCertDate( ).toString( ) );
 
         // Delete test
         CandidateIdentityAttributeHome.remove( candidateIdentityAttribute.getId( ) );
         optCandidateIdentityAttributeStored = CandidateIdentityAttributeHome.findByPrimaryKey( candidateIdentityAttribute.getId( ) );
         candidateIdentityAttributeStored = optCandidateIdentityAttributeStored.orElse( null );
         assertNull( candidateIdentityAttributeStored );
-        
+
     }
-    
-    
-     
 
 }

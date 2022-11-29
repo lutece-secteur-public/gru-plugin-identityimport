@@ -6,7 +6,7 @@
     <head>
         <!-- Keywords example : "cms, authentication, cms, workflow, seo, collaborative, ..." 
              Use the language of this xdoc -->
-        <meta name="keywords" content="" />
+        <meta name="keywords" content="identity,import" />
     </head>
     <body>
         <section name="Plugin identityimport">
@@ -16,13 +16,16 @@
             </p>
             -->
             <subsection name="Introduction">
-                <p></p>
+                <p>The aim of this plugin is to import identities in batch mode to an IdentityStore server</p>
+                <p>Identities can be imported in batch with a Rest service, and they will be processed to be inserted into the IdentityStore database.</p>
+                <p>The identities will be automatically inserted, or rejected if a sibling exists, or treated manually.</p>
+                <p>The unique identifier (CUID) of the inserted identity will be returned as batch result.</p>
             </subsection>
             <subsection name="Configuration">
-                <p></p>
+                <p>The Identitystore endpoints must be configured, also the clients that will be authorized to use this service.</p>
             </subsection>
             <subsection name="Usage">
-                <p></p>
+                <p>Go to the "manage batchs" menu section.</p>
             </subsection>
         </section>
     </body>

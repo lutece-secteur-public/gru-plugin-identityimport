@@ -1,5 +1,3 @@
-<#include "managebatchs_tabs.html" />
-<@tabs2 tab="batch" />
 
 <@box>
 	<@boxHeader title='#i18n{identityimport.manage_batch.title}' boxTools=true>
@@ -17,28 +15,33 @@
             <th>#i18n{identityimport.manage_batchs.columnUser}</th>
             <th>#i18n{identityimport.manage_batchs.columnAppCode}</th>
             <th>#i18n{identityimport.manage_batchs.columnComment}</th>
+            <th>#i18n{identityimport.manage_batchs.columnStatus}</th>
             <th>#i18n{portal.util.labelActions}</th>
         </tr>
         <@tableHeadBodySeparator />
         <#list batch_list as batch >
         <tr>
             <td>
-				${batch.date}
+				${batch.resource.date}
 			</td>
             <td>
-				${batch.user}
+				${batch.resource.user}
 			</td>
             <td>
-				${batch.appCode}
+				${batch.resource.appCode}
 			</td>
             <td>
-				${batch.comment}
+				${batch.resource.comment}
 			</td>
         	<td>
-				<@aButton href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=modifyBatch&id=${batch.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
-						
-				<@aButton href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=confirmRemoveBatch&id=${batch.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
+        	  <#if batch.state??><@tag color='warning'>${batch.state.name}</@tag><#else> not set</#if>
+        	</td>
+        	<td>
 
+						
+				<@aButton href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=modifyBatch&id=${batch.resource.id}' title='#i18n{portal.util.labelView}' buttonIcon='eye' />
+						
+				
 	        </td>
         </tr>
         </#list>

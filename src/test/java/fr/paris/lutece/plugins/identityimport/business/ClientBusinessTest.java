@@ -28,16 +28,14 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *"
+ *
  * License 1.0
  */
-
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.test.LuteceTestCase;
 
 import java.util.Optional;
-
 
 /**
  * This is the business class test for the object Client
@@ -51,13 +49,13 @@ public class ClientBusinessTest extends LuteceTestCase
     private static final String TOKEN1 = "Token1";
     private static final String TOKEN2 = "Token2";
 
-	/**
-	* test Client
-	*/
-    public void testBusiness(  )
+    /**
+     * test Client
+     */
+    public void testBusiness( )
     {
         // Initialize an object
-        Client client = new Client();
+        Client client = new Client( );
         client.setName( NAME1 );
         client.setAppCode( APPCODE1 );
         client.setToken( TOKEN1 );
@@ -65,10 +63,10 @@ public class ClientBusinessTest extends LuteceTestCase
         // Create test
         ClientHome.create( client );
         Optional<Client> optClientStored = ClientHome.findByPrimaryKey( client.getId( ) );
-        Client clientStored = optClientStored.orElse( new Client ( ) );
-        assertEquals( clientStored.getName( ) , client.getName( ) );
-        assertEquals( clientStored.getAppCode( ) , client.getAppCode( ) );
-        assertEquals( clientStored.getToken( ) , client.getToken( ) );
+        Client clientStored = optClientStored.orElse( new Client( ) );
+        assertEquals( clientStored.getName( ), client.getName( ) );
+        assertEquals( clientStored.getAppCode( ), client.getAppCode( ) );
+        assertEquals( clientStored.getToken( ), client.getToken( ) );
 
         // Update test
         client.setName( NAME2 );
@@ -76,11 +74,11 @@ public class ClientBusinessTest extends LuteceTestCase
         client.setToken( TOKEN2 );
         ClientHome.update( client );
         optClientStored = ClientHome.findByPrimaryKey( client.getId( ) );
-        clientStored = optClientStored.orElse( new Client ( ) );
-        
-        assertEquals( clientStored.getName( ) , client.getName( ) );
-        assertEquals( clientStored.getAppCode( ) , client.getAppCode( ) );
-        assertEquals( clientStored.getToken( ) , client.getToken( ) );
+        clientStored = optClientStored.orElse( new Client( ) );
+
+        assertEquals( clientStored.getName( ), client.getName( ) );
+        assertEquals( clientStored.getAppCode( ), client.getAppCode( ) );
+        assertEquals( clientStored.getToken( ), client.getToken( ) );
 
         // List test
         ClientHome.getClientsList( );
@@ -90,10 +88,7 @@ public class ClientBusinessTest extends LuteceTestCase
         optClientStored = ClientHome.findByPrimaryKey( client.getId( ) );
         clientStored = optClientStored.orElse( null );
         assertNull( clientStored );
-        
+
     }
-    
-    
-     
 
 }

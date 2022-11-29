@@ -34,7 +34,7 @@
             <feature-title>identityimport.adminFeature.ManageCandidateIdentities.name</feature-title>
             <feature-description>identityimport.adminFeature.ManageCandidateIdentities.description</feature-description>
             <feature-level>0</feature-level>
-            <feature-url>jsp/admin/plugins/identityimport/ManageCandidateIdentitys.jsp</feature-url>
+            <feature-url>jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp</feature-url>
             <feature-icon-url></feature-icon-url>
         </admin-feature>
         <admin-feature>
@@ -55,54 +55,6 @@
         </admin-feature>
     </admin-features>
 
-    <!-- XPages parameters -->
-    <applications>
-    </applications>
-
-    <!-- Portlet parameters -->
-    <portlets>
-    </portlets>
-    
-    <!-- Place plugin resources declaration above (remove if unnecessary) -->
-
-    <!-- CSS -->
-    <!--
-    <css-stylesheets>
-        <css-stylesheets-scope>xpage|portal</css-stylesheets-scope>
-        <css-stylesheet>...</css-stylesheet>
-    </css-stylesheets>
-    -->
-
-    <!-- BackOffice CSS -->
-    <!--
-    <admin-css-stylesheets>
-        <admin-css-stylesheet>...</admin-css-stylesheet>
-    </admin-css-stylesheets>
-    -->
-
-    <!-- Freemarker macros -->
-    <!-- 
-    <freemarker-macro-files>
-        <freemarker-macro-file>...</freemarker-macro-file>
-    </freemarker-macro-files>
-    -->
-
-    <!-- Javascript files -->
-    <!--
-    <javascript-files>
-        <javascript-files-scope>xpage|portal</javascript-files-scope>
-        <javascript-file>...</javascript-file>
-    </javascript-files>
-    -->    
-    
-    <!-- RBAC Resources -->
-    <!--
-    <rbac-resource-types>
-        <rbac-resource-type>
-            <rbac-resource-type-class>...</rbac-resource-type-class>
-        </rbac-resource-type>
-    </rbac-resource-types>
-    -->
 
     <!-- Admin Dashboard components -->
     <!-- 
@@ -114,42 +66,5 @@
     </admindashboard-components>
     -->
     
-    <!-- Dashboard components -->
-    <!--
-    <dashboard-components>
-        <dashboard-component>
-            <dashboard-component-name>...</dashboard-component-name>
-            <dashboard-component-class>...</dashboard-component-class>
-            <dashboard-feature-right>...</dashboard-feature-right>
-        </dashboard-component>
-    </dashboard-components>
-    -->
-
-    <!-- Daemons -->
-    <!-- 
-    <daemons>
-        <daemon>
-            <daemon-id>...</daemon-id>
-            <daemon-name>...</daemon-name>
-            <daemon-description>...</daemon-description>
-            <daemon-class>...</daemon-class>
-        </daemon>
-    </daemons>
-    -->
-    
-   
-    <!-- Other services -->
-    <!-- * servlets -->
-    <!-- * Listeners -->
-    <!-- * Portlets -->
-    <!-- * params -->
-    <!-- * search-indexers -->
-    <!-- * link-service -->
-    <!-- * html-service -->
-    <!-- * content-service -->
-    <!-- * insert-services -->
-    <!-- * page-include-services -->
-    
-    <!-- see  lutece-core/webapp/WEB-INF/plugins/plugin_*.dtd -->
 
 </plug-in>

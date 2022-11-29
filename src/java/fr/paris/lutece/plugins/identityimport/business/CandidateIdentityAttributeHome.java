@@ -32,14 +32,12 @@
  * License 1.0
  */
 
-
- package fr.paris.lutece.plugins.identityimport.business;
+package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.ReferenceList;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -56,14 +54,16 @@ public final class CandidateIdentityAttributeHome
     /**
      * Private constructor - this class need not be instantiated
      */
-    private CandidateIdentityAttributeHome(  )
+    private CandidateIdentityAttributeHome( )
     {
     }
 
     /**
      * Create an instance of the candidateIdentityAttribute class
-     * @param candidateIdentityAttribute The instance of the CandidateIdentityAttribute which contains the informations to store
-     * @return The  instance of candidateIdentityAttribute which has been created with its primary key.
+     * 
+     * @param candidateIdentityAttribute
+     *            The instance of the CandidateIdentityAttribute which contains the informations to store
+     * @return The instance of candidateIdentityAttribute which has been created with its primary key.
      */
     public static CandidateIdentityAttribute create( CandidateIdentityAttribute candidateIdentityAttribute )
     {
@@ -74,8 +74,10 @@ public final class CandidateIdentityAttributeHome
 
     /**
      * Update of the candidateIdentityAttribute which is specified in parameter
-     * @param candidateIdentityAttribute The instance of the CandidateIdentityAttribute which contains the data to store
-     * @return The instance of the  candidateIdentityAttribute which has been updated
+     * 
+     * @param candidateIdentityAttribute
+     *            The instance of the CandidateIdentityAttribute which contains the data to store
+     * @return The instance of the candidateIdentityAttribute which has been updated
      */
     public static CandidateIdentityAttribute update( CandidateIdentityAttribute candidateIdentityAttribute )
     {
@@ -86,7 +88,9 @@ public final class CandidateIdentityAttributeHome
 
     /**
      * Remove the candidateIdentityAttribute whose identifier is specified in parameter
-     * @param nKey The candidateIdentityAttribute Id
+     * 
+     * @param nKey
+     *            The candidateIdentityAttribute Id
      */
     public static void remove( int nKey )
     {
@@ -95,7 +99,9 @@ public final class CandidateIdentityAttributeHome
 
     /**
      * Returns an instance of a candidateIdentityAttribute whose identifier is specified in parameter
-     * @param nKey The candidateIdentityAttribute primary key
+     * 
+     * @param nKey
+     *            The candidateIdentityAttribute primary key
      * @return an instance of CandidateIdentityAttribute
      */
     public static Optional<CandidateIdentityAttribute> findByPrimaryKey( int nKey )
@@ -104,36 +110,30 @@ public final class CandidateIdentityAttributeHome
     }
 
     /**
-     * Load the data of all the candidateIdentityAttribute objects and returns them as a list
-     * @return the list which contains the data of all the candidateIdentityAttribute objects
-     */
-    public static List<CandidateIdentityAttribute> getCandidateIdentityAttributesList( )
-    {
-        return _dao.selectCandidateIdentityAttributesList( _plugin );
-    }
-    
-    /**
      * Load the id of all the candidateIdentityAttribute objects and returns them as a list
+     * 
      * @return the list which contains the id of all the candidateIdentityAttribute objects
      */
-    public static List<Integer> getIdCandidateIdentityAttributesList( )
+    public static List<Integer> getIdCandidateIdentityAttributesList( int idIdentity )
     {
-        return _dao.selectIdCandidateIdentityAttributesList( _plugin );
+        return _dao.selectIdCandidateIdentityAttributesList( idIdentity, _plugin );
     }
-    
+
     /**
-     * Load the data of all the candidateIdentityAttribute objects and returns them as a referenceList
-     * @return the referenceList which contains the data of all the candidateIdentityAttribute objects
+     * Load the id of all the candidateIdentityAttribute objects and returns them as a list
+     * 
+     * @return the list which contains the id of all the candidateIdentityAttribute objects
      */
-    public static ReferenceList getCandidateIdentityAttributesReferenceList( )
+    public static List<CandidateIdentityAttribute> getCandidateIdentityAttributesList( int idIdentity )
     {
-        return _dao.selectCandidateIdentityAttributesReferenceList( _plugin );
+        return _dao.selectCandidateIdentityAttributesList( idIdentity, _plugin );
     }
     
-	
     /**
      * Load the data of all the avant objects and returns them as a list
-     * @param listIds liste of ids
+     * 
+     * @param listIds
+     *            liste of ids
      * @return the list which contains the data of all the avant objects
      */
     public static List<CandidateIdentityAttribute> getCandidateIdentityAttributesListByIds( List<Integer> listIds )
@@ -142,4 +142,3 @@ public final class CandidateIdentityAttributeHome
     }
 
 }
-

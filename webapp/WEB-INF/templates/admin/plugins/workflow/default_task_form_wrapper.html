@@ -1,0 +1,19 @@
+<@row>
+	<@columns>
+			<@tform action='${target_jsp!}' params='enctype="multipart/form-data"'>
+				<fieldset>
+					<legend> #i18n{workflow.task_submit_form.page_title}</legend>
+					<input type='hidden' name='action' value='processWorkflowAction' />
+					<input type='hidden' name='submitted_task_form' value='true' />
+					<input type='hidden' name='action_id' value='${action_id!}' />
+					<input type='hidden' name='id' value='${resource_id!}' />
+					<input type='hidden' name='resource_type_id' value='${resource_type_id!}' />
+					${task_form}
+					<@formGroup id='submit_task_form_buttons_div'>
+						<@button type='submit' name='save' buttonIcon='check' title='#i18n{workflow.tasks_form_test_workflow.button_save}' />
+						<@button type='submit' name='back' value='back' buttonIcon='times' title='#i18n{workflow.tasks_form_test_workflow.button_cancel}' color='btn-default' />
+					</@formGroup>
+				</fieldset>
+		    </@tform>
+	</@columns>
+ </@row>

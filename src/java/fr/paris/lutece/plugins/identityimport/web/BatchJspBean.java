@@ -31,51 +31,63 @@
  *
  * License 1.0
  */
- 	
- 
+
 package fr.paris.lutece.plugins.identityimport.web;
 
-import fr.paris.lutece.portal.service.message.AdminMessage;
-import fr.paris.lutece.portal.service.message.AdminMessageService;
-import fr.paris.lutece.portal.service.security.SecurityTokenService;
-import fr.paris.lutece.portal.service.admin.AccessDeniedException;
-import fr.paris.lutece.portal.service.util.AppException;
-import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
-import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
-import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
-import fr.paris.lutece.util.url.UrlItem;
-import fr.paris.lutece.util.html.AbstractPaginator;
-
-import java.util.Comparator;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.beanutils.BeanUtils;
+
+import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.identityimport.business.Batch;
 import fr.paris.lutece.plugins.identityimport.business.BatchHome;
+import fr.paris.lutece.plugins.identityimport.wf.WorkflowBean;
+import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
+import fr.paris.lutece.portal.service.admin.AccessDeniedException;
+import fr.paris.lutece.portal.service.message.AdminMessage;
+import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.progressmanager.ProgressManagerService;
+import fr.paris.lutece.portal.service.security.SecurityTokenService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppException;
+import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.util.html.AbstractPaginator;
+import fr.paris.lutece.util.url.UrlItem;
 
 /**
  * This class provides the user interface to manage Batch features ( manage, create, modify, remove )
  */
 @Controller( controllerJsp = "ManageBatchs.jsp", controllerPath = "jsp/admin/plugins/identityimport/", right = "IDENTITYIMPORT_BATCH_MANAGEMENT" )
-public class BatchJspBean extends AbstractManageBatchsJspBean <Integer, Batch>
+public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBean<Batch>>
 {
     // Templates
     private static final String TEMPLATE_MANAGE_BATCHS = "/admin/plugins/identityimport/manage_batchs.html";
     private static final String TEMPLATE_CREATE_BATCH = "/admin/plugins/identityimport/create_batch.html";
     private static final String TEMPLATE_MODIFY_BATCH = "/admin/plugins/identityimport/modify_batch.html";
-
+    private static final String TEMPLATE_PROCESS_BATCH = "/admin/plugins/identityimport/process_batch.html";
+    
     // Parameters
     private static final String PARAMETER_ID_BATCH = "id";
+    private static final String PARAMETER_ID_ACTION = "id_action";
+    private static final String MARK_FEED_TOKEN = "feed_token";
 
     // Properties for page titles
     private static final String PROPERTY_PAGE_TITLE_MANAGE_BATCHS = "identityimport.manage_batchs.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_MODIFY_BATCH = "identityimport.modify_batch.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_CREATE_BATCH = "identityimport.create_batch.pageTitle";
+	private static final String PROPERTY_PAGE_TITLE_PROCESS_BATCH = "identityimport.process_batch.pageTitle";
 
-    // Markers
+	// Markers
     private static final String MARK_BATCH_LIST = "batch_list";
     private static final String MARK_BATCH = "batch";
 
@@ -91,81 +103,93 @@ public class BatchJspBean extends AbstractManageBatchsJspBean <Integer, Batch>
     private static final String VIEW_MANAGE_BATCHS = "manageBatchs";
     private static final String VIEW_CREATE_BATCH = "createBatch";
     private static final String VIEW_MODIFY_BATCH = "modifyBatch";
+    private static final String VIEW_PROCESS_BATCH = "processBatch";
 
     // Actions
     private static final String ACTION_CREATE_BATCH = "createBatch";
     private static final String ACTION_MODIFY_BATCH = "modifyBatch";
     private static final String ACTION_REMOVE_BATCH = "removeBatch";
     private static final String ACTION_CONFIRM_REMOVE_BATCH = "confirmRemoveBatch";
+    private static final String ACTION_PROCESS_WORKFLOW_ACTION = "processAction";
 
     // Infos
     private static final String INFO_BATCH_CREATED = "identityimport.info.batch.created";
     private static final String INFO_BATCH_UPDATED = "identityimport.info.batch.updated";
     private static final String INFO_BATCH_REMOVED = "identityimport.info.batch.removed";
-    
+
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
-    
+
+    // Workflow
+    private static final String BATCH_WFBEANSERVICE = "identityimport.batch.wfbeanservice";
+    private WorkflowBeanService<Batch> _wfBeanService = SpringContextService.getBean( BATCH_WFBEANSERVICE );
+
     // Session variable to store working values
     private Batch _batch;
+    WorkflowBean<Batch> _wfBean;
+
     private List<Integer> _listIdBatchs;
-    
+
     /**
      * Build the Manage View
-     * @param request The HTTP request
+     * 
+     * @param request
+     *            The HTTP request
      * @return The page
      */
     @View( value = VIEW_MANAGE_BATCHS, defaultView = true )
     public String getManageBatchs( HttpServletRequest request )
     {
         _batch = null;
-        
-        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX) == null || _listIdBatchs.isEmpty( ) )
+
+        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX ) == null || _listIdBatchs.isEmpty( ) )
         {
-        	_listIdBatchs = BatchHome.getIdBatchsList(  );
+            _listIdBatchs = BatchHome.getIdBatchsList( );
         }
-        
+
         Map<String, Object> model = getPaginatedListModel( request, MARK_BATCH_LIST, _listIdBatchs, JSP_MANAGE_BATCHS );
 
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_BATCHS, TEMPLATE_MANAGE_BATCHS, model );
     }
 
-	/**
+    /**
      * Get Items from Ids list
+     * 
      * @param listIds
      * @return the populated list of items corresponding to the id List
      */
-	@Override
-	List<Batch> getItemsFromIds( List<Integer> listIds ) 
-	{
-		List<Batch> listBatch = BatchHome.getBatchsListByIds( listIds );
-		
-		// keep original order
-        return listBatch.stream()
-                 .sorted(Comparator.comparingInt( notif -> listIds.indexOf( notif.getId())))
-                 .collect(Collectors.toList());
-	}
-    
+    @Override
+    List<WorkflowBean<Batch>> getItemsFromIds( List<Integer> listIds )
+    {
+        List<Batch> listBatch = BatchHome.getBatchsListByIds( listIds );
+
+        // keep original order
+        return listBatch.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) )
+                .map( b -> _wfBeanService.createWorkflowBean( b, b.getId( ), getUser( ) ) )
+                .collect( Collectors.toList( ) );
+    }
+
     /**
-    * reset the _listIdBatchs list
-    */
+     * reset the _listIdBatchs list
+     */
     public void resetListId( )
     {
-    	_listIdBatchs = new ArrayList<>( );
+        _listIdBatchs = new ArrayList<>( );
     }
 
     /**
      * Returns the form to create a batch
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return the html code of the batch form
      */
     @View( VIEW_CREATE_BATCH )
     public String getCreateBatch( HttpServletRequest request )
     {
-        _batch = ( _batch != null ) ? _batch : new Batch(  );
+        _batch = ( _batch != null ) ? _batch : new Batch( );
 
-        Map<String, Object> model = getModel(  );
+        Map<String, Object> model = getModel( );
         model.put( MARK_BATCH, _batch );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_BATCH ) );
 
@@ -175,7 +199,8 @@ public class BatchJspBean extends AbstractManageBatchsJspBean <Integer, Batch>
     /**
      * Process the data capture form of a new batch
      *
-     * @param request The Http Request
+     * @param request
+     *            The Http Request
      * @return The Jsp URL of the process result
      * @throws AccessDeniedException
      */
@@ -183,11 +208,10 @@ public class BatchJspBean extends AbstractManageBatchsJspBean <Integer, Batch>
     public String doCreateBatch( HttpServletRequest request ) throws AccessDeniedException
     {
         populate( _batch, request, getLocale( ) );
-        
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_BATCH ) )
         {
-            throw new AccessDeniedException ( "Invalid security token" );
+            throw new AccessDeniedException( "Invalid security token" );
         }
 
         // Check constraints
@@ -197,17 +221,19 @@ public class BatchJspBean extends AbstractManageBatchsJspBean <Integer, Batch>
         }
 
         BatchHome.create( _batch );
-        addInfo( INFO_BATCH_CREATED, getLocale(  ) );
+        addInfo( INFO_BATCH_CREATED, getLocale( ) );
         resetListId( );
+
+        _wfBean = _wfBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
 
         return redirectView( request, VIEW_MANAGE_BATCHS );
     }
 
     /**
-     * Manages the removal form of a batch whose identifier is in the http
-     * request
+     * Manages the removal form of a batch whose identifier is in the http request
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return the html code to confirm
      */
     @Action( ACTION_CONFIRM_REMOVE_BATCH )
@@ -217,7 +243,7 @@ public class BatchJspBean extends AbstractManageBatchsJspBean <Integer, Batch>
         UrlItem url = new UrlItem( getActionUrl( ACTION_REMOVE_BATCH ) );
         url.addParameter( PARAMETER_ID_BATCH, nId );
 
-        String strMessageUrl = AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_BATCH, url.getUrl(  ), AdminMessage.TYPE_CONFIRMATION );
+        String strMessageUrl = AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_BATCH, url.getUrl( ), AdminMessage.TYPE_CONFIRMATION );
 
         return redirect( request, strMessageUrl );
     }
@@ -225,18 +251,21 @@ public class BatchJspBean extends AbstractManageBatchsJspBean <Integer, Batch>
     /**
      * Handles the removal form of a batch
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return the jsp URL to display the form to manage batchs
      */
     @Action( ACTION_REMOVE_BATCH )
     public String doRemoveBatch( HttpServletRequest request )
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
-        
-        
+
         BatchHome.remove( nId );
-        addInfo( INFO_BATCH_REMOVED, getLocale(  ) );
+        addInfo( INFO_BATCH_REMOVED, getLocale( ) );
         resetListId( );
+
+        _batch = null;
+        _wfBean = null;
 
         return redirectView( request, VIEW_MANAGE_BATCHS );
     }
@@ -244,7 +273,8 @@ public class BatchJspBean extends AbstractManageBatchsJspBean <Integer, Batch>
     /**
      * Returns the form to update info about a batch
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return The HTML form to update info
      */
     @View( VIEW_MODIFY_BATCH )
@@ -252,15 +282,18 @@ public class BatchJspBean extends AbstractManageBatchsJspBean <Integer, Batch>
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
 
-        if ( _batch == null || ( _batch.getId(  ) != nId ) )
+        if ( _batch == null || ( _batch.getId( ) != nId ) )
         {
             Optional<Batch> optBatch = BatchHome.findByPrimaryKey( nId );
-            _batch = optBatch.orElseThrow( ( ) -> new AppException(ERROR_RESOURCE_NOT_FOUND ) );
+            _batch = optBatch.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+
+            _wfBean = _wfBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
         }
 
-
-        Map<String, Object> model = getModel(  );
-        model.put( MARK_BATCH, _batch );
+        _wfBeanService.addHistory(_wfBean, request, getLocale( ) );
+        
+        Map<String, Object> model = getModel( );
+        model.put( MARK_BATCH, _wfBean );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_BATCH ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_BATCH, TEMPLATE_MODIFY_BATCH, model );
@@ -269,19 +302,19 @@ public class BatchJspBean extends AbstractManageBatchsJspBean <Integer, Batch>
     /**
      * Process the change form of a batch
      *
-     * @param request The Http request
+     * @param request
+     *            The Http request
      * @return The Jsp URL of the process result
      * @throws AccessDeniedException
      */
     @Action( ACTION_MODIFY_BATCH )
     public String doModifyBatch( HttpServletRequest request ) throws AccessDeniedException
-    {   
+    {
         populate( _batch, request, getLocale( ) );
-		
-		
+
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_MODIFY_BATCH ) )
         {
-            throw new AccessDeniedException ( "Invalid security token" );
+            throw new AccessDeniedException( "Invalid security token" );
         }
 
         // Check constraints
@@ -291,9 +324,36 @@ public class BatchJspBean extends AbstractManageBatchsJspBean <Integer, Batch>
         }
 
         BatchHome.update( _batch );
-        addInfo( INFO_BATCH_UPDATED, getLocale(  ) );
+        addInfo( INFO_BATCH_UPDATED, getLocale( ) );
         resetListId( );
 
         return redirectView( request, VIEW_MANAGE_BATCHS );
+    }
+
+    /**
+     * process a workflow action
+     *
+     * @param request
+     *            The Http request
+     * @return the jsp URL to display the form to manage batchs
+     */
+    @Action( ACTION_PROCESS_WORKFLOW_ACTION )
+    public String doProcessAction( HttpServletRequest request )
+    {
+        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
+        int nAction = Integer.parseInt( request.getParameter( PARAMETER_ID_ACTION ) );
+
+        if ( _batch == null || ( _batch.getId( ) != nId ) )
+        {
+            Optional<Batch> optBatch = BatchHome.findByPrimaryKey( nId );
+            _batch = optBatch.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+
+            _wfBean = _wfBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
+        }
+
+        _wfBeanService.processAction(_wfBean, nAction, request, getLocale( ) );        
+        
+        return redirect( request, VIEW_MODIFY_BATCH, PARAMETER_ID_BATCH, nId );
+        
     }
 }

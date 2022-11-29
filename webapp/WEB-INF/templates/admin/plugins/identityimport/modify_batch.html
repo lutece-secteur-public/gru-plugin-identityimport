@@ -1,40 +1,69 @@
-<#include "managebatchs_tabs.html" />
-<@tabs2 tab="batch" />
 
+   <@row >
 
+   <@columns >
+   
 <@box>
 	<@boxHeader title='#i18n{identityimport.modify_batch.title}' />
 	<@boxBody>
     <@tform class="form-horizontal" method="post" name="modify_batch" action="jsp/admin/plugins/identityimport/ManageBatchs.jsp" >
 			<@messages errors=errors />
-			<@input type="hidden" id="id" name="id" value="${batch.id}"/>
+			<@input type="hidden" id="id" name="id" value="${batch.resource.id}"/>
 			<@input type="hidden" value="${token}" name="token" />
 			
 			<@formGroup labelFor='date' labelKey='#i18n{identityimport.modify_batch.labelDate}' mandatory=true>
-				<@input type='text' id='date' name='date'  value='${batch.date!\'\'}' tabIndex='0' />
+				<@input type='text' id='date' name='date'  value='${batch.resource.date!\'\'}' tabIndex='0' />
 			</@formGroup>
 			<@formGroup labelFor='user' labelKey='#i18n{identityimport.modify_batch.labelUser}' mandatory=true>
-				<@input type='text' id='user' name='user'  maxlength=255 value='${batch.user!\'\'}' tabIndex='1' />
+				<@input type='text' id='user' name='user'  maxlength=255 value='${batch.resource.user!\'\'}' tabIndex='1' />
 			</@formGroup>
 			<@formGroup labelFor='app_code' labelKey='#i18n{identityimport.modify_batch.labelAppCode}' mandatory=true>
-				<@input type='text' id='app_code' name='app_code'  maxlength=50 value='${batch.appCode!\'\'}' tabIndex='2' />
+				<@input type='text' id='app_code' name='app_code'  maxlength=50 value='${batch.resource.appCode!\'\'}' tabIndex='2' />
 			</@formGroup>
 			<@formGroup labelFor='comment' labelKey='#i18n{identityimport.modify_batch.labelComment}' mandatory=true>
-				<@input type='text' id='comment' name='comment'  value='${batch.comment!\'\'}' tabIndex='3' />
+				<@input type='text' id='comment' name='comment'  value='${batch.resource.comment!\'\'}' tabIndex='3' />
 			</@formGroup>
         <@actionButtons button1Name="action_modifyBatch" button2Name="view_manageBatch"/>
         
-        <#if workflow_action_list??>
-        <#list workflow_action_list as action >
-		    <a href="METIER_JSP_URL?id_action=${action.id}&id_resource=${id}">
-		        <img src="image?resource_type=workflow_icon_img&id=${action.icon.id}"
-		                <#if action.icon.width!=-1> width="${action.icon.width}"</#if>
-		                <#if action.icon.height!=-1> height="${action.icon.height}"</#if>
-		                title="${action.name}"
-		                alt="${action.name}"/>
+        <@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?batch_id=${batch.resource.id}' 
+        title='#i18n{identityimport.manage_candidateidentities.title}'  buttonIcon='list'  size='md'  />
+				
+				
+        <@aButton href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=confirmRemoveBatch&id=${batch.resource.id}' 
+        title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'   size='md'  />
+        
+       </@tform>
+    </@boxBody>
+</@box>
+
+   </@columns >
+
+   <@columns >
+<@box>
+	<@boxHeader title='Workflow' />
+	<@boxBody>
+        
+        statut : <#if batch.state??><@tag  color='warning'>${batch.state.name}</@tag><#else> not set</#if>   
+        
+        <br>
+        <br>
+        
+        <#if batch.actions??>actions : 
+        <#list batch.actions as action >
+            <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processAction&id_action=${action.id}&id=${batch.resource.id}"
+                        title="${action.name}" alt="${action.name}"  size='md' />
+            <!--  img src="image?resource_type=workflow_icon_img&id=${action.icon.id}" -->
 		     </a>
 		</#list>
+		<#else>no action
 		</#if>
-    </@tform>
+		
+		<br><br>
+		History : ${batch.history! }
+
 	</@boxBody>
 </@box>
+
+   </@columns >
+</@row >
+   

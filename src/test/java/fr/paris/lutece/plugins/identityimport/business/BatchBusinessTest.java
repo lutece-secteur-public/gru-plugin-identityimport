@@ -28,10 +28,9 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *"
+ *
  * License 1.0
  */
-
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.test.LuteceTestCase;
@@ -45,7 +44,7 @@ import java.sql.Date;
  */
 public class BatchBusinessTest extends LuteceTestCase
 {
-	private static final Date DATE1 = new Date( 1000000l );
+    private static final Date DATE1 = new Date( 1000000l );
     private static final Date DATE2 = new Date( 2000000l );
     private static final String USER1 = "User1";
     private static final String USER2 = "User2";
@@ -54,13 +53,13 @@ public class BatchBusinessTest extends LuteceTestCase
     private static final String COMMENT1 = "Comment1";
     private static final String COMMENT2 = "Comment2";
 
-	/**
-	* test Batch
-	*/
-    public void testBusiness(  )
+    /**
+     * test Batch
+     */
+    public void testBusiness( )
     {
         // Initialize an object
-        Batch batch = new Batch();
+        Batch batch = new Batch( );
         batch.setDate( DATE1 );
         batch.setUser( USER1 );
         batch.setAppCode( APPCODE1 );
@@ -69,11 +68,11 @@ public class BatchBusinessTest extends LuteceTestCase
         // Create test
         BatchHome.create( batch );
         Optional<Batch> optBatchStored = BatchHome.findByPrimaryKey( batch.getId( ) );
-        Batch batchStored = optBatchStored.orElse( new Batch ( ) );
-        assertEquals( batchStored.getDate( ).toString() , batch.getDate( ).toString( ) );
-        assertEquals( batchStored.getUser( ) , batch.getUser( ) );
-        assertEquals( batchStored.getAppCode( ) , batch.getAppCode( ) );
-        assertEquals( batchStored.getComment( ) , batch.getComment( ) );
+        Batch batchStored = optBatchStored.orElse( new Batch( ) );
+        assertEquals( batchStored.getDate( ).toString( ), batch.getDate( ).toString( ) );
+        assertEquals( batchStored.getUser( ), batch.getUser( ) );
+        assertEquals( batchStored.getAppCode( ), batch.getAppCode( ) );
+        assertEquals( batchStored.getComment( ), batch.getComment( ) );
 
         // Update test
         batch.setDate( DATE2 );
@@ -82,12 +81,12 @@ public class BatchBusinessTest extends LuteceTestCase
         batch.setComment( COMMENT2 );
         BatchHome.update( batch );
         optBatchStored = BatchHome.findByPrimaryKey( batch.getId( ) );
-        batchStored = optBatchStored.orElse( new Batch ( ) );
-        
-        assertEquals( batchStored.getDate( ).toString( ) , batch.getDate( ).toString( ) );
-        assertEquals( batchStored.getUser( ) , batch.getUser( ) );
-        assertEquals( batchStored.getAppCode( ) , batch.getAppCode( ) );
-        assertEquals( batchStored.getComment( ) , batch.getComment( ) );
+        batchStored = optBatchStored.orElse( new Batch( ) );
+
+        assertEquals( batchStored.getDate( ).toString( ), batch.getDate( ).toString( ) );
+        assertEquals( batchStored.getUser( ), batch.getUser( ) );
+        assertEquals( batchStored.getAppCode( ), batch.getAppCode( ) );
+        assertEquals( batchStored.getComment( ), batch.getComment( ) );
 
         // List test
         BatchHome.getBatchsList( );
@@ -97,10 +96,7 @@ public class BatchBusinessTest extends LuteceTestCase
         optBatchStored = BatchHome.findByPrimaryKey( batch.getId( ) );
         batchStored = optBatchStored.orElse( null );
         assertNull( batchStored );
-        
+
     }
-    
-    
-     
 
 }

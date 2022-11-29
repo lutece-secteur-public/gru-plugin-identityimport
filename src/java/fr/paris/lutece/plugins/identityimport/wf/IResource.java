@@ -31,40 +31,21 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.identityimport.rs;
+package fr.paris.lutece.plugins.identityimport.wf;
 
-/**
- * Rest Constants
- */
-public final class Constants
+public interface IResource
 {
-    public static final String API_PATH = "identityimport/api";
-    public static final String VERSION_PATH = "/v{" + Constants.VERSION + "}";
-    public static final String ID_PATH = "/{" + Constants.ID + "}";
-    public static final String VERSION = "version";
-    public static final String ID = "id";
-
-    public static final String SWAGGER_DIRECTORY_PATH = "/plugins/";
-    public static final String SWAGGER_PATH = "/swagger";
-    public static final String SWAGGER_VERSION_PATH = "/v";
-    public static final String SWAGGER_REST_PATH = "rest/";
-    public static final String SWAGGER_JSON = "/swagger.json";
-
-    public static final String EMPTY_OBJECT = "{}";
-    public static final String ERROR_NOT_FOUND_VERSION = "Version not found";
-    public static final String ERROR_NOT_FOUND_RESOURCE = "Resource not found";
-    public static final String ERROR_BAD_REQUEST_EMPTY_PARAMETER = "Empty parameter";
-
-    public static final String BATCH_PATH = "/batchs";
-    public static final String BATCH_ATTRIBUTE_DATE = "date";
-    public static final String BATCH_ATTRIBUTE_USER = "user";
-    public static final String BATCH_ATTRIBUTE_APP_CODE = "app_code";
-    public static final String BATCH_ATTRIBUTE_COMMENT = "comment";
+    /**
+     * get resource type
+     * 
+     * @return the type
+     */
+    public String getResourceType( );
 
     /**
-     * Private constructor
+     * get resource Id
+     * 
+     * @return the id
      */
-    private Constants( )
-    {
-    }
+    public int getResourceId( );
 }
