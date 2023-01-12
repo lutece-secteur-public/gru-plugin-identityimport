@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS identityimport_batch;
 CREATE TABLE identityimport_batch (
 id_batch int AUTO_INCREMENT,
 date date NOT NULL,
-user varchar(255) default '' NOT NULL,
+username varchar(255) default '' NOT NULL,
 app_code varchar(50) default '' NOT NULL,
 comment long varchar,
 PRIMARY KEY (id_batch)
@@ -38,7 +38,7 @@ DROP TABLE IF EXISTS identityimport_candidate_identity_attribute;
 CREATE TABLE identityimport_candidate_identity_attribute (
 id_candidate_identity_attribute int AUTO_INCREMENT,
 id_candidate_identity int ,
-`key` varchar(255) default '' NOT NULL,
+key varchar(255) default '' NOT NULL,
 value long varchar,
 cert_process varchar(255) default '',
 cert_date date,
