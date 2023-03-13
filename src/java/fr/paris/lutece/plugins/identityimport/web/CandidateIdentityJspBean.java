@@ -34,6 +34,9 @@
 
 package fr.paris.lutece.plugins.identityimport.web;
 
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.*;
+import fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService;
+import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.security.SecurityTokenService;
@@ -53,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.api.user.User;
@@ -82,7 +86,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
 
     // Parameters
     private static final String PARAMETER_ID_CANDIDATEIDENTITY = "id";
-    private static final String PARAMETER_BATCH_ID = "batch_id";
+    private static final String PARAMETER_BATCH_ID = "id_batch";
 
     // Properties for page titles
     private static final String PROPERTY_PAGE_TITLE_MANAGE_CANDIDATEIDENTITIES = "identityimport.manage_candidateidentities.pageTitle";
@@ -92,6 +96,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
 
     // Markers
     private static final String MARK_CANDIDATEIDENTITY_LIST = "candidateidentity_list";
+    private static final String MARK_CANDIDATEIDENTITY_DUPLICATE_LIST = "candidateidentity_duplicate_list";
     private static final String MARK_CANDIDATEIDENTITY = "candidateidentity";
 
     private static final String JSP_MANAGE_CANDIDATEIDENTITIES = "jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp";
@@ -122,6 +127,8 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
     private static final String INFO_CANDIDATEIDENTITY_REMOVED = "identityimport.info.candidateidentity.removed";
     private static final String INFO_CANDIDATEIDENTITY_IMPORTED = "identityimport.info.candidateidentity.imported";
 
+    private static final String INFO_CANDIDATEIDENTITY_RETRIEVE_DUPLICATE = "identityimport.info.candidateidentity.retrieve.duplicate";
+
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
     
@@ -132,6 +139,8 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
     private static final String CANDIDATEIDENTITY_WFBEANSERVICE = "identityimport.candidateidentity.wfbeanservice";
 
     private WorkflowBeanService<CandidateIdentity> _wfBeanService = SpringContextService.getBean( CANDIDATEIDENTITY_WFBEANSERVICE );
+
+    private IdentityService identityService = SpringContextService.getBean( "identityService.rest.httpAccess.v3" );
 
     // Session variable to store working values
     private CandidateIdentity _candidateidentity;
@@ -159,6 +168,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
         }
 
         Map<String, Object> model = getPaginatedListModel( request, MARK_CANDIDATEIDENTITY_LIST, _listIdCandidateIdentities, JSP_MANAGE_CANDIDATEIDENTITIES );
+        model.put(PARAMETER_BATCH_ID, _currentBatchId);
 
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_CANDIDATEIDENTITIES, TEMPLATE_MANAGE_CANDIDATEIDENTITIES, model );
     }
@@ -203,6 +213,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
 
         Map<String, Object> model = getModel( );
         model.put( MARK_CANDIDATEIDENTITY, _candidateidentity );
+        model.put( PARAMETER_BATCH_ID, _currentBatchId );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_CANDIDATEIDENTITY ) );
 
         return getPage( PROPERTY_PAGE_TITLE_CREATE_CANDIDATEIDENTITY, TEMPLATE_CREATE_CANDIDATEIDENTITY, model );
@@ -256,6 +267,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
         UrlItem url = new UrlItem( getActionUrl( ACTION_REMOVE_CANDIDATEIDENTITY ) );
         url.addParameter( PARAMETER_ID_CANDIDATEIDENTITY, nId );
+        url.addParameter( PARAMETER_BATCH_ID, _currentBatchId );
 
         String strMessageUrl = AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_CANDIDATEIDENTITY, url.getUrl( ),
                 AdminMessage.TYPE_CONFIRMATION );
@@ -282,7 +294,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
         _candidateidentity = null;
         _wfBean = null;
         
-        return redirectView( request, VIEW_MANAGE_CANDIDATEIDENTITIES );
+        return redirect( request, VIEW_MANAGE_CANDIDATEIDENTITIES, PARAMETER_ID_CANDIDATEIDENTITY, nId, PARAMETER_BATCH_ID, _currentBatchId );
     }
 
     /**
@@ -301,7 +313,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
         {
             Optional<CandidateIdentity> optCandidateIdentity = CandidateIdentityHome.findByPrimaryKey( nId );
             _candidateidentity = optCandidateIdentity.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
-            
+            _currentBatchId = Integer.parseInt( request.getParameter( PARAMETER_BATCH_ID ) );
             _wfBean = _wfBeanService.createWorkflowBean( _candidateidentity, 
             		_candidateidentity.getId( ), _candidateidentity.getIdBatch( ), getUser( ) );
         }
@@ -310,6 +322,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
         
         Map<String, Object> model = getModel( );
         model.put( MARK_CANDIDATEIDENTITY, _wfBean );
+        model.put(PARAMETER_BATCH_ID, _currentBatchId);
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_CANDIDATEIDENTITY ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_CANDIDATEIDENTITY, TEMPLATE_MODIFY_CANDIDATEIDENTITY, model );
@@ -421,13 +434,79 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
             
             _wfBean =  _wfBeanService.createWorkflowBean( _candidateidentity,
             		_candidateidentity.getId( ), _candidateidentity.getIdBatch( ), getUser( ) );
-            
-            
+        }
+        Map<String, Object> model = getModel( );
+
+        if ( _candidateidentity != null ) {
+            // Appel API Recherche
+            IdentitySearchRequest searchRequest = new IdentitySearchRequest();
+            SearchDto searchDto = new SearchDto();
+            List<SearchAttributeDto> searchAttributes = _candidateidentity.getAttributes().stream()
+                    .filter(attr -> attr.getCode().equals("family_name") ||
+                            attr.getCode().equals("first_name") ||
+                            attr.getCode().equals("birthdate"))
+                    .map(attr -> {
+                        SearchAttributeDto searchAttribute = new SearchAttributeDto();
+                        searchAttribute.setKey(attr.getCode());
+                        searchAttribute.setValue(attr.getValue());
+                        if (attr.getCode().equals("birthdate")) {
+                            searchAttribute.setStrict(true);
+                        } else {
+                            searchAttribute.setStrict(false);
+                        }
+                        return searchAttribute;
+                    }).collect(Collectors.toList());
+            searchDto.setAttributes(searchAttributes);
+            searchRequest.setSearch(searchDto);
+
+            try {
+                IdentitySearchResponse response = identityService.searchIdentities(searchRequest, _candidateidentity.getClientAppCode());
+
+                List<String> keyList = response.getIdentities().stream()
+                        .flatMap(duplicate -> duplicate.getAttributes().stream())
+                        .map(attr -> attr.getKey())
+                        .distinct().collect(Collectors.toList());
+                model.put( "key_list", keyList );
+                model.put( MARK_CANDIDATEIDENTITY_DUPLICATE_LIST, response.getIdentities() );
+            } catch (IdentityStoreException e) {
+                addInfo( INFO_CANDIDATEIDENTITY_RETRIEVE_DUPLICATE, getLocale( ) );
+            }
         }
 
         _wfBeanService.addHistory(_wfBean, request, getLocale( ) );
 
+        model.put( MARK_CANDIDATEIDENTITY, _wfBean );
+        model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_CANDIDATEIDENTITY ) );
+
+        return getPage( PROPERTY_PAGE_TITLE_IMPORT_CANDIDATEIDENTITY, TEMPLATE_IMPORT_CANDIDATEIDENTITY, model );
+    }
+
+    /**
+     * Identify the candidateidentity to import
+     *
+     * @param request
+     *            The Http request
+     * @return The HTML form to update info
+     */
+    @Action( ACTION_IMPORT_CANDIDATEIDENTITY )
+    public String doImportCandidateIdentity( HttpServletRequest request )
+    {
+        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
+
+        if ( _candidateidentity == null || ( _candidateidentity.getId( ) != nId ) )
+        {
+            Optional<CandidateIdentity> optCandidateIdentity = CandidateIdentityHome.findByPrimaryKey( nId );
+            _candidateidentity = optCandidateIdentity.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+
+            _candidateidentity.setAttributes( CandidateIdentityAttributeHome.getCandidateIdentityAttributesList( nId ) );
+
+            _wfBean =  _wfBeanService.createWorkflowBean( _candidateidentity,
+                    _candidateidentity.getId( ), _candidateidentity.getIdBatch( ), getUser( ) );
+        }
         Map<String, Object> model = getModel( );
+
+        _wfBeanService.addHistory(_wfBean, request, getLocale( ) );
+
         model.put( MARK_CANDIDATEIDENTITY, _wfBean );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_CANDIDATEIDENTITY ) );
 

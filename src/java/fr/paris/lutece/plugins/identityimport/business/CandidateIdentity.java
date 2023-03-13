@@ -34,9 +34,6 @@
 package fr.paris.lutece.plugins.identityimport.business;
 
 import javax.validation.constraints.Size;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import fr.paris.lutece.plugins.identityimport.wf.IResource;
 
 import java.io.Serializable;
 import java.util.List;
@@ -61,8 +58,10 @@ public class CandidateIdentity implements Serializable
     @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.CustomerId.size}" )
     private String _strCustomerId;
 
-    @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.ClientId.size}" )
-    private String _strClientId;
+    @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.ExternalCustomerId.size}" )
+    private String _strExternalCustomerId;
+
+    private String _strClientAppCode;
 
     @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.Status.size}" )
     private String strStatus;
@@ -155,24 +154,32 @@ public class CandidateIdentity implements Serializable
 
 
     /**
-     * Returns the ClientId
+     * Returns the ExternalCustomerId
      * 
-     * @return The ClientId
+     * @return The ExternalCustomerId
      */
-    public String getClientId( )
+    public String getExternalCustomerId( )
     {
-        return _strClientId;
+        return _strExternalCustomerId;
     }
 
     /**
-     * Sets the ClientId
+     * Sets the ExternalCustomerId
      * 
-     * @param strClientId
-     *            The ClientId
+     * @param strExternalCustomerId
+     *            The ExternalCustomerId
      */
-    public void setClientId( String strClientId )
+    public void setExternalCustomerId(String strExternalCustomerId )
     {
-        _strClientId = strClientId;
+        _strExternalCustomerId = strExternalCustomerId;
+    }
+
+    public String getClientAppCode() {
+        return _strClientAppCode;
+    }
+
+    public void setClientAppCode(String _strClientAppCode) {
+        this._strClientAppCode = _strClientAppCode;
     }
 
     /**

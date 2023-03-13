@@ -4,111 +4,107 @@
 	<@boxBody>
 	
 			<@messages errors=errors />
-   <@row >
+	   <@row >
 
-   <@columns >
-   		<@input type="hidden" id="id" name="id" value="${candidateidentity.resource.id}"/>
-			
-   		<@table >
-   		<@tr><@td>
-			
-		#i18n{identityimport.modify_candidateidentity.labelIdBatch} : 
-				${candidateidentity.resource.idBatch!''}
-				
-   		</@td></@tr>
-   		<@tr><@td>
-		
-        #i18n{identityimport.modify_candidateidentity.labelConnectionId}' : 
-               ${candidateidentity.resource.connectionId!''}
-		
-		
-   		</@td></@tr>
-   		<@tr><@td>
-		
-		#i18n{identityimport.modify_candidateidentity.labelCustomerId}' : 
-				${candidateidentity.resource.customerId!}
-			
-		</@td></@tr>
-   		<@tr><@td>
-   		attributes ...
-   		
-   		</@td></@tr>
-   		</@table>
-			
-	</@columns >
-	
-			
-	<@columns >
-   		<@input type="hidden" id="id" name="id" value="${candidateidentity.resource.id}"/>
-			
-   		<@table >
-   		<@tr><@td>
-			
-		#i18n{identityimport.modify_candidateidentity.labelIdBatch} : 
-				${candidateidentity.resource.idBatch!''}
-				
-   		</@td></@tr>
-   		<@tr><@td>
-		
-        #i18n{identityimport.modify_candidateidentity.labelConnectionId}' : 
-               ${candidateidentity.resource.connectionId!''}
-		
-		
-   		</@td></@tr>
-   		<@tr><@td>
-		
-		#i18n{identityimport.modify_candidateidentity.labelCustomerId}' : 
-				${candidateidentity.resource.customerId!}
-			
-		</@td></@tr>
-   		<@tr><@td>
-   		attributes ...
-   		
-   		</@td></@tr>
-   		</@table>
-			
-	</@columns >
-	<@columns >
-   		<@input type="hidden" id="id" name="id" value="${candidateidentity.resource.id}"/>
-			
-   		<@table >
-   		<@tr><@td>
-			
-		#i18n{identityimport.modify_candidateidentity.labelIdBatch} : 
-				${candidateidentity.resource.idBatch!''}
-				
-   		</@td></@tr>
-   		<@tr><@td>
-		
-        #i18n{identityimport.modify_candidateidentity.labelConnectionId}' : 
-               ${candidateidentity.resource.connectionId!''}
-		
-		
-   		</@td></@tr>
-   		<@tr><@td>
-		
-		#i18n{identityimport.modify_candidateidentity.labelCustomerId}' : 
-				${candidateidentity.resource.customerId!}
-			
-		</@td></@tr>
-   		<@tr><@td>
-   		attributes ...
-   		
-   		</@td></@tr>
-   		
-   		<@tr><@td>
-   		SELECT
-   		   		
-   		</@td></@tr>
-   		
-   		</@table>
-			
-	</@columns >
-	
-	
-	
-        
-        </@row>
+		<div class="col-auto left-col">
+			<@columns>
+				<@table >
+					<@tr>
+						<@td>#i18n{identityimport.modify_candidateidentity.labelIdBatch} :</@td>
+					</@tr>
+					<@tr>
+						<@td>#i18n{identityimport.modify_candidateidentity.labelConnectionId} :</@td>
+					</@tr>
+					<@tr>
+						<@td>#i18n{identityimport.import_candidateidentity.labelCustomerId} :</@td>
+					</@tr>
+					<#list key_list as key >
+						<@tr>
+							<@td>${key!} :</@td>
+						</@tr>
+					</#list>
+				</@table>
+			</@columns >
+		</div>
+		<div class="col right-col d-flex flex-nowrap" style="overflow-x: auto">
+			<@columns >
+				<@table >
+					<@tr>
+						<@td>${candidateidentity.resource.idBatch!''}</@td>
+					</@tr>
+					<@tr>
+						<@td>${candidateidentity.resource.connectionId!''}</@td>
+					</@tr>
+					<@tr>
+						<@td>${candidateidentity.resource.customerId!''}</@td>
+					</@tr>
+					<#list key_list as key >
+						<@tr>
+							<#assign key_found = false>
+							<#list candidateidentity.resource.attributes as attribute>
+								<#if attribute.code??>
+									<#if key == attribute.code>
+										<@td>${attribute.value!}</@td>
+										<#assign key_found = true>
+									</#if>
+								</#if>
+							</#list>
+							<#if key_found = false>
+								<@td><i>Non défini</i></@td>
+							</#if>
+						</@tr>
+					</#list>
+					<@tr>
+						<@td><i style="font-weight: bold">Candidat</i></@td>
+					</@tr>
+				</@table>
+			</@columns >
+			<#list candidateidentity_duplicate_list as duplicate >
+				<@columns>
+					<@input type="hidden" id="connection_id" name="connection_id" value="${duplicate.connectionId}"/>
+					<@input type="hidden" id="customer_id" name="customer_id" value="${duplicate.customerId}"/>
+
+					<@table >
+						<@tr>
+							<@td>
+								${candidateidentity.resource.idBatch!''}
+							</@td>
+						</@tr>
+						<@tr>
+							<@td>
+								${duplicate.connectionId!''}
+							</@td>
+						</@tr>
+						<@tr>
+							<@td>
+								${duplicate.customerId!}
+							</@td>
+						</@tr>
+						<#list key_list as key >
+							<@tr>
+								<#assign key_found = false>
+								<#list duplicate.attributes as attribute>
+									<#if key = attribute.key>
+										<@td>${attribute.value!}</@td>
+										<#assign key_found = true>
+									</#if>
+								</#list>
+								<#if key_found = false>
+									<@td><i>Non défini</i></@td>
+								</#if>
+							</@tr>
+						</#list>
+						<@tr>
+							<td>
+								<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=importCandidateIdentity&id=${candidateidentity.resource.id}&connection_id=${duplicate.connectionId}&customer_id=${duplicate.customerId}' title='#i18n{portal.util.labelUpload}' hideTitle=['all'] buttonIcon='upload' />
+							</td>
+						</@tr>
+					</@table>
+				</@columns >
+			</#list>
+		</div>
+
+		</@row>
     
 	</@boxBody>
 </@box>

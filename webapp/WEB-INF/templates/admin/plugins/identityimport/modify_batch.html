@@ -8,7 +8,7 @@
 	<@boxBody>
     <@tform class="form-horizontal" method="post" name="modify_batch" action="jsp/admin/plugins/identityimport/ManageBatchs.jsp" >
 			<@messages errors=errors />
-			<@input type="hidden" id="id" name="id" value="${batch.resource.id}"/>
+			<@input type="hidden" id="id_batch" name="id_batch" value="${batch.resource.id}"/>
 			<@input type="hidden" value="${token}" name="token" />
 			
 			<@formGroup labelFor='date' labelKey='#i18n{identityimport.modify_batch.labelDate}' mandatory=true>
@@ -25,7 +25,7 @@
 			</@formGroup>
         <@actionButtons button1Name="action_modifyBatch" button2Name="view_manageBatch"/>
         
-        <@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?batch_id=${batch.resource.id}' 
+        <@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?id_batch=${batch.resource.id}'
         title='#i18n{identityimport.manage_candidateidentities.title}'  buttonIcon='list'  size='md'  />
 				
 				

@@ -20,13 +20,13 @@
         <#list client_list as client >
         <tr>
             <td>
-				${client.name}
+				${client.name!}
 			</td>
             <td>
-				${client.appCode}
+				${client.appCode!}
 			</td>
             <td>
-				${client.token}
+				${client.token!}
 			</td>
         	<td>
 				<@aButton href='jsp/admin/plugins/identityimport/ManageClients.jsp?view=modifyClient&id=${client.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />

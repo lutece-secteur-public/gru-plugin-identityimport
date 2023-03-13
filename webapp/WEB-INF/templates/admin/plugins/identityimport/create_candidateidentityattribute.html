@@ -5,23 +5,24 @@
     <@tform name='create_candidateidentityattribute' action='jsp/admin/plugins/identityimport/ManageCandidateIdentityAttributes.jsp' >
 
         <@messages errors=errors />
-        <@input type="hidden" id="id" name="id"/>
+        <@input type="hidden" value="${id_identity}" id="id_identity" name="id_identity"/>
+		<@input type="hidden" value="${id_batch}" name="id_batch" />
         <@input type="hidden" value="${token}" name="token" />
 
-		<@formGroup labelFor='key' labelKey='#i18n{identityimport.modify_candidateidentityattribute.labelKey}' mandatory=true>
-			<@input type='text' id='key' name='key'  maxlength=255 value='${candidateidentityattribute.key!\'\'}' tabIndex='0' />
+		<@formGroup labelFor='code' labelKey='#i18n{identityimport.modify_candidateidentityattribute.labelKey}' mandatory=true>
+			<@input type='text' id='code' name='code'  maxlength=255 value='${candidateidentityattribute.code!\'\'}' tabIndex='0' />
 		</@formGroup>
 		<@formGroup labelFor='value' labelKey='#i18n{identityimport.modify_candidateidentityattribute.labelValue}' mandatory=true>
 			<@input type='text' id='value' name='value'  value='${candidateidentityattribute.value!\'\'}' tabIndex='1' />
 		</@formGroup>
-		<@formGroup labelFor='cert_process' labelKey='#i18n{identityimport.modify_candidateidentityattribute.labelCertProcess}' mandatory=true>
+		<@formGroup labelFor='cert_process' labelKey='#i18n{identityimport.modify_candidateidentityattribute.labelCertProcess}'>
 			<@input type='text' id='cert_process' name='cert_process'  maxlength=255 value='${candidateidentityattribute.certProcess!\'\'}' tabIndex='2' />
 		</@formGroup>
-		<@formGroup labelFor='cert_date' labelKey='#i18n{identityimport.modify_candidateidentityattribute.labelCertDate}' mandatory=true>
+		<@formGroup labelFor='cert_date' labelKey='#i18n{identityimport.modify_candidateidentityattribute.labelCertDate}'>
 			<@input type='text' id='cert_date' name='cert_date'  value='${candidateidentityattribute.certDate!\'\'}' tabIndex='3' />
 		</@formGroup>
 				
-		<@actionButtons button1Name="action_createCandidateIdentityAttribute" button2Name="view_manageCandidateIdentityAttribute"/>
+		<@actionButtons button1Name="action_createCandidateIdentityAttribute" button2Name="view_manageCandidateIdentityAttributes"/>
     </@tform>
 	</@boxBody>
 </@box>

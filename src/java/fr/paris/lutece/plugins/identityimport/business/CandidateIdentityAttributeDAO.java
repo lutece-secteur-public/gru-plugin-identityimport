@@ -35,7 +35,6 @@
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.sql.DAOUtil;
 import java.sql.Statement;
 
@@ -55,7 +54,7 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity_attribute SET code = ?, value = ?, cert_process = ?, cert_date = ? WHERE id_candidate_identity_attribute = ?";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_candidate_identity_attribute FROM identityimport_candidate_identity_attribute where id_candidate_identity = ? ";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_candidate_identity_attribute, id_candidate_identity, code, value, cert_process, cert_date FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute IN (  ";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_candidate_identity_attribute, id_candidate_identity, code, value, cert_date, cert_process FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute IN (  ";
 
     /**
      * {@inheritDoc }
@@ -66,7 +65,7 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
             int nIndex = 1;
-            daoUtil.setInt( nIndex++, candidateIdentityAttribute.getIdentityId( ) );
+            daoUtil.setInt( nIndex++, candidateIdentityAttribute.getIdIdentity( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getCode( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getValue( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getCertProcess( ) );
@@ -99,7 +98,7 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
                 int nIndex = 1;
 
                 candidateIdentityAttribute.setId( daoUtil.getInt( nIndex++ ) );
-                candidateIdentityAttribute.setIdentityId( daoUtil.getInt( nIndex++ ) );
+                candidateIdentityAttribute.setIdIdentity( daoUtil.getInt( nIndex++ ) );
                 candidateIdentityAttribute.setCode( daoUtil.getString( nIndex++ ) );
                 candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
                 candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex++ ) );
@@ -133,7 +132,6 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
         {
             int nIndex = 1;
 
-            daoUtil.setInt( nIndex++, candidateIdentityAttribute.getIdentityId( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getCode( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getValue( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getCertProcess( ) );
@@ -162,7 +160,7 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
                 int nIndex = 1;
 
                 candidateIdentityAttribute.setId( daoUtil.getInt( nIndex++ ) );
-                candidateIdentityAttribute.setIdentityId( daoUtil.getInt( nIndex++ ) );
+                candidateIdentityAttribute.setIdIdentity( daoUtil.getInt( nIndex++ ) );
                 candidateIdentityAttribute.setCode( daoUtil.getString( nIndex++ ) );
                 candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
                 candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex++ ) );
@@ -185,7 +183,7 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
         List<Integer> candidateIdentityAttributeList = new ArrayList<>( );
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
         {
-        	daoUtil.setInt( 0, idIdentity);
+        	daoUtil.setInt( 1, idIdentity);
             daoUtil.executeQuery( );
 
             while ( daoUtil.next( ) )
@@ -232,10 +230,11 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
                     int nIndex = 1;
 
                     candidateIdentityAttribute.setId( daoUtil.getInt( nIndex++ ) );
+                    candidateIdentityAttribute.setIdIdentity( daoUtil.getInt( nIndex++ ) );
                     candidateIdentityAttribute.setCode( daoUtil.getString( nIndex++ ) );
                     candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
-                    candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex++ ) );
-                    candidateIdentityAttribute.setCertDate( daoUtil.getDate( nIndex ) );
+                    candidateIdentityAttribute.setCertDate( daoUtil.getDate( nIndex++ ) );
+                    candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex ) );
 
                     candidateIdentityAttributeList.add( candidateIdentityAttribute );
                 }

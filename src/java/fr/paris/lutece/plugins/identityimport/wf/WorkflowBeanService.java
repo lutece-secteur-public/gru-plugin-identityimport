@@ -142,7 +142,7 @@ public class WorkflowBeanService<T> implements Serializable
     public WorkflowBean<T> refresh( WorkflowBean<T> wfBean )
     {
     	// set (or initialize) state
-    	wfBean.setState( WorkflowService.getInstance( ).getState( wfBean.getResourceId( ), _strResourceType, _nWorkflowKey, -1 ) );
+    	wfBean.setState( WorkflowService.getInstance( ).getState( wfBean.getResourceId( ), _strResourceType, _nWorkflowKey, wfBean.getExternalParentId() ) );
     	
     	// set available actions
     	wfBean.setActions( WorkflowService.getInstance( ).getActions( wfBean.getResourceId( ), _strResourceType, _nWorkflowKey, wfBean.getUser( ) ) );

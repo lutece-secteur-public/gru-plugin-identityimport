@@ -38,7 +38,6 @@ import java.io.Serializable;
 import java.sql.Date;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 /**
  * This is the business class for the object CandidateIdentityAttribute
@@ -60,7 +59,6 @@ public class CandidateIdentityAttribute implements Serializable
 
     @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentityattribute.CertProcess.size}" )
     private String _strCertProcess;
-    @NotNull( message = "#i18n{portal.validation.message.notEmpty}" )
     private Date _dateCertDate;
 
     /**
@@ -173,7 +171,7 @@ public class CandidateIdentityAttribute implements Serializable
      * 
      * @return the id
      */
-	public int getIdentityId() {
+	public int getIdIdentity() {
 		return _nIdIdentity;
 	}
 
@@ -182,7 +180,7 @@ public class CandidateIdentityAttribute implements Serializable
 	 * 
 	 * @param _nIdIdentity
 	 */
-	public void setIdentityId(int _nIdIdentity) {
+	public void setIdIdentity(int _nIdIdentity) {
 		this._nIdIdentity = _nIdIdentity;
 	}
 

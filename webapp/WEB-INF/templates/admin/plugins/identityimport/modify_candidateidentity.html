@@ -5,19 +5,14 @@
     <@tform class="form-horizontal" method="post" name="modify_candidateidentity" action="jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp" >
 			<@messages errors=errors />
 			<@input type="hidden" id="id" name="id" value="${candidateidentity.resource.id}"/>
+			<@input type="hidden" id="id_batch" name="id_batch" value="${id_batch}"/>
 			<@input type="hidden" value="${token}" name="token" />
-			
-			<@formGroup labelFor='id_batch' labelKey='#i18n{identityimport.modify_candidateidentity.labelIdBatch}' mandatory=true>
-				<@input type='text' id='id_batch' name='id_batch'  maxlength=255 value='${candidateidentity.resource.idBatch!\'\'}' tabIndex='0' />
-			</@formGroup>
+
 			<@formGroup labelFor='connection_id' labelKey='#i18n{identityimport.modify_candidateidentity.labelConnectionId}' >
-				<@input type='text' id='connection_id' name='connection_id'  maxlength=255 value='${candidateidentity.resource.connectionId!\'\'}' tabIndex='1' />
+				<@input type='text' id='connection_id' name='connection_id'  maxlength=255 value='${candidateidentity.resource.connectionId!\'\'}' tabIndex='0' />
 			</@formGroup>
-			<@formGroup labelFor='customer_id' labelKey='#i18n{identityimport.modify_candidateidentity.labelCustomerId}' mandatory=true >
-				<@input type='text' id='customer_id' name='customer_id'  maxlength=255 value='${candidateidentity.resource.customerId!\'\'}' tabIndex='2' />
-			</@formGroup>
-			<@formGroup labelFor='status' labelKey='#i18n{identityimport.modify_candidateidentity.labelStatus}' >
-				<@input type='text' id='status' name='status'  maxlength=255 value='${candidateidentity.resource.status!\'\'}' tabIndex='3' />
+			<@formGroup labelFor='external_customer_id' labelKey='#i18n{identityimport.modify_candidateidentity.labelExternalCustomerId}'>
+				<@input type='text' id='external_customer_id' name='external_customer_id'  maxlength=255 value='${candidateidentity.resource.externalCustomerId!\'\'}' tabIndex='1' />
 			</@formGroup>
         <@actionButtons button1Name="action_modifyCandidateIdentity" button2Name="view_manageCandidateIdentity"/>
     </@tform>

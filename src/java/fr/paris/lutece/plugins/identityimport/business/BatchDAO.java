@@ -49,13 +49,13 @@ import java.util.Optional;
 public final class BatchDAO implements IBatchDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id_batch, date, username, app_code, comment FROM identityimport_batch WHERE id_batch = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_batch ( date, username, app_code, comment ) VALUES ( ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_batch, date, user, app_code, comment FROM identityimport_batch WHERE id_batch = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_batch ( date, user, app_code, comment ) VALUES ( ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_batch WHERE id_batch = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_batch SET id_batch = ?, date = ?, username = ?, app_code = ?, comment = ? WHERE id_batch = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_batch, date, username, app_code, comment FROM identityimport_batch";
+    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_batch SET id_batch = ?, date = ?, user = ?, app_code = ?, comment = ? WHERE id_batch = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_batch, date, user, app_code, comment FROM identityimport_batch";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_batch FROM identityimport_batch";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_batch, date, username, app_code, comment FROM identityimport_batch WHERE id_batch IN (  ";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_batch, date, user, app_code, comment FROM identityimport_batch WHERE id_batch IN (  ";
 
     /**
      * {@inheritDoc }
