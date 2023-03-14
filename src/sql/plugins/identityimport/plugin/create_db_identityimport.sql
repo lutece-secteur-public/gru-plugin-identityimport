@@ -38,7 +38,7 @@ DROP TABLE IF EXISTS identityimport_candidate_identity_attribute;
 CREATE TABLE identityimport_candidate_identity_attribute (
 id_candidate_identity_attribute int AUTO_INCREMENT,
 id_candidate_identity int ,
-key varchar(255) default '' NOT NULL,
+code varchar(255) default '' NOT NULL,
 value long varchar,
 cert_process varchar(255) default '',
 cert_date date,
