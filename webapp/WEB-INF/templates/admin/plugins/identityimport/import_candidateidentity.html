@@ -61,7 +61,7 @@
 			</@columns >
 			<#list candidateidentity_duplicate_list as duplicate >
 				<@columns>
-					<@input type="hidden" id="connection_id" name="connection_id" value="${duplicate.connectionId}"/>
+					<@input type="hidden" id="connection_id" name="connection_id" value="${duplicate.connectionId!''}"/>
 					<@input type="hidden" id="customer_id" name="customer_id" value="${duplicate.customerId}"/>
 
 					<@table >
@@ -96,7 +96,7 @@
 						</#list>
 						<@tr>
 							<td>
-								<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=importCandidateIdentity&id=${candidateidentity.resource.id}&connection_id=${duplicate.connectionId}&customer_id=${duplicate.customerId}' title='#i18n{portal.util.labelUpload}' hideTitle=['all'] buttonIcon='upload' />
+								<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=importCandidateIdentity&id=${candidateidentity.resource.id}&customer_id=${duplicate.customerId}' title='#i18n{portal.util.labelUpload}' hideTitle=['all'] buttonIcon='upload' />
 							</td>
 						</@tr>
 					</@table>
