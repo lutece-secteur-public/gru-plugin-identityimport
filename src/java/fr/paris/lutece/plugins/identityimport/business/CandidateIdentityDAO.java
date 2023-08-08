@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2023, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@
  *
  * License 1.0
  */
-
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -48,10 +47,9 @@ import java.util.Optional;
 public final class CandidateIdentityDAO implements ICandidateIdentityDAO
 {
     // Constants
-	private static final String SQL_QUERY_SELECT_ALL = "SELECT i.id_candidate_identity, i.id_batch, i.connection_id, i.customer_id, i.client_id, i.status, ib.app_code " +
-            " FROM identityimport_candidate_identity  i " +
-            " JOIN identityimport_batch ib on i.id_batch = ib.id_batch ";
-	private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE id_candidate_identity = ?";
+    private static final String SQL_QUERY_SELECT_ALL = "SELECT i.id_candidate_identity, i.id_batch, i.connection_id, i.customer_id, i.client_id, i.status, ib.app_code "
+            + " FROM identityimport_candidate_identity  i " + " JOIN identityimport_batch ib on i.id_batch = ib.id_batch ";
+    private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE id_candidate_identity = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_candidate_identity ( id_batch, connection_id, customer_id, client_id, status) VALUES ( ?, ?, ?, ?, ?) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_candidate_identity WHERE id_candidate_identity = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity SET id_candidate_identity = ?, id_batch = ?, connection_id = ?, customer_id = ?, client_id = ?, status = ? WHERE id_candidate_identity = ?";
@@ -71,7 +69,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
             daoUtil.setInt( nIndex++, candidateIdentity.getIdBatch( ) );
             daoUtil.setString( nIndex++, candidateIdentity.getConnectionId( ) );
             daoUtil.setString( nIndex++, candidateIdentity.getCustomerId( ) );
-            daoUtil.setString( nIndex++, candidateIdentity.getExternalCustomerId() );
+            daoUtil.setString( nIndex++, candidateIdentity.getExternalCustomerId( ) );
             daoUtil.setString( nIndex, candidateIdentity.getStatus( ) );
 
             daoUtil.executeUpdate( );
@@ -140,7 +138,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
             daoUtil.setInt( nIndex++, candidateIdentity.getIdBatch( ) );
             daoUtil.setString( nIndex++, candidateIdentity.getConnectionId( ) );
             daoUtil.setString( nIndex++, candidateIdentity.getCustomerId( ) );
-            daoUtil.setString( nIndex++, candidateIdentity.getExternalCustomerId() );
+            daoUtil.setString( nIndex++, candidateIdentity.getExternalCustomerId( ) );
             daoUtil.setString( nIndex++, candidateIdentity.getStatus( ) );
             daoUtil.setInt( nIndex, candidateIdentity.getId( ) );
 
@@ -186,10 +184,10 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     public List<Integer> selectIdCandidateIdentitiesList( int nBatchId, Plugin plugin )
     {
         List<Integer> candidateIdentityList = new ArrayList<>( );
-        
+
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
         {
-        	daoUtil.setInt( 1, nBatchId );
+            daoUtil.setInt( 1, nBatchId );
             daoUtil.executeQuery( );
 
             while ( daoUtil.next( ) )
@@ -242,7 +240,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
                     candidateIdentity.setExternalCustomerId( daoUtil.getString( nIndex++ ) );
                     candidateIdentity.setStatus( daoUtil.getString( nIndex++ ) );
                     candidateIdentity.setClientAppCode( daoUtil.getString( nIndex++ ) );
-                    
+
                     candidateIdentityList.add( candidateIdentity );
                 }
 

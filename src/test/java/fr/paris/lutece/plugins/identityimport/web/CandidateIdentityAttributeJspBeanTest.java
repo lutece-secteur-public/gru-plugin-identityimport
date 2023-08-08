@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2023, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ import fr.paris.lutece.portal.web.l10n.LocaleService;
  */
 public class CandidateIdentityAttributeJspBeanTest extends LuteceTestCase
 {
-	private static final String KEY1 = "Key1";
+    private static final String KEY1 = "Key1";
     private static final String KEY2 = "Key2";
     private static final int IDENTITY1 = 1;
     private static final int IDENTITY2 = 2;
@@ -89,7 +89,7 @@ public class CandidateIdentityAttributeJspBeanTest extends LuteceTestCase
         AdminUser adminUser = new AdminUser( );
         adminUser.setAccessCode( "admin" );
 
-        request.addParameter( "identity_id", String.valueOf( IDENTITY1 ) ) ;
+        request.addParameter( "identity_id", String.valueOf( IDENTITY1 ) );
         request.addParameter( "key", KEY1 );
         request.addParameter( "value", VALUE1 );
         request.addParameter( "cert_process", CERTPROCESS1 );

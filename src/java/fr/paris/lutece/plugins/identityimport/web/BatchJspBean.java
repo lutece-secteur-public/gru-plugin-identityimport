@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2023, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@
  *
  * License 1.0
  */
-
 package fr.paris.lutece.plugins.identityimport.web;
 
 import java.util.ArrayList;
@@ -75,7 +74,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String TEMPLATE_CREATE_BATCH = "/admin/plugins/identityimport/create_batch.html";
     private static final String TEMPLATE_MODIFY_BATCH = "/admin/plugins/identityimport/modify_batch.html";
     private static final String TEMPLATE_PROCESS_BATCH = "/admin/plugins/identityimport/process_batch.html";
-    
+
     // Parameters
     private static final String PARAMETER_ID_BATCH = "id";
     private static final String PARAMETER_ID_ACTION = "id_action";
@@ -85,9 +84,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String PROPERTY_PAGE_TITLE_MANAGE_BATCHS = "identityimport.manage_batchs.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_MODIFY_BATCH = "identityimport.modify_batch.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_CREATE_BATCH = "identityimport.create_batch.pageTitle";
-	private static final String PROPERTY_PAGE_TITLE_PROCESS_BATCH = "identityimport.process_batch.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_PROCESS_BATCH = "identityimport.process_batch.pageTitle";
 
-	// Markers
+    // Markers
     private static final String MARK_BATCH_LIST = "batch_list";
     private static final String MARK_BATCH = "batch";
 
@@ -165,8 +164,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
         // keep original order
         return listBatch.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) )
-                .map( b -> _wfBeanService.createWorkflowBean( b, b.getId( ), getUser( ) ) )
-                .collect( Collectors.toList( ) );
+                .map( b -> _wfBeanService.createWorkflowBean( b, b.getId( ), getUser( ) ) ).collect( Collectors.toList( ) );
     }
 
     /**
@@ -290,8 +288,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             _wfBean = _wfBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
         }
 
-        _wfBeanService.addHistory(_wfBean, request, getLocale( ) );
-        
+        _wfBeanService.addHistory( _wfBean, request, getLocale( ) );
+
         Map<String, Object> model = getModel( );
         model.put( MARK_BATCH, _wfBean );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_BATCH ) );
@@ -351,9 +349,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             _wfBean = _wfBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
         }
 
-        _wfBeanService.processAction(_wfBean, nAction, request, getLocale( ) );        
-        
+        _wfBeanService.processAction( _wfBean, nAction, request, getLocale( ) );
+
         return redirect( request, VIEW_MODIFY_BATCH, PARAMETER_ID_BATCH, nId );
-        
+
     }
 }

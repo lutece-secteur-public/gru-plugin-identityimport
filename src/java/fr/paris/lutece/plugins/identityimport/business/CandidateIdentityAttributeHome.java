@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2023, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@
  *
  * License 1.0
  */
-
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -128,7 +127,7 @@ public final class CandidateIdentityAttributeHome
     {
         return _dao.selectCandidateIdentityAttributesList( idIdentity, _plugin );
     }
-    
+
     /**
      * Load the data of all the avant objects and returns them as a list
      * 

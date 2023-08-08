@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2023, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ import fr.paris.lutece.plugins.workflowcore.business.state.State;
 public class WorkflowBean<T>
 {
 
-	private T _resource;
+    private T _resource;
     private String _strResourceType;
     private int _nResourceId;
     private User _user;
@@ -67,7 +67,7 @@ public class WorkflowBean<T>
         this._strResourceType = strResourceType;
         this._nWorkflowKey = nWorkflowKey;
     }
-    
+
     /**
      * constructor with external parent id
      * 
@@ -104,7 +104,7 @@ public class WorkflowBean<T>
     {
         return _nWorkflowKey;
     }
-    
+
     /**
      * get the state of the resource
      * 
@@ -150,52 +150,62 @@ public class WorkflowBean<T>
 
     /**
      * set state
+     * 
      * @param _state
      */
-	public void setState(State _state) {
-		this._state = _state;
-	}
+    public void setState( State _state )
+    {
+        this._state = _state;
+    }
 
-	/**
-	 * set actions
-	 * @param _listActions
-	 */
-	public void setActions(Collection<Action> _listActions) {
-		this._listActions = _listActions;
-	}
+    /**
+     * set actions
+     * 
+     * @param _listActions
+     */
+    public void setActions( Collection<Action> _listActions )
+    {
+        this._listActions = _listActions;
+    }
 
-	/** set history
-	 * 
-	 * @param _strHistory
-	 */
-	public void setHistory(String _strHistory) {
-		this._strHistory = _strHistory;
-	}
-	
-	/**
-	 * get resource id
-	 * @return the id
-	 */
-	public int getResourceId( ) {
-		return _nResourceId;
-	}
+    /**
+     * set history
+     * 
+     * @param _strHistory
+     */
+    public void setHistory( String _strHistory )
+    {
+        this._strHistory = _strHistory;
+    }
 
-	/**
-	 * get external parent id
-	 * 
-	 * @return the parent id
-	 */
-	public int getExternalParentId() {
-		return _nExternalParentId;
-	}
+    /**
+     * get resource id
+     * 
+     * @return the id
+     */
+    public int getResourceId( )
+    {
+        return _nResourceId;
+    }
 
-	/**
-	 * get user
-	 * @return the user
-	 */
-	public User getUser() {
-		return _user;
-	}
-	
-	
+    /**
+     * get external parent id
+     * 
+     * @return the parent id
+     */
+    public int getExternalParentId( )
+    {
+        return _nExternalParentId;
+    }
+
+    /**
+     * get user
+     * 
+     * @return the user
+     */
+    public User getUser( )
+    {
+        return _user;
+    }
+
 }

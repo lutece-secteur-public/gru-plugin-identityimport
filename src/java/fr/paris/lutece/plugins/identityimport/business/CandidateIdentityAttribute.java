@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2023, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ public class CandidateIdentityAttribute implements Serializable
 
     // Variables declarations
     private int _nId;
-    
+
     private int _nIdIdentity;
 
     @NotEmpty( message = "#i18n{identityimport.validation.candidateidentityattribute.Key.notEmpty}" )
@@ -171,17 +171,19 @@ public class CandidateIdentityAttribute implements Serializable
      * 
      * @return the id
      */
-	public int getIdIdentity() {
-		return _nIdIdentity;
-	}
+    public int getIdIdentity( )
+    {
+        return _nIdIdentity;
+    }
 
-	/**
-	 * set identity id
-	 * 
-	 * @param _nIdIdentity
-	 */
-	public void setIdIdentity(int _nIdIdentity) {
-		this._nIdIdentity = _nIdIdentity;
-	}
+    /**
+     * set identity id
+     * 
+     * @param _nIdIdentity
+     */
+    public void setIdIdentity( int _nIdIdentity )
+    {
+        this._nIdIdentity = _nIdIdentity;
+    }
 
 }

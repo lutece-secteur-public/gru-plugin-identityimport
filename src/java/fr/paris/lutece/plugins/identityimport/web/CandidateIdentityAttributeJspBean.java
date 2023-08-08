@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2023, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@
  *
  * License 1.0
  */
-
 package fr.paris.lutece.plugins.identityimport.web;
 
 import fr.paris.lutece.portal.service.message.AdminMessage;
@@ -62,10 +61,10 @@ import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribut
 public class CandidateIdentityAttributeJspBean extends AbstractManageItemsJspBean<Integer, CandidateIdentityAttribute>
 {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 9007725551001629387L;
-	// Templates
+     * 
+     */
+    private static final long serialVersionUID = 9007725551001629387L;
+    // Templates
     private static final String TEMPLATE_MANAGE_CANDIDATEIDENTITYATTRIBUTES = "/admin/plugins/identityimport/manage_candidateidentityattributes.html";
     private static final String TEMPLATE_CREATE_CANDIDATEIDENTITYATTRIBUTE = "/admin/plugins/identityimport/create_candidateidentityattribute.html";
     private static final String TEMPLATE_MODIFY_CANDIDATEIDENTITYATTRIBUTE = "/admin/plugins/identityimport/modify_candidateidentityattribute.html";
@@ -115,7 +114,7 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageItemsJspBea
     private CandidateIdentityAttribute _candidateidentityattribute;
     private List<Integer> _listIdCandidateIdentityAttributes;
     private int _currentIdentityId;
-    
+
     /**
      * Build the Manage View
      * 
@@ -127,17 +126,17 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageItemsJspBea
     public String getManageCandidateIdentityAttributes( HttpServletRequest request )
     {
         _candidateidentityattribute = null;
-        final int _currentBatchId = Integer.parseInt( request.getParameter(MARK_BATCH_ID) );
+        final int _currentBatchId = Integer.parseInt( request.getParameter( MARK_BATCH_ID ) );
 
         if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX ) == null || _listIdCandidateIdentityAttributes.isEmpty( ) )
         {
-        	_currentIdentityId = Integer.parseInt( request.getParameter( PARAMETER_IDENTITY_ID ) );
+            _currentIdentityId = Integer.parseInt( request.getParameter( PARAMETER_IDENTITY_ID ) );
             _listIdCandidateIdentityAttributes = CandidateIdentityAttributeHome.getIdCandidateIdentityAttributesList( _currentIdentityId );
         }
 
         Map<String, Object> model = getPaginatedListModel( request, MARK_CANDIDATEIDENTITYATTRIBUTE_LIST, _listIdCandidateIdentityAttributes,
                 JSP_MANAGE_CANDIDATEIDENTITYATTRIBUTES );
-        model.put(MARK_BATCH_ID, _currentBatchId);
+        model.put( MARK_BATCH_ID, _currentBatchId );
 
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_CANDIDATEIDENTITYATTRIBUTES, TEMPLATE_MANAGE_CANDIDATEIDENTITYATTRIBUTES, model );
     }
@@ -177,7 +176,7 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageItemsJspBea
     public String getCreateCandidateIdentityAttribute( HttpServletRequest request )
     {
         _candidateidentityattribute = ( _candidateidentityattribute != null ) ? _candidateidentityattribute : new CandidateIdentityAttribute( );
-        final int _currentBatchId = Integer.parseInt( request.getParameter(MARK_BATCH_ID) );
+        final int _currentBatchId = Integer.parseInt( request.getParameter( MARK_BATCH_ID ) );
 
         Map<String, Object> model = getModel( );
         model.put( MARK_CANDIDATEIDENTITYATTRIBUTE, _candidateidentityattribute );
@@ -200,7 +199,7 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageItemsJspBea
     public String doCreateCandidateIdentityAttribute( HttpServletRequest request ) throws AccessDeniedException
     {
         populate( _candidateidentityattribute, request, getLocale( ) );
-        final int _currentBatchId = Integer.parseInt( request.getParameter(MARK_BATCH_ID) );
+        final int _currentBatchId = Integer.parseInt( request.getParameter( MARK_BATCH_ID ) );
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_CANDIDATEIDENTITYATTRIBUTE ) )
         {
@@ -231,7 +230,7 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageItemsJspBea
     public String getConfirmRemoveCandidateIdentityAttribute( HttpServletRequest request )
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITYATTRIBUTE ) );
-        final int _currentBatchId = Integer.parseInt( request.getParameter(MARK_BATCH_ID) );
+        final int _currentBatchId = Integer.parseInt( request.getParameter( MARK_BATCH_ID ) );
         UrlItem url = new UrlItem( getActionUrl( ACTION_REMOVE_CANDIDATEIDENTITYATTRIBUTE ) );
         url.addParameter( PARAMETER_ID_CANDIDATEIDENTITYATTRIBUTE, nId );
         url.addParameter( MARK_BATCH_ID, _currentBatchId );
@@ -253,7 +252,7 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageItemsJspBea
     public String doRemoveCandidateIdentityAttribute( HttpServletRequest request )
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITYATTRIBUTE ) );
-        final int _currentBatchId = Integer.parseInt( request.getParameter(MARK_BATCH_ID) );
+        final int _currentBatchId = Integer.parseInt( request.getParameter( MARK_BATCH_ID ) );
 
         CandidateIdentityAttributeHome.remove( nId );
         addInfo( INFO_CANDIDATEIDENTITYATTRIBUTE_REMOVED, getLocale( ) );
@@ -273,7 +272,7 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageItemsJspBea
     public String getModifyCandidateIdentityAttribute( HttpServletRequest request )
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITYATTRIBUTE ) );
-        final int _currentBatchId = Integer.parseInt( request.getParameter(MARK_BATCH_ID) );
+        final int _currentBatchId = Integer.parseInt( request.getParameter( MARK_BATCH_ID ) );
 
         if ( _candidateidentityattribute == null || ( _candidateidentityattribute.getId( ) != nId ) )
         {
@@ -302,7 +301,7 @@ public class CandidateIdentityAttributeJspBean extends AbstractManageItemsJspBea
     public String doModifyCandidateIdentityAttribute( HttpServletRequest request ) throws AccessDeniedException
     {
         populate( _candidateidentityattribute, request, getLocale( ) );
-        final int _currentBatchId = Integer.parseInt( request.getParameter(MARK_BATCH_ID) );
+        final int _currentBatchId = Integer.parseInt( request.getParameter( MARK_BATCH_ID ) );
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_MODIFY_CANDIDATEIDENTITYATTRIBUTE ) )
         {

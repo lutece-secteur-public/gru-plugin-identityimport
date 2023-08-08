@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2023, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ public class CandidateIdentity implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-	private static final String CONSTANT_RESOURCE_IDENTITY_CANDIDATE = "IDENTITYIMPORT_CANDIDATE_RESOURCE";
+    private static final String CONSTANT_RESOURCE_IDENTITY_CANDIDATE = "IDENTITYIMPORT_CANDIDATE_RESOURCE";
 
     // Variables declarations
     private int _nId;
@@ -65,8 +65,8 @@ public class CandidateIdentity implements Serializable
 
     @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.Status.size}" )
     private String strStatus;
-    
-	private List<CandidateIdentityAttribute> _listAttributes;
+
+    private List<CandidateIdentityAttribute> _listAttributes;
 
     /**
      * Returns the Id
@@ -152,7 +152,6 @@ public class CandidateIdentity implements Serializable
         _strCustomerId = strCustomerId;
     }
 
-
     /**
      * Returns the ExternalCustomerId
      * 
@@ -169,55 +168,59 @@ public class CandidateIdentity implements Serializable
      * @param strExternalCustomerId
      *            The ExternalCustomerId
      */
-    public void setExternalCustomerId(String strExternalCustomerId )
+    public void setExternalCustomerId( String strExternalCustomerId )
     {
         _strExternalCustomerId = strExternalCustomerId;
     }
 
-    public String getClientAppCode() {
+    public String getClientAppCode( )
+    {
         return _strClientAppCode;
     }
 
-    public void setClientAppCode(String _strClientAppCode) {
+    public void setClientAppCode( String _strClientAppCode )
+    {
         this._strClientAppCode = _strClientAppCode;
     }
 
     /**
-     * set attributes 
+     * set attributes
      * 
      * @param list
      */
-	public void setAttributes( List<CandidateIdentityAttribute> list ) 
-	{
-		_listAttributes = list;
-		
-	}
+    public void setAttributes( List<CandidateIdentityAttribute> list )
+    {
+        _listAttributes = list;
+
+    }
 
     /**
-     * get attributes 
+     * get attributes
      * 
      * @param list
      */
-	public  List<CandidateIdentityAttribute> getAttributes( ) 
-	{
-		return _listAttributes;		
-	}
+    public List<CandidateIdentityAttribute> getAttributes( )
+    {
+        return _listAttributes;
+    }
 
-	/**
-	 * get status
-	 * 
-	 * @return the status
-	 */
-	public String getStatus() {
-		return strStatus;
-	}
+    /**
+     * get status
+     * 
+     * @return the status
+     */
+    public String getStatus( )
+    {
+        return strStatus;
+    }
 
-	/**
-	 * set Status
-	 * 
-	 * @param strStatus
-	 */
-	public void setStatus(String strStatus) {
-		this.strStatus = strStatus;
-	}
+    /**
+     * set Status
+     * 
+     * @param strStatus
+     */
+    public void setStatus( String strStatus )
+    {
+        this.strStatus = strStatus;
+    }
 }
