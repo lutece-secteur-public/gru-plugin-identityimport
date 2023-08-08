@@ -34,40 +34,33 @@
 
 package fr.paris.lutece.plugins.identityimport.web;
 
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.*;
-import fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService;
-import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
-import fr.paris.lutece.portal.service.message.AdminMessage;
-import fr.paris.lutece.portal.service.message.AdminMessageService;
-import fr.paris.lutece.portal.service.security.SecurityTokenService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.admin.AccessDeniedException;
-import fr.paris.lutece.portal.service.util.AppException;
-import fr.paris.lutece.portal.service.workflow.WorkflowService;
-import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
-import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
-import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
-import fr.paris.lutece.util.url.UrlItem;
-import fr.paris.lutece.util.html.AbstractPaginator;
-
-import java.util.Comparator;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.servlet.http.HttpServletRequest;
-
-import fr.paris.lutece.api.user.User;
-import fr.paris.lutece.plugins.identityimport.business.Batch;
-import fr.paris.lutece.plugins.identityimport.business.BatchHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentity;
+import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribute;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBean;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeTreatmentType;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AuthorType;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.RequestAuthor;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.*;
+import fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService;
+import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
+import fr.paris.lutece.portal.service.admin.AccessDeniedException;
+import fr.paris.lutece.portal.service.message.AdminMessage;
+import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.security.SecurityTokenService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppException;
+import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.util.html.AbstractPaginator;
+import fr.paris.lutece.util.url.UrlItem;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class provides the user interface to manage CandidateIdentity features ( manage, create, modify, remove )
@@ -440,20 +433,21 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
 		Map<String, Object> model = getModel( );
 
 		// Appel API Recherche
-		IdentitySearchRequest searchRequest = new IdentitySearchRequest();
-		SearchDto searchDto = new SearchDto();
-		List<SearchAttributeDto> searchAttributes = _candidateidentity.getAttributes().stream()
+		final IdentitySearchRequest searchRequest = new IdentitySearchRequest();
+		searchRequest.setOrigin(buildAuthor());
+		final SearchDto searchDto = new SearchDto();
+		final List<SearchAttributeDto> searchAttributes = _candidateidentity.getAttributes().stream()
 				.filter(attr -> attr.getCode().equals("family_name") ||
 						attr.getCode().equals("first_name") ||
 						attr.getCode().equals("birthdate"))
 				.map(attr -> {
-					SearchAttributeDto searchAttribute = new SearchAttributeDto();
+					final SearchAttributeDto searchAttribute = new SearchAttributeDto();
 					searchAttribute.setKey(attr.getCode());
 					searchAttribute.setValue(attr.getValue());
 					if (attr.getCode().equals("birthdate")) {
-						searchAttribute.setStrict(true);
+						searchAttribute.setTreatmentType(AttributeTreatmentType.STRICT);
 					} else {
-						searchAttribute.setStrict(false);
+						searchAttribute.setTreatmentType(AttributeTreatmentType.APPROXIMATED);
 					}
 					return searchAttribute;
 				}).collect(Collectors.toList());
@@ -461,7 +455,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
 		searchRequest.setSearch(searchDto);
 
 		// init attributes key list
-		List<String> keyList = _candidateidentity.getAttributes().stream().map( attr -> attr.getCode( ) ).collect(Collectors.toList());
+		List<String> keyList = _candidateidentity.getAttributes().stream().map(CandidateIdentityAttribute::getCode).collect(Collectors.toList());
 
 		try {
 			IdentitySearchResponse response = identityService.searchIdentities(searchRequest, _candidateidentity.getClientAppCode());
@@ -484,6 +478,14 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
 		model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_CANDIDATEIDENTITY ) );
 
 		return getPage( PROPERTY_PAGE_TITLE_IMPORT_CANDIDATEIDENTITY, TEMPLATE_IMPORT_CANDIDATEIDENTITY, model );
+	}
+
+	private RequestAuthor buildAuthor( )
+	{
+		final RequestAuthor author = new RequestAuthor( );
+		author.setName( getUser( ).getEmail( ) );
+		author.setType( AuthorType.application );
+		return author;
 	}
 
 	/**
