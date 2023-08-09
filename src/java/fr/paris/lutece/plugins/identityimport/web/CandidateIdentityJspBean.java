@@ -429,10 +429,10 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
         final IdentitySearchRequest searchRequest = new IdentitySearchRequest( );
         searchRequest.setOrigin( buildAuthor( ) );
         final SearchDto searchDto = new SearchDto( );
-        final List<SearchAttributeDto> searchAttributes = _candidateidentity.getAttributes( ).stream( )
+        final List<SearchAttribute> searchAttributes = _candidateidentity.getAttributes( ).stream( )
                 .filter( attr -> attr.getCode( ).equals( "family_name" ) || attr.getCode( ).equals( "first_name" ) || attr.getCode( ).equals( "birthdate" ) )
                 .map( attr -> {
-                    final SearchAttributeDto searchAttribute = new SearchAttributeDto( );
+                    final SearchAttribute searchAttribute = new SearchAttribute( );
                     searchAttribute.setKey( attr.getCode( ) );
                     searchAttribute.setValue( attr.getValue( ) );
                     if ( attr.getCode( ).equals( "birthdate" ) )
