@@ -41,6 +41,7 @@ import fr.paris.lutece.plugins.identityimport.wf.WorkflowBean;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeTreatmentType;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AuthorType;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.RequestAuthor;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.*;
 import fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService;
@@ -455,7 +456,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
         {
             IdentitySearchResponse response = identityService.searchIdentities( searchRequest, _candidateidentity.getClientAppCode( ) );
 
-            keyList.addAll( response.getIdentities( ).stream( ).flatMap( duplicate -> duplicate.getAttributes( ).stream( ) ).map( CertifiedAttribute::getKey )
+            keyList.addAll( response.getIdentities( ).stream( ).flatMap( duplicate -> duplicate.getAttributes( ).stream( ) ).map( AttributeDto::getKey )
                     .distinct( ).collect( Collectors.toList( ) ) );
 
             model.put( MARK_CANDIDATEIDENTITY_DUPLICATE_LIST, response.getIdentities( ) );
