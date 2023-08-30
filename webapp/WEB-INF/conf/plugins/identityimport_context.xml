@@ -23,18 +23,17 @@
 	</bean>
 
 	<!-- IHttpTransportProvider declarations -->
-	<bean id="httpAccessTransport.v3" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.HttpAccessTransport" >
-	<property name="ApiEndPointUrl">
-            <value>${identityimport.identitystore.ApiEndPointUrl}</value>
-        </property>
-        </bean>
-
-	<bean id="restTransport.httpAccess.v3" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.IdentityTransportRest">
-		      <constructor-arg ref="identitystore.httpAccessTransport"/>
+	<bean id="httpAccessTransport-ids" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.HttpAccessTransport" >
+		<property name="apiEndPointUrl">
+			<value>${identityimport.identitystore.ApiEndPointUrl}</value>
+		</property>
+	</bean>
+	<bean id="restTransport.identity.httpAccess" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.IdentityTransportRest">
+		<constructor-arg ref="httpAccessTransport-ids" />
 	</bean>
 
 	<!-- IdentityService impl -->
 	<bean id="identityService.rest.httpAccess.v3" class="fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService">
-		<constructor-arg ref="restTransport.httpAccess.v3"/>
+		<constructor-arg ref="restTransport.identity.httpAccess"/>
 	</bean>
 </beans>
