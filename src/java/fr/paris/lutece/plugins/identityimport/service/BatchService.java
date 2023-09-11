@@ -40,6 +40,7 @@ import fr.paris.lutece.plugins.identityimport.business.CandidateIdentity;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribute;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
+import fr.paris.lutece.plugins.identityimport.wf.WorkflowBean;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
@@ -110,6 +111,11 @@ public class BatchService
                 {
                     throw new IdentityStoreException( "The provided client code " + batch.getAppCode( ) + " does not match the client code "
                             + bean.getAppCode( ) + " stored for given reference " + batch.getReference( ) );
+                } else { //TODO voir comment gérer les états proprement
+                    final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean(bean, bean.getId(), user);
+                    if(workflowBean.getState().getId() == 3 || workflowBean.getState().getId() == 10) {
+                        throw new IdentityStoreException("Cannot process batch " + batch.getReference() + " in state " + workflowBean.getState().getName());
+                    }
                 }
 
             // Init workflow resource
