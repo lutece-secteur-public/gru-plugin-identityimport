@@ -111,10 +111,14 @@ public class BatchService
                 {
                     throw new IdentityStoreException( "The provided client code " + batch.getAppCode( ) + " does not match the client code "
                             + bean.getAppCode( ) + " stored for given reference " + batch.getReference( ) );
-                } else { //TODO voir comment gérer les états proprement
-                    final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean(bean, bean.getId(), user);
-                    if(workflowBean.getState().getId() == 3 || workflowBean.getState().getId() == 10) {
-                        throw new IdentityStoreException("Cannot process batch " + batch.getReference() + " in state " + workflowBean.getState().getName());
+                }
+                else
+                { // TODO voir comment gérer les états proprement
+                    final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean( bean, bean.getId( ), user );
+                    if ( workflowBean.getState( ).getId( ) == 3 || workflowBean.getState( ).getId( ) == 10 )
+                    {
+                        throw new IdentityStoreException(
+                                "Cannot process batch " + batch.getReference( ) + " in state " + workflowBean.getState( ).getName( ) );
                     }
                 }
 
