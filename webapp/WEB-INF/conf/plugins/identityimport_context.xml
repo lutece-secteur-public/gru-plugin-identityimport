@@ -5,12 +5,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" >
 
     <bean id="identityimport.batchDAO" class="fr.paris.lutece.plugins.identityimport.business.BatchDAO" />
-    <bean id="identityimport.batchRest" class="fr.paris.lutece.plugins.identityimport.rs.BatchRest" />
     <bean id="identityimport.candidateIdentityDAO" class="fr.paris.lutece.plugins.identityimport.business.CandidateIdentityDAO" />
     <bean id="identityimport.candidateIdentityAttributeDAO" class="fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeDAO" />
     <bean id="identityimport.clientDAO" class="fr.paris.lutece.plugins.identityimport.business.ClientDAO" />
 
-    <bean id="identityimport.swaggerRest" class="fr.paris.lutece.plugins.identityimport.rs.SwaggerRest" />
 
 	<bean id="identityimport.batch.wfbeanservice" class="fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService">
 		<constructor-arg index="0" value="IDENTITYIMPORT_BATCH_RESOURCE" />
