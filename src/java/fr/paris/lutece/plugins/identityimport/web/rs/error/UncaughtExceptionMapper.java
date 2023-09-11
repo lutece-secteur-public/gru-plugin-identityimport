@@ -31,46 +31,44 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.identityimport.web.rs;
+package fr.paris.lutece.plugins.identityimport.web.rs.error;
 
-import fr.paris.lutece.plugins.identityimport.web.request.IdentityBatchImportRequest;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportRequest;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportResponse;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.ResponseStatusType;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.error.ErrorResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
-import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
-import fr.paris.lutece.plugins.rest.service.RestConstants;
-import org.apache.commons.lang3.StringUtils;
+import fr.paris.lutece.plugins.rest.service.mapper.GenericUncaughtExceptionMapper;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
+
+import static javax.ws.rs.core.Response.Status;
 
 /**
- * BatchRest
+ * Exception mapper designed to intercept uncaught {@link Exception}.<br/>
+ * It will only be triggered if no better suitable mappers are available for the fired exception.
  */
-@Path( RestConstants.BASE_PATH + Constants.PLUGIN_PATH + Constants.VERSION_PATH_V3 + Constants.BATCH_PATH )
-public class BatchRestService
+@Provider
+public class UncaughtExceptionMapper extends GenericUncaughtExceptionMapper<Exception, ErrorResponse>
 {
-    /**
-     * Create Batch
-     * 
-     * @param request
-     * @return
-     */
-    @POST
-    @Path( StringUtils.EMPTY )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response importBatch( final BatchImportRequest request, @HeaderParam( Constants.PARAM_CLIENT_CODE ) String strHeaderClientAppCode )
-            throws IdentityStoreException
+    @Override
+    protected Status getStatus( )
     {
-        final IdentityBatchImportRequest identityBatchImportRequest = new IdentityBatchImportRequest( request, strHeaderClientAppCode );
-        final BatchImportResponse entity = (BatchImportResponse) identityBatchImportRequest.doRequest( );
-        return Response.status( entity.getStatus( ).getCode( ) ).entity( entity ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
+        return Status.INTERNAL_SERVER_ERROR;
     }
 
+    @Override
+    protected ErrorResponse buildEntity( final Exception e )
+    {
+        final ErrorResponse response = new ErrorResponse( );
+        response.setStatus( ResponseStatusType.valueOf( getStatus( ).name( ) ) );
+        response.setMessage( ERROR_DURING_TREATMENT + " :: " + e.getMessage( ) );
+        response.setI18nMessageKey( Constants.PROPERTY_REST_ERROR_DURING_TREATMENT );
+        return response;
+    }
+
+    @Override
+    protected String getType( )
+    {
+        return MediaType.APPLICATION_JSON;
+    }
 }

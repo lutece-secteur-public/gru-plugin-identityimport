@@ -31,48 +31,33 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.identityimport.web.request;
+package fr.paris.lutece.plugins.identityimport.web.rs;
 
-import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
-import fr.paris.lutece.portal.service.util.AppException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
-public abstract class AbstractRequest
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
+
+@Provider
+public class CustomMapper implements ContextResolver<ObjectMapper>
 {
-    protected final String _strClientCode;
 
-    protected AbstractRequest( String strClientCode )
+    private final ObjectMapper mapper;
+
+    public CustomMapper( )
     {
-        _strClientCode = strClientCode;
+        this.mapper = new ObjectMapper( );
+        this.mapper.enable( SerializationFeature.INDENT_OUTPUT );
+        // this.mapper.enable( SerializationFeature.WRAP_ROOT_VALUE );
+        // this.mapper.enable( DeserializationFeature.UNWRAP_ROOT_VALUE );
+        this.mapper.disable( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES );
     }
 
-    /**
-     * Valid the request according to parameter
-     *
-     * @throws AppException
-     *             if request not valid
-     * @throws IdentityStoreException
-     */
-    protected abstract void validRequest( ) throws IdentityStoreException;
-
-    /**
-     * Specific action for the request
-     *
-     * @return html/json string response
-     * @throws AppException
-     *             in case of request fail
-     */
-    protected abstract Object doSpecificRequest( ) throws IdentityStoreException;
-
-    /**
-     * Do the request, call the inner validRequest and doSpecificRequest
-     *
-     * @return html/json string response
-     * @throws AppException
-     *             in case of failure
-     */
-    public Object doRequest( ) throws IdentityStoreException
+    @Override
+    public ObjectMapper getContext( Class<?> aClass )
     {
-        this.validRequest( );
-        return doSpecificRequest( );
+        return this.mapper;
     }
 }
