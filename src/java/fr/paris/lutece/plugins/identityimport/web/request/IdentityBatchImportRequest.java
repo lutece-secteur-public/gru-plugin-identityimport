@@ -66,7 +66,7 @@ public class IdentityBatchImportRequest extends AbstractRequest
     {
         final BatchImportResponse response = new BatchImportResponse( );
         final BatchDto batch = _request.getBatch( );
-        batch.setAppCode(_strClientCode);
+        batch.setAppCode( _strClientCode );
         if ( StringUtils.isEmpty( batch.getReference( ) ) )
         {
             batch.setReference( UUID.randomUUID( ).toString( ) );
@@ -80,7 +80,7 @@ public class IdentityBatchImportRequest extends AbstractRequest
         catch( final IdentityStoreException e )
         {
             response.setStatus( ResponseStatusType.FAILURE );
-            response.setMessage(e.getMessage());
+            response.setMessage( e.getMessage( ) );
         }
 
         return response;
