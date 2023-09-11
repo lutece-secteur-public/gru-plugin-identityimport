@@ -40,6 +40,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * This class provides Data Access methods for CandidateIdentity objects
@@ -55,6 +56,9 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity SET id_candidate_identity = ?, id_batch = ?, connection_id = ?, customer_id = ?, client_id = ?, status = ? WHERE id_candidate_identity = ?";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_candidate_identity FROM identityimport_candidate_identity where id_batch = ?";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = SQL_QUERY_SELECT_ALL + " WHERE id_candidate_identity IN (  ";
+    private static final String EXTERNAL_IDS = "{external_ids}";
+    private static final String SQL_QUERY_EXISTS_BY_IDS = "SELECT EXISTS(SELECT 1 FROM identityimport_candidate_identity ci JOIN identityimport_batch b ON ci.id_batch = b.id_batch WHERE b.reference = ? AND ci.client_id IN ("
+            + EXTERNAL_IDS + "))";
     private static final String SQL_QUERY_SELECTALL_BY_IDS_END = ")";
 
     /**
@@ -250,5 +254,25 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
         }
         return candidateIdentityList;
 
+    }
+
+    @Override
+    public boolean checkIfOneExists( final Plugin plugin, final String batchReference, List<String> externalIds )
+    {
+        if ( !externalIds.isEmpty( ) )
+        {
+            final String query = SQL_QUERY_EXISTS_BY_IDS.replace( EXTERNAL_IDS,
+                    externalIds.stream( ).map( s -> "'" + s + "'" ).collect( Collectors.joining( "," ) ) );
+            try ( final DAOUtil daoUtil = new DAOUtil( query, plugin ) )
+            {
+                daoUtil.setString( 1, batchReference );
+                daoUtil.executeQuery( );
+                if ( daoUtil.next( ) )
+                {
+                    return daoUtil.getBoolean( 1 );
+                }
+            }
+        }
+        return false;
     }
 }

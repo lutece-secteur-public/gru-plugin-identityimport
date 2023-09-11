@@ -33,14 +33,11 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
-import java.io.Serializable;
-import java.sql.Date;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import fr.paris.lutece.plugins.identityimport.wf.IResource;
+import java.io.Serializable;
+import java.sql.Date;
 
 /**
  * This is the business class for the object Batch
@@ -53,6 +50,11 @@ public class Batch implements Serializable
 
     // Variables declarations
     private int _nId;
+
+    @NotEmpty( message = "#i18n{identityimport.validation.batch.Reference.notEmpty}" )
+    @Size( max = 255, message = "#i18n{identityimport.validation.Reference.User.size}" )
+    private String _strReference;
+
     @NotNull( message = "#i18n{portal.validation.message.notEmpty}" )
     private Date _dateDate;
 
@@ -106,6 +108,27 @@ public class Batch implements Serializable
     public void setDate( Date dateDate )
     {
         _dateDate = dateDate;
+    }
+
+    /**
+     * Returns the Reference
+     *
+     * @return The Reference
+     */
+    public String getReference( )
+    {
+        return _strReference;
+    }
+
+    /**
+     * Sets the Reference
+     *
+     * @param strReference
+     *            The Reference
+     */
+    public void setReference( String strReference )
+    {
+        _strReference = strReference;
     }
 
     /**

@@ -108,11 +108,24 @@ public interface ICandidateIdentityDAO
     /**
      * Load the data of all the avant objects and returns them as a list
      * 
-     * @param plugin
+     * @param _plugin
      *            the Plugin
      * @param listIds
      *            liste of ids
      * @return The list which contains the data of all the avant objects
      */
     List<CandidateIdentity> selectCandidateIdentitiesListByIds( Plugin _plugin, List<Integer> listIds );
+
+    /**
+     * Check if at least one of the externalIds exists in the batch identified by batchReference
+     * 
+     * @param plugin
+     *            the plugin
+     * @param batchReference
+     *            the reference of the batch
+     * @param externalIds
+     *            the list of external ids
+     * @return true if at least one external id exists in the batch
+     */
+    boolean checkIfOneExists( Plugin plugin, final String batchReference, List<String> externalIds );
 }

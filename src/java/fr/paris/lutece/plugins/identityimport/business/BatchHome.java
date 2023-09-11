@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
@@ -150,4 +151,13 @@ public final class BatchHome
         return _dao.selectBatchsListByIds( _plugin, listIds );
     }
 
+    public static Batch getBatch( final String reference )
+    {
+        return _dao.selectBatchByReference( _plugin, reference );
+    }
+
+    public static Optional<Batch> getBatch( final int id )
+    {
+        return _dao.load( id, _plugin );
+    }
 }

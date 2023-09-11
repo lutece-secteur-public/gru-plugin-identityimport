@@ -6,6 +6,7 @@
 DROP TABLE IF EXISTS identityimport_batch;
 CREATE TABLE identityimport_batch (
 id_batch int AUTO_INCREMENT,
+reference VARCHAR(255) NOT NULL UNIQUE,
 date date NOT NULL,
 user varchar(255) default '' NOT NULL,
 app_code varchar(50) default '' NOT NULL,

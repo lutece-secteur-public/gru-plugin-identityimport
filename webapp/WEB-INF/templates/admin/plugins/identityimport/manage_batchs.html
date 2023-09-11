@@ -3,6 +3,7 @@
 	<@boxHeader title='#i18n{identityimport.manage_batch.title}' boxTools=true>
 		<@tform class='form-inline pull-right' name='manage_batch' action='jsp/admin/plugins/identityimport/ManageBatchs.jsp'>
 			<@button type='submit' name='view_createBatch' buttonIcon='plus' title='#i18n{identityimport.manage_batchs.buttonAdd}' />
+            <@button type='submit' name='view_importBatch' buttonIcon='upload' title='#i18n{identityimport.manage_batchs.buttonImport}' />
 		</@tform>
 	</@boxHeader>
 	<@boxBody>    
@@ -11,6 +12,7 @@
     <div class="clearfix"></div>
     <@table>
         <tr>
+            <th>#i18n{identityimport.manage_batchs.columnReference}</th>
             <th>#i18n{identityimport.manage_batchs.columnDate}</th>
             <th>#i18n{identityimport.manage_batchs.columnUser}</th>
             <th>#i18n{identityimport.manage_batchs.columnAppCode}</th>
@@ -21,6 +23,9 @@
         <@tableHeadBodySeparator />
         <#list batch_list as batch >
         <tr>
+            <td>
+                ${batch.resource.reference}
+            </td>
             <td>
 				${batch.resource.date}
 			</td>
@@ -37,12 +42,9 @@
         	  <#if batch.state??><@tag color='warning'>${batch.state.name}</@tag><#else> not set</#if>
         	</td>
         	<td>
-
-						
 				<@aButton href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=modifyBatch&id=${batch.resource.id}' title='#i18n{portal.util.labelView}' buttonIcon='eye' />
-						
-				
-	        </td>
+				<@aButton href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=completeBatch&id=${batch.resource.id}' title='#i18n{identityimport.manage_batchs.buttonComplete}' buttonIcon='pencil' />
+            </td>
         </tr>
         </#list>
     </@table>

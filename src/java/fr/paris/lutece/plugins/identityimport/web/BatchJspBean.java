@@ -33,35 +33,38 @@
  */
 package fr.paris.lutece.plugins.identityimport.web;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.beanutils.BeanUtils;
-
-import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.identityimport.business.Batch;
 import fr.paris.lutece.plugins.identityimport.business.BatchHome;
+import fr.paris.lutece.plugins.identityimport.service.BatchService;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBean;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
+import fr.paris.lutece.plugins.identitystore.v3.csv.CsvIdentityService;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
+import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
+import fr.paris.lutece.plugins.progressmanager.service.ProgressManagerService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
-import fr.paris.lutece.portal.service.progressmanager.ProgressManagerService;
 import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
 import fr.paris.lutece.util.html.AbstractPaginator;
 import fr.paris.lutece.util.url.UrlItem;
+import org.apache.commons.fileupload.FileItem;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * This class provides the user interface to manage Batch features ( manage, create, modify, remove )
@@ -70,6 +73,7 @@ import fr.paris.lutece.util.url.UrlItem;
 public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBean<Batch>>
 {
     // Templates
+    private static final String TEMPLATE_IMPORT_BATCH = "/admin/plugins/identityimport/import_batch.html";
     private static final String TEMPLATE_MANAGE_BATCHS = "/admin/plugins/identityimport/manage_batchs.html";
     private static final String TEMPLATE_CREATE_BATCH = "/admin/plugins/identityimport/create_batch.html";
     private static final String TEMPLATE_MODIFY_BATCH = "/admin/plugins/identityimport/modify_batch.html";
@@ -78,9 +82,11 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     // Parameters
     private static final String PARAMETER_ID_BATCH = "id";
     private static final String PARAMETER_ID_ACTION = "id_action";
+    private static final String PARAMETER_CSV_FILE = "csvFile";
     private static final String MARK_FEED_TOKEN = "feed_token";
 
     // Properties for page titles
+    private static final String PROPERTY_PAGE_TITLE_IMPORT_BATCH = "identityimport.import_batch.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_MANAGE_BATCHS = "identityimport.manage_batchs.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_MODIFY_BATCH = "identityimport.modify_batch.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_CREATE_BATCH = "identityimport.create_batch.pageTitle";
@@ -89,6 +95,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     // Markers
     private static final String MARK_BATCH_LIST = "batch_list";
     private static final String MARK_BATCH = "batch";
+    private static final String MARK_NEW_IMPORT = "newImport";
 
     private static final String JSP_MANAGE_BATCHS = "jsp/admin/plugins/identityimport/ManageBatchs.jsp";
 
@@ -99,12 +106,15 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String VALIDATION_ATTRIBUTES_PREFIX = "identityimport.model.entity.batch.attribute.";
 
     // Views
+    private static final String VIEW_IMPORT_BATCH = "importBatch";
+    private static final String VIEW_COMPLETE_BATCH = "completeBatch";
     private static final String VIEW_MANAGE_BATCHS = "manageBatchs";
     private static final String VIEW_CREATE_BATCH = "createBatch";
     private static final String VIEW_MODIFY_BATCH = "modifyBatch";
     private static final String VIEW_PROCESS_BATCH = "processBatch";
 
     // Actions
+    private static final String ACTION_IMPORT_BATCH = "importBatch";
     private static final String ACTION_CREATE_BATCH = "createBatch";
     private static final String ACTION_MODIFY_BATCH = "modifyBatch";
     private static final String ACTION_REMOVE_BATCH = "removeBatch";
@@ -121,13 +131,18 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
     // Workflow
     private static final String BATCH_WFBEANSERVICE = "identityimport.batch.wfbeanservice";
-    private WorkflowBeanService<Batch> _wfBeanService = SpringContextService.getBean( BATCH_WFBEANSERVICE );
+    private final WorkflowBeanService<Batch> _wfBeanService = SpringContextService.getBean( BATCH_WFBEANSERVICE );
+
+    // Feed
+
+    private static final String FEED_NAME = "importBatchFeed";
+    private final ProgressManagerService progressManagerService = ProgressManagerService.getInstance( );
 
     // Session variable to store working values
     private Batch _batch;
     WorkflowBean<Batch> _wfBean;
-
     private List<Integer> _listIdBatchs;
+    private String _feedToken;
 
     /**
      * Build the Manage View
@@ -140,6 +155,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     public String getManageBatchs( HttpServletRequest request )
     {
         _batch = null;
+        unregisterFeed( );
 
         if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX ) == null || _listIdBatchs.isEmpty( ) )
         {
@@ -186,6 +202,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     public String getCreateBatch( HttpServletRequest request )
     {
         _batch = ( _batch != null ) ? _batch : new Batch( );
+        unregisterFeed( );
 
         Map<String, Object> model = getModel( );
         model.put( MARK_BATCH, _batch );
@@ -278,6 +295,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     @View( VIEW_MODIFY_BATCH )
     public String getModifyBatch( HttpServletRequest request )
     {
+        unregisterFeed( );
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
 
         if ( _batch == null || ( _batch.getId( ) != nId ) )
@@ -329,6 +347,105 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     }
 
     /**
+     * Import a new batch
+     *
+     * @param request
+     *            The Http Request
+     * @return The Jsp URL of the process result
+     * @throws AccessDeniedException
+     */
+    @View( VIEW_IMPORT_BATCH )
+    public String getViewImportBatch( HttpServletRequest request ) throws AccessDeniedException
+    {
+        registerFeed( );
+        _batch = ( _batch != null ) ? _batch : new Batch( );
+
+        final Map<String, Object> model = getModel( );
+        model.put( MARK_NEW_IMPORT, "true" );
+        model.put( MARK_BATCH, _batch );
+        model.put( MARK_FEED_TOKEN, _feedToken );
+        model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_BATCH ) );
+
+        return getPage( PROPERTY_PAGE_TITLE_IMPORT_BATCH, TEMPLATE_IMPORT_BATCH, model );
+    }
+
+    /**
+     * Complete an existing batch
+     *
+     * @param request
+     *            The Http Request
+     * @return The Jsp URL of the process result
+     * @throws AccessDeniedException
+     */
+    @View( VIEW_COMPLETE_BATCH )
+    public String getViewCompletetBatch( HttpServletRequest request ) throws AccessDeniedException
+    {
+        registerFeed( );
+        final int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
+        final Optional<Batch> batch = BatchHome.getBatch( nId );
+        if ( !batch.isPresent( ) )
+        {
+            addError( "Aucun batch n'a pu être trouvé avec l'id " + nId );
+            return redirectView( request, VIEW_MANAGE_BATCHS );
+        }
+
+        _batch = batch.get( );
+
+        final Map<String, Object> model = getModel( );
+        model.put( MARK_NEW_IMPORT, "false" );
+        model.put( MARK_BATCH, _batch );
+        model.put( MARK_FEED_TOKEN, _feedToken );
+        model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_BATCH ) );
+
+        return getPage( PROPERTY_PAGE_TITLE_IMPORT_BATCH, TEMPLATE_IMPORT_BATCH, model );
+    }
+
+    /**
+     * Process the data capture form of a new batch
+     *
+     * @param request
+     *            The Http Request
+     * @return The Jsp URL of the process result
+     * @throws AccessDeniedException
+     */
+    @Action( ACTION_IMPORT_BATCH )
+    public String doImportBatch( HttpServletRequest request ) throws AccessDeniedException
+    {
+        if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_BATCH ) )
+        {
+            throw new AccessDeniedException( "Invalid security token" );
+        }
+
+        try
+        {
+            populate( _batch, request, getLocale( ) );
+            final MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+            final FileItem fileItem = multipartRequest.getFile( PARAMETER_CSV_FILE );
+
+            final BatchDto batchDto = BatchService.instance( ).getDto( _batch );
+            final List<IdentityDto> importedIdentities = CsvIdentityService.instance( ).read( fileItem.getInputStream( ) );
+            batchDto.getIdentities( ).addAll( importedIdentities );
+            // Check constraints
+            if ( !validateBean( _batch, VALIDATION_ATTRIBUTES_PREFIX ) )
+            {
+                return redirectView( request, VIEW_CREATE_BATCH );
+            }
+
+            BatchService.instance( ).importBatch( batchDto, getUser( ), _feedToken );
+
+            addInfo( INFO_BATCH_CREATED, getLocale( ) );
+            resetListId( );
+        }
+        catch( IdentityStoreException | IOException e )
+        {
+            addError( e.getMessage( ) );
+            return redirectView( request, VIEW_IMPORT_BATCH );
+        }
+
+        return redirect( request, VIEW_MODIFY_BATCH, PARAMETER_ID_BATCH, _batch.getId( ) );
+    }
+
+    /**
      * process a workflow action
      *
      * @param request
@@ -352,6 +469,16 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         _wfBeanService.processAction( _wfBean, nAction, request, getLocale( ) );
 
         return redirect( request, VIEW_MODIFY_BATCH, PARAMETER_ID_BATCH, nId );
+    }
 
+    private void unregisterFeed( )
+    {
+        _feedToken = null;
+        progressManagerService.unRegisterFeed( FEED_NAME );
+    }
+
+    private void registerFeed( )
+    {
+        _feedToken = progressManagerService.registerFeed( FEED_NAME, 0 );
     }
 }

@@ -25,15 +25,28 @@
 	<!-- IHttpTransportProvider declarations -->
 	<bean id="httpAccessTransport-ids" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.HttpAccessTransport" >
 		<property name="apiEndPointUrl">
-			<value>${identityimport.identitystore.ApiEndPointUrl}</value>
+			<value>${identityimport.identitystore.api.endpoint.url}</value>
 		</property>
 	</bean>
 	<bean id="restTransport.identity.httpAccess" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.IdentityTransportRest">
 		<constructor-arg ref="httpAccessTransport-ids" />
 	</bean>
+	<bean id="restTransport.serviceContract.httpAccess" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.ServiceContractTransportRest">
+		<constructor-arg ref="httpAccessTransport-ids"/>
+	</bean>
 
 	<!-- IdentityService impl -->
 	<bean id="identityService.rest.httpAccess.v3" class="fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService">
 		<constructor-arg ref="restTransport.identity.httpAccess"/>
+	</bean>
+
+	<!-- ServiceContractService impl -->
+	<bean id="identity.serviceContractService" class="fr.paris.lutece.plugins.identitystore.v3.web.service.ServiceContractService">
+		<constructor-arg ref="restTransport.serviceContract.httpAccess"/>
+	</bean>
+
+	<!-- Cache -->
+	<bean id="identity.serviceContractCacheService"  class="fr.paris.lutece.plugins.identityimport.cache.ServiceContractCache">
+		<constructor-arg ref="identity.serviceContractService"/>
 	</bean>
 </beans>

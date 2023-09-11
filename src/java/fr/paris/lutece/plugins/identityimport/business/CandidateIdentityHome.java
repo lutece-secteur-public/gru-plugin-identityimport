@@ -140,4 +140,16 @@ public final class CandidateIdentityHome
         return _dao.selectCandidateIdentitiesListByIds( _plugin, listIds );
     }
 
+    /**
+     * Load the data of all the avant objects and returns them as a list
+     *
+     * @param externalIds
+     *            liste of external ids
+     * @return the list which contains the data of all the avant objects
+     */
+    public static boolean checkIfOneExists( final String batchReference, final List<String> externalIds )
+    {
+        return _dao.checkIfOneExists( _plugin, batchReference, externalIds );
+    }
+
 }

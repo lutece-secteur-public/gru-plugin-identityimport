@@ -47,14 +47,17 @@ import java.util.Optional;
  */
 public final class BatchDAO implements IBatchDAO
 {
+    private static final String BATCH_SELECT_FIELDS = "id_batch, reference, date, user, app_code, comment";
+
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id_batch, date, user, app_code, comment FROM identityimport_batch WHERE id_batch = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_batch ( date, user, app_code, comment ) VALUES ( ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch WHERE id_batch = ?";
+    private static final String SQL_QUERY_SELECT_BY_REFERENCE = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch WHERE reference = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_batch ( reference, date, user, app_code, comment ) VALUES ( ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_batch WHERE id_batch = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_batch SET id_batch = ?, date = ?, user = ?, app_code = ?, comment = ? WHERE id_batch = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_batch, date, user, app_code, comment FROM identityimport_batch";
+    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_batch SET reference = ?, date = ?, user = ?, app_code = ?, comment = ? WHERE id_batch = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_batch FROM identityimport_batch";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_batch, date, user, app_code, comment FROM identityimport_batch WHERE id_batch IN (  ";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch WHERE id_batch IN (  ";
 
     /**
      * {@inheritDoc }
@@ -62,9 +65,10 @@ public final class BatchDAO implements IBatchDAO
     @Override
     public void insert( Batch batch, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
             int nIndex = 1;
+            daoUtil.setString( nIndex++, batch.getReference( ) );
             daoUtil.setDate( nIndex++, batch.getDate( ) );
             daoUtil.setString( nIndex++, batch.getUser( ) );
             daoUtil.setString( nIndex++, batch.getAppCode( ) );
@@ -85,25 +89,17 @@ public final class BatchDAO implements IBatchDAO
     @Override
     public Optional<Batch> load( int nKey, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
             daoUtil.setInt( 1, nKey );
             daoUtil.executeQuery( );
-            Batch batch = null;
 
             if ( daoUtil.next( ) )
             {
-                batch = new Batch( );
-                int nIndex = 1;
-
-                batch.setId( daoUtil.getInt( nIndex++ ) );
-                batch.setDate( daoUtil.getDate( nIndex++ ) );
-                batch.setUser( daoUtil.getString( nIndex++ ) );
-                batch.setAppCode( daoUtil.getString( nIndex++ ) );
-                batch.setComment( daoUtil.getString( nIndex ) );
+                return Optional.of( getBatch( daoUtil ) );
             }
 
-            return Optional.ofNullable( batch );
+            return Optional.empty( );
         }
     }
 
@@ -130,7 +126,7 @@ public final class BatchDAO implements IBatchDAO
         {
             int nIndex = 1;
 
-            daoUtil.setInt( nIndex++, batch.getId( ) );
+            daoUtil.setString( nIndex++, batch.getReference( ) );
             daoUtil.setDate( nIndex++, batch.getDate( ) );
             daoUtil.setString( nIndex++, batch.getUser( ) );
             daoUtil.setString( nIndex++, batch.getAppCode( ) );
@@ -154,19 +150,28 @@ public final class BatchDAO implements IBatchDAO
 
             while ( daoUtil.next( ) )
             {
-                Batch batch = new Batch( );
-                int nIndex = 1;
-
-                batch.setId( daoUtil.getInt( nIndex++ ) );
-                batch.setDate( daoUtil.getDate( nIndex++ ) );
-                batch.setUser( daoUtil.getString( nIndex++ ) );
-                batch.setAppCode( daoUtil.getString( nIndex++ ) );
-                batch.setComment( daoUtil.getString( nIndex ) );
-
-                batchList.add( batch );
+                batchList.add( getBatch( daoUtil ) );
             }
 
             return batchList;
+        }
+    }
+
+    @Override
+    public Batch selectBatchByReference( final Plugin plugin, final String reference )
+    {
+        Batch batch = new Batch( );
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_REFERENCE, plugin ) )
+        {
+            daoUtil.setString( 1, reference );
+            daoUtil.executeQuery( );
+
+            if ( daoUtil.next( ) )
+            {
+                batch = getBatch( daoUtil );
+            }
+
+            return batch;
         }
     }
 
@@ -227,10 +232,10 @@ public final class BatchDAO implements IBatchDAO
                 builder.append( "?," );
             }
 
-            String placeHolders = builder.deleteCharAt( builder.length( ) - 1 ).toString( );
-            String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ")";
+            final String placeHolders = builder.deleteCharAt( builder.length( ) - 1 ).toString( );
+            final String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ")";
 
-            try ( DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
+            try ( final DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
             {
                 int index = 1;
                 for ( Integer n : listIds )
@@ -241,16 +246,7 @@ public final class BatchDAO implements IBatchDAO
                 daoUtil.executeQuery( );
                 while ( daoUtil.next( ) )
                 {
-                    Batch batch = new Batch( );
-                    int nIndex = 1;
-
-                    batch.setId( daoUtil.getInt( nIndex++ ) );
-                    batch.setDate( daoUtil.getDate( nIndex++ ) );
-                    batch.setUser( daoUtil.getString( nIndex++ ) );
-                    batch.setAppCode( daoUtil.getString( nIndex++ ) );
-                    batch.setComment( daoUtil.getString( nIndex ) );
-
-                    batchList.add( batch );
+                    batchList.add( getBatch( daoUtil ) );
                 }
 
                 daoUtil.free( );
@@ -259,5 +255,18 @@ public final class BatchDAO implements IBatchDAO
         }
         return batchList;
 
+    }
+
+    private Batch getBatch( final DAOUtil daoUtil )
+    {
+        final Batch batch = new Batch( );
+        int nIndex = 1;
+        batch.setId( daoUtil.getInt( nIndex++ ) );
+        batch.setReference( daoUtil.getString( nIndex++ ) );
+        batch.setDate( daoUtil.getDate( nIndex++ ) );
+        batch.setUser( daoUtil.getString( nIndex++ ) );
+        batch.setAppCode( daoUtil.getString( nIndex++ ) );
+        batch.setComment( daoUtil.getString( nIndex ) );
+        return batch;
     }
 }

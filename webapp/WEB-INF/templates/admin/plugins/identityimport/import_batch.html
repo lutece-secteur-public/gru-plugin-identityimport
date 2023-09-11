@@ -1,0 +1,52 @@
+
+<@box>
+	<@boxHeader title='#i18n{identityimport.import_batch.title}' />
+	<@boxBody>
+    <@tform name='import_batch' action='jsp/admin/plugins/identityimport/ManageBatchs.jsp' enctype="multipart/form-data" >
+
+        <@messages errors=errors />
+        <@input type="hidden" id="id" name="id"/>
+        <@input type="hidden" value="${token}" name="token" />
+        <input type="hidden" value="${newImport}" id="newImport"/>
+
+		<@formGroup labelFor='reference' labelKey='#i18n{identityimport.modify_batch.labelReference}' mandatory=true>
+			<@input type='text' id='reference' name='reference'  value='${batch.reference!\'\'}' tabIndex='0' />
+		</@formGroup>
+		<@formGroup labelFor='date' labelKey='#i18n{identityimport.modify_batch.labelDate}' mandatory=true >
+			<@input type='text' id='date' name='date'  value='${batch.date!\'\'}' tabIndex='1' />
+		</@formGroup>
+		<@formGroup labelFor='user' labelKey='#i18n{identityimport.modify_batch.labelUser}' mandatory=true>
+			<@input type='text' id='user' name='user'  maxlength=255 value='${batch.user!\'\'}' tabIndex='2' />
+		</@formGroup>
+		<@formGroup labelFor='app_code' labelKey='#i18n{identityimport.modify_batch.labelAppCode}' mandatory=true>
+			<@input type='text' id='app_code' name='app_code'  maxlength=50 value='${batch.appCode!\'\'}' tabIndex='3' />
+		</@formGroup>
+		<@formGroup labelFor='comment' labelKey='#i18n{identityimport.modify_batch.labelComment}' mandatory=true>
+			<@input type='text' id='comment' name='comment'  value='${batch.comment!\'\'}' tabIndex='4' />
+		</@formGroup>
+		<@formGroup labelFor='csvFile' labelKey='#i18n{identityimport.import_batch.labelCsvFile}' mandatory=true>
+			<@input type='file' id='csvFile' name='csvFile'  value='${batch.reference!\'\'}' tabIndex='5' />
+		</@formGroup>
+
+		<div id="report-container" class="my-3">
+			<@progressManager token='${feed_token}' id='progress-${feed_token}' showReport=true intervalTime=10000 />
+		</div>
+
+		<@actionButtons button1Name="action_importBatch" button2Name="view_manageBatch"/>
+    </@tform>
+	</@boxBody>
+</@box>
+<script>
+	$(document).ready(function() {
+		let newImport = $("#newImport").val();
+		if(newImport === 'false' || newImport === false){
+			$("#reference").prop('disabled', true);
+			$("#date").prop('disabled', true);
+			$("#user").prop('disabled', true);
+			$("#app_code").prop('disabled', true);
+			$("#comment").prop('disabled', true);
+		}
+	});
+</script>
+
+

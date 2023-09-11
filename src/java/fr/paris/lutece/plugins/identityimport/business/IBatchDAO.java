@@ -124,4 +124,6 @@ public interface IBatchDAO
      * @return The list which contains the data of all the avant objects
      */
     List<Batch> selectBatchsListByIds( Plugin _plugin, List<Integer> listIds );
+
+    Batch selectBatchByReference( Plugin plugin, String reference );
 }
