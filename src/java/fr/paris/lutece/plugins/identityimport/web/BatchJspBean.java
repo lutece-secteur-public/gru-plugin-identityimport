@@ -302,7 +302,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         {
             Optional<Batch> optBatch = BatchHome.findByPrimaryKey( nId );
             _batch = optBatch.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+        }
 
+        if(_wfBean == null || _wfBean.getResourceId() != nId ){
             _wfBean = _wfBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
         }
 
@@ -416,6 +418,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             throw new AccessDeniedException( "Invalid security token" );
         }
 
+        int batchId = 0;
+
         try
         {
             populate( _batch, request, getLocale( ) );
@@ -431,7 +435,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
                 return redirectView( request, VIEW_CREATE_BATCH );
             }
 
-            BatchService.instance( ).importBatch( batchDto, getUser( ), _feedToken );
+            batchId = BatchService.instance().importBatch(batchDto, getUser(), _feedToken);
 
             addInfo( INFO_BATCH_CREATED, getLocale( ) );
             resetListId( );
@@ -442,7 +446,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             return redirectView( request, VIEW_IMPORT_BATCH );
         }
 
-        return redirect( request, VIEW_MODIFY_BATCH, PARAMETER_ID_BATCH, _batch.getId( ) );
+        return redirect( request, VIEW_MODIFY_BATCH, PARAMETER_ID_BATCH, batchId );
     }
 
     /**

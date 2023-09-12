@@ -12,7 +12,7 @@
 		<@input type="hidden" value="${token}" name="token" />
 
 		<@formGroup labelFor='reference' labelKey='#i18n{identityimport.modify_batch.labelReference}' mandatory=true>
-			<@input type='text' id='reference' name='reference'  value='${batch.reference!\'\'}' tabIndex='0' />
+			<@input type='text' id='reference' name='reference'  value='${batch.resource.reference!\'\'}' tabIndex='0' />
 		</@formGroup>
 		<@formGroup labelFor='date' labelKey='#i18n{identityimport.modify_batch.labelDate}' mandatory=true>
 			<@input type='text' id='date' name='date'  value='${batch.resource.date!\'\'}' tabIndex='0' />

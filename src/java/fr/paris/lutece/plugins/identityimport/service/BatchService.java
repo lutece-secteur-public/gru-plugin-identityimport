@@ -78,7 +78,7 @@ public class BatchService
         return instance;
     }
 
-    public void importBatch( final BatchDto batch, final User user, final String feedToken ) throws IdentityStoreException
+    public int importBatch( final BatchDto batch, final User user, final String feedToken ) throws IdentityStoreException
     {
         // Ensure that provided batch size does not exceed the limit defined in properties
         this.validateImportBatchLimit( batch );
@@ -166,6 +166,7 @@ public class BatchService
                 progressManagerService.addReport( feedToken, "Created" + batch.getIdentities( ).size( ) + " candidate identities" );
             }
             TransactionManager.commitTransaction( null );
+            return bean.getId();
         }
         catch( final Exception e )
         {
