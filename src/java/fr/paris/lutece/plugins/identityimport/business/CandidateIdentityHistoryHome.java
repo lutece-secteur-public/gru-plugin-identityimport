@@ -1,3 +1,36 @@
+/*
+ * Copyright (c) 2002-2023, City of Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
+ */
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -7,7 +40,8 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 import java.util.List;
 import java.util.Optional;
 
-public class CandidateIdentityHistoryHome {
+public class CandidateIdentityHistoryHome
+{
     // Static variable pointed at the DAO instance
     private static final ICandidateIdentityHistoryDAO _dao = SpringContextService.getBean( "identityimport.candidateIdentityHistoryDao" );
     private static final Plugin _plugin = PluginService.getPlugin( "identityimport" );
@@ -18,8 +52,9 @@ public class CandidateIdentityHistoryHome {
      * @param candidateIdentityHistory
      *            instance of the candidateIdentityHistory object to insert
      */
-    public static void insert( CandidateIdentityHistory candidateIdentityHistory) {
-        _dao.insert(candidateIdentityHistory, _plugin);
+    public static void insert( CandidateIdentityHistory candidateIdentityHistory )
+    {
+        _dao.insert( candidateIdentityHistory, _plugin );
     }
 
     /**
@@ -28,8 +63,9 @@ public class CandidateIdentityHistoryHome {
      * @param candidateIdentityHistory
      *            the reference of the candidateIdentityHistory to update
      */
-    public static void update( CandidateIdentityHistory candidateIdentityHistory ){
-        _dao.update(candidateIdentityHistory, _plugin);
+    public static void update( CandidateIdentityHistory candidateIdentityHistory )
+    {
+        _dao.update( candidateIdentityHistory, _plugin );
     }
 
     /**
@@ -38,8 +74,9 @@ public class CandidateIdentityHistoryHome {
      * @param nWfResourceHistoryId
      *            The identifier to select
      */
-    public static Optional<CandidateIdentityHistory> selectByWfHistory(int nWfResourceHistoryId){
-        return _dao.selectByWfHistory(nWfResourceHistoryId, _plugin);
+    public static Optional<CandidateIdentityHistory> selectByWfHistory( int nWfResourceHistoryId )
+    {
+        return _dao.selectByWfHistory( nWfResourceHistoryId, _plugin );
     }
 
     /**
@@ -48,8 +85,9 @@ public class CandidateIdentityHistoryHome {
      * @param nId
      *            The identifier to select
      */
-    public static Optional<CandidateIdentityHistory> select( int nId ){
-        return _dao.select(nId, _plugin);
+    public static Optional<CandidateIdentityHistory> select( int nId )
+    {
+        return _dao.select( nId, _plugin );
     }
 
     /**
@@ -58,8 +96,9 @@ public class CandidateIdentityHistoryHome {
      * @param nCandidateIdentityId
      *            The identifier to select
      */
-    public static List<CandidateIdentityHistory> selectAll(int nCandidateIdentityId ){
-        return _dao.selectAll(nCandidateIdentityId, _plugin);
+    public static List<CandidateIdentityHistory> selectAll( int nCandidateIdentityId )
+    {
+        return _dao.selectAll( nCandidateIdentityId, _plugin );
     }
 
     /**
@@ -68,7 +107,8 @@ public class CandidateIdentityHistoryHome {
      * @param nKey
      *            The identifier of the CandidateIdentity to delete
      */
-    public static void delete( int nKey ){
-        _dao.delete(nKey, _plugin);
+    public static void delete( int nKey )
+    {
+        _dao.delete( nKey, _plugin );
     }
 }

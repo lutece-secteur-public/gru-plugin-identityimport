@@ -166,7 +166,7 @@ public class BatchService
                 progressManagerService.addReport( feedToken, "Created" + batch.getIdentities( ).size( ) + " candidate identities" );
             }
             TransactionManager.commitTransaction( null );
-            return bean.getId();
+            return bean.getId( );
         }
         catch( final Exception e )
         {

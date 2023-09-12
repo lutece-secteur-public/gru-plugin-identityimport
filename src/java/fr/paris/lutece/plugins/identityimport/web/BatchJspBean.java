@@ -304,7 +304,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             _batch = optBatch.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
         }
 
-        if(_wfBean == null || _wfBean.getResourceId() != nId ){
+        if ( _wfBean == null || _wfBean.getResourceId( ) != nId )
+        {
             _wfBean = _wfBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
         }
 
@@ -435,7 +436,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
                 return redirectView( request, VIEW_CREATE_BATCH );
             }
 
-            batchId = BatchService.instance().importBatch(batchDto, getUser(), _feedToken);
+            batchId = BatchService.instance( ).importBatch( batchDto, getUser( ), _feedToken );
 
             addInfo( INFO_BATCH_CREATED, getLocale( ) );
             resetListId( );

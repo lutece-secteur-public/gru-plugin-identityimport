@@ -57,7 +57,8 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
 
     private final static String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity_history SET status = ?, comment = ? WHERE id_wf_resource_history = ?";
 
-    private final static String SQL_QUERY_SELECT_ALL = QUERY_SELECT_ALL + " ih JOIN workflow_resource_history rh ON rh.id_history = ih.id_wf_resource_history WHERE rh.id_resource = ?";
+    private final static String SQL_QUERY_SELECT_ALL = QUERY_SELECT_ALL
+            + " ih JOIN workflow_resource_history rh ON rh.id_history = ih.id_wf_resource_history WHERE rh.id_resource = ?";
 
     /**
      * {@inheritDoc }
@@ -95,7 +96,7 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
 
             if ( daoUtil.next( ) )
             {
-                candidateIdentityHistory = this.getCandidateIdentityHistory(daoUtil);
+                candidateIdentityHistory = this.getCandidateIdentityHistory( daoUtil );
             }
 
             return Optional.ofNullable( candidateIdentityHistory );
@@ -114,8 +115,9 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
             daoUtil.executeQuery( );
             CandidateIdentityHistory candidateIdentityHistory = null;
 
-            if ( daoUtil.next( ) ) {
-                candidateIdentityHistory = this.getCandidateIdentityHistory(daoUtil);
+            if ( daoUtil.next( ) )
+            {
+                candidateIdentityHistory = this.getCandidateIdentityHistory( daoUtil );
             }
             return Optional.ofNullable( candidateIdentityHistory );
         }
@@ -165,14 +167,15 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
 
             while ( daoUtil.next( ) )
             {
-                histories.add( this.getCandidateIdentityHistory(daoUtil) );
+                histories.add( this.getCandidateIdentityHistory( daoUtil ) );
             }
 
             return histories;
         }
     }
 
-    private CandidateIdentityHistory getCandidateIdentityHistory(final DAOUtil daoUtil) {
+    private CandidateIdentityHistory getCandidateIdentityHistory( final DAOUtil daoUtil )
+    {
         final CandidateIdentityHistory history = new CandidateIdentityHistory( );
         int nIndex = 1;
         history.setId( daoUtil.getInt( nIndex++ ) );

@@ -49,8 +49,8 @@ import java.util.stream.Collectors;
 public final class CandidateIdentityDAO implements ICandidateIdentityDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT_ALL = "WITH history AS ( select rh.id_resource, icih.status, icih.comment, max(creation_date) from workflow_resource_history rh left join identityimport_candidate_identity_history icih on icih.id_wf_resource_history = rh.id_history group by rh.id_resource ,icih.status, icih.comment ) " +
-            "SELECT i.id_candidate_identity, i.id_batch, i.connection_id, i.customer_id, i.client_id, ib.app_code, history.status, history.comment FROM identityimport_candidate_identity i JOIN identityimport_batch ib ON i.id_batch = ib.id_batch LEFT JOIN history ON history.id_resource = i.id_candidate_identity";
+    private static final String SQL_QUERY_SELECT_ALL = "WITH history AS ( select rh.id_resource, icih.status, icih.comment, max(creation_date) from workflow_resource_history rh left join identityimport_candidate_identity_history icih on icih.id_wf_resource_history = rh.id_history group by rh.id_resource ,icih.status, icih.comment ) "
+            + "SELECT i.id_candidate_identity, i.id_batch, i.connection_id, i.customer_id, i.client_id, ib.app_code, history.status, history.comment FROM identityimport_candidate_identity i JOIN identityimport_batch ib ON i.id_batch = ib.id_batch LEFT JOIN history ON history.id_resource = i.id_candidate_identity";
     private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE i.id_candidate_identity = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_candidate_identity ( id_batch, connection_id, customer_id, client_id) VALUES ( ?, ?, ?, ?) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_candidate_identity WHERE id_candidate_identity = ? ";
@@ -99,7 +99,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
 
             if ( daoUtil.next( ) )
             {
-                candidateIdentity = this.getCandidateIdentity(daoUtil);
+                candidateIdentity = this.getCandidateIdentity( daoUtil );
             }
 
             return Optional.ofNullable( candidateIdentity );
@@ -153,7 +153,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
 
             while ( daoUtil.next( ) )
             {
-                candidateIdentityList.add( this.getCandidateIdentity(daoUtil) );
+                candidateIdentityList.add( this.getCandidateIdentity( daoUtil ) );
             }
 
             return candidateIdentityList;
@@ -213,7 +213,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
                 daoUtil.executeQuery( );
                 while ( daoUtil.next( ) )
                 {
-                    candidateIdentityList.add( this.getCandidateIdentity(daoUtil) );
+                    candidateIdentityList.add( this.getCandidateIdentity( daoUtil ) );
                 }
 
                 daoUtil.free( );
@@ -224,7 +224,8 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
 
     }
 
-    private CandidateIdentity getCandidateIdentity(DAOUtil daoUtil) {
+    private CandidateIdentity getCandidateIdentity( DAOUtil daoUtil )
+    {
         CandidateIdentity candidateIdentity = new CandidateIdentity( );
         int nIndex = 1;
 
@@ -234,7 +235,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
         candidateIdentity.setCustomerId( daoUtil.getString( nIndex++ ) );
         candidateIdentity.setExternalCustomerId( daoUtil.getString( nIndex++ ) );
         candidateIdentity.setClientAppCode( daoUtil.getString( nIndex++ ) );
-        candidateIdentity.setStatus(StringUtils.defaultString(daoUtil.getString(nIndex), ""));
+        candidateIdentity.setStatus( StringUtils.defaultString( daoUtil.getString( nIndex ), "" ) );
         return candidateIdentity;
     }
 
