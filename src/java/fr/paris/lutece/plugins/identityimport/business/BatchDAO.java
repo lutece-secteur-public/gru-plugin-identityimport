@@ -160,7 +160,6 @@ public final class BatchDAO implements IBatchDAO
     @Override
     public Batch selectBatchByReference( final Plugin plugin, final String reference )
     {
-        Batch batch = new Batch( );
         try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_REFERENCE, plugin ) )
         {
             daoUtil.setString( 1, reference );
@@ -168,10 +167,10 @@ public final class BatchDAO implements IBatchDAO
 
             if ( daoUtil.next( ) )
             {
-                batch = getBatch( daoUtil );
+                return getBatch( daoUtil );
             }
 
-            return batch;
+            return null;
         }
     }
 
