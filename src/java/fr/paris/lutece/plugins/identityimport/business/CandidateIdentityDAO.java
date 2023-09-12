@@ -35,8 +35,9 @@ package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
-import java.sql.Statement;
+import org.apache.commons.lang3.StringUtils;
 
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,14 +49,14 @@ import java.util.stream.Collectors;
 public final class CandidateIdentityDAO implements ICandidateIdentityDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT_ALL = "SELECT i.id_candidate_identity, i.id_batch, i.connection_id, i.customer_id, i.client_id, i.status, ib.app_code "
-            + " FROM identityimport_candidate_identity  i " + " JOIN identityimport_batch ib on i.id_batch = ib.id_batch ";
-    private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE id_candidate_identity = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_candidate_identity ( id_batch, connection_id, customer_id, client_id, status) VALUES ( ?, ?, ?, ?, ?) ";
+    private static final String SQL_QUERY_SELECT_ALL = "WITH history AS ( select rh.id_resource, icih.status, icih.comment, max(creation_date) from workflow_resource_history rh left join identityimport_candidate_identity_history icih on icih.id_wf_resource_history = rh.id_history group by rh.id_resource ,icih.status, icih.comment ) " +
+            "SELECT i.id_candidate_identity, i.id_batch, i.connection_id, i.customer_id, i.client_id, ib.app_code, history.status, history.comment FROM identityimport_candidate_identity i JOIN identityimport_batch ib ON i.id_batch = ib.id_batch LEFT JOIN history ON history.id_resource = i.id_candidate_identity";
+    private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE i.id_candidate_identity = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_candidate_identity ( id_batch, connection_id, customer_id, client_id) VALUES ( ?, ?, ?, ?) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_candidate_identity WHERE id_candidate_identity = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity SET id_candidate_identity = ?, id_batch = ?, connection_id = ?, customer_id = ?, client_id = ?, status = ? WHERE id_candidate_identity = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity SET id_candidate_identity = ?, id_batch = ?, connection_id = ?, customer_id = ?, client_id = ? WHERE id_candidate_identity = ?";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_candidate_identity FROM identityimport_candidate_identity where id_batch = ?";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = SQL_QUERY_SELECT_ALL + " WHERE id_candidate_identity IN (  ";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = SQL_QUERY_SELECT_ALL + " WHERE i.id_candidate_identity IN (  ";
     private static final String EXTERNAL_IDS = "{external_ids}";
     private static final String SQL_QUERY_EXISTS_BY_IDS = "SELECT EXISTS(SELECT 1 FROM identityimport_candidate_identity ci JOIN identityimport_batch b ON ci.id_batch = b.id_batch WHERE b.reference = ? AND ci.client_id IN ("
             + EXTERNAL_IDS + "))";
@@ -73,8 +74,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
             daoUtil.setInt( nIndex++, candidateIdentity.getIdBatch( ) );
             daoUtil.setString( nIndex++, candidateIdentity.getConnectionId( ) );
             daoUtil.setString( nIndex++, candidateIdentity.getCustomerId( ) );
-            daoUtil.setString( nIndex++, candidateIdentity.getExternalCustomerId( ) );
-            daoUtil.setString( nIndex, candidateIdentity.getStatus( ) );
+            daoUtil.setString( nIndex, candidateIdentity.getExternalCustomerId( ) );
 
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )
@@ -99,16 +99,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
 
             if ( daoUtil.next( ) )
             {
-                candidateIdentity = new CandidateIdentity( );
-                int nIndex = 1;
-
-                candidateIdentity.setId( daoUtil.getInt( nIndex++ ) );
-                candidateIdentity.setIdBatch( daoUtil.getInt( nIndex++ ) );
-                candidateIdentity.setConnectionId( daoUtil.getString( nIndex++ ) );
-                candidateIdentity.setCustomerId( daoUtil.getString( nIndex++ ) );
-                candidateIdentity.setExternalCustomerId( daoUtil.getString( nIndex++ ) );
-                candidateIdentity.setStatus( daoUtil.getString( nIndex++ ) );
-                candidateIdentity.setClientAppCode( daoUtil.getString( nIndex++ ) );
+                candidateIdentity = this.getCandidateIdentity(daoUtil);
             }
 
             return Optional.ofNullable( candidateIdentity );
@@ -143,7 +134,6 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
             daoUtil.setString( nIndex++, candidateIdentity.getConnectionId( ) );
             daoUtil.setString( nIndex++, candidateIdentity.getCustomerId( ) );
             daoUtil.setString( nIndex++, candidateIdentity.getExternalCustomerId( ) );
-            daoUtil.setString( nIndex++, candidateIdentity.getStatus( ) );
             daoUtil.setInt( nIndex, candidateIdentity.getId( ) );
 
             daoUtil.executeUpdate( );
@@ -163,18 +153,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
 
             while ( daoUtil.next( ) )
             {
-                CandidateIdentity candidateIdentity = new CandidateIdentity( );
-                int nIndex = 1;
-
-                candidateIdentity.setId( daoUtil.getInt( nIndex++ ) );
-                candidateIdentity.setIdBatch( daoUtil.getInt( nIndex++ ) );
-                candidateIdentity.setConnectionId( daoUtil.getString( nIndex++ ) );
-                candidateIdentity.setCustomerId( daoUtil.getString( nIndex++ ) );
-                candidateIdentity.setExternalCustomerId( daoUtil.getString( nIndex++ ) );
-                candidateIdentity.setStatus( daoUtil.getString( nIndex++ ) );
-                candidateIdentity.setClientAppCode( daoUtil.getString( nIndex++ ) );
-
-                candidateIdentityList.add( candidateIdentity );
+                candidateIdentityList.add( this.getCandidateIdentity(daoUtil) );
             }
 
             return candidateIdentityList;
@@ -234,18 +213,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
                 daoUtil.executeQuery( );
                 while ( daoUtil.next( ) )
                 {
-                    CandidateIdentity candidateIdentity = new CandidateIdentity( );
-                    int nIndex = 1;
-
-                    candidateIdentity.setId( daoUtil.getInt( nIndex++ ) );
-                    candidateIdentity.setIdBatch( daoUtil.getInt( nIndex++ ) );
-                    candidateIdentity.setConnectionId( daoUtil.getString( nIndex++ ) );
-                    candidateIdentity.setCustomerId( daoUtil.getString( nIndex++ ) );
-                    candidateIdentity.setExternalCustomerId( daoUtil.getString( nIndex++ ) );
-                    candidateIdentity.setStatus( daoUtil.getString( nIndex++ ) );
-                    candidateIdentity.setClientAppCode( daoUtil.getString( nIndex++ ) );
-
-                    candidateIdentityList.add( candidateIdentity );
+                    candidateIdentityList.add( this.getCandidateIdentity(daoUtil) );
                 }
 
                 daoUtil.free( );
@@ -254,6 +222,20 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
         }
         return candidateIdentityList;
 
+    }
+
+    private CandidateIdentity getCandidateIdentity(DAOUtil daoUtil) {
+        CandidateIdentity candidateIdentity = new CandidateIdentity( );
+        int nIndex = 1;
+
+        candidateIdentity.setId( daoUtil.getInt( nIndex++ ) );
+        candidateIdentity.setIdBatch( daoUtil.getInt( nIndex++ ) );
+        candidateIdentity.setConnectionId( daoUtil.getString( nIndex++ ) );
+        candidateIdentity.setCustomerId( daoUtil.getString( nIndex++ ) );
+        candidateIdentity.setExternalCustomerId( daoUtil.getString( nIndex++ ) );
+        candidateIdentity.setClientAppCode( daoUtil.getString( nIndex++ ) );
+        candidateIdentity.setStatus(StringUtils.defaultString(daoUtil.getString(nIndex), ""));
+        return candidateIdentity;
     }
 
     @Override

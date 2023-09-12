@@ -25,7 +25,6 @@ id_batch int default '0' NOT NULL,
 connection_id varchar(255) default '',
 customer_id varchar(255) default '',
 client_id varchar(255) default '',
-status VARCHAR(255) ,
 PRIMARY KEY (id_candidate_identity)
 );
 
@@ -61,3 +60,16 @@ app_code varchar(50) default '' NOT NULL,
 token long varchar,
 PRIMARY KEY (id_client)
 );
+
+--
+-- Structure for table identityimport_candidate_identity_history
+--
+
+DROP TABLE IF EXISTS identityimport_candidate_identity_history;
+CREATE TABLE identityimport_candidate_identity_history(
+id_history int AUTO_INCREMENT,
+id_wf_resource_history int,
+status VARCHAR(255) NOT NULL,
+comment VARCHAR(1024),
+PRIMARY KEY (id_history)
+)

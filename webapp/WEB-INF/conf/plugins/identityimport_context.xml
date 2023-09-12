@@ -6,6 +6,7 @@
 
     <bean id="identityimport.batchDAO" class="fr.paris.lutece.plugins.identityimport.business.BatchDAO" />
     <bean id="identityimport.candidateIdentityDAO" class="fr.paris.lutece.plugins.identityimport.business.CandidateIdentityDAO" />
+    <bean id="identityimport.candidateIdentityHistoryDao" class="fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHistoryDAO" />
     <bean id="identityimport.candidateIdentityAttributeDAO" class="fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeDAO" />
     <bean id="identityimport.clientDAO" class="fr.paris.lutece.plugins.identityimport.business.ClientDAO" />
 

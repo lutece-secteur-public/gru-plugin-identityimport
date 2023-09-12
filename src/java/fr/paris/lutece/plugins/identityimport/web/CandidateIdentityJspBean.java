@@ -57,6 +57,7 @@ import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.util.html.AbstractPaginator;
 import fr.paris.lutece.util.url.UrlItem;
+import org.apache.commons.collections4.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -415,7 +416,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
 
-        if ( _candidateidentity == null || ( _candidateidentity.getId( ) != nId ) )
+        if ( _candidateidentity == null || ( _candidateidentity.getId( ) != nId ) || CollectionUtils.isEmpty(_candidateidentity.getAttributes()))
         {
             Optional<CandidateIdentity> optCandidateIdentity = CandidateIdentityHome.findByPrimaryKey( nId );
             _candidateidentity = optCandidateIdentity.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );

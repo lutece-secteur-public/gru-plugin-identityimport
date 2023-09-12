@@ -59,49 +59,51 @@
 					</@tr>
 				</@table>
 			</@columns >
-			<#list candidateidentity_duplicate_list as duplicate >
-				<@columns>
-					<@input type="hidden" id="connection_id" name="connection_id" value="${duplicate.connectionId!''}"/>
-					<@input type="hidden" id="customer_id" name="customer_id" value="${duplicate.customerId}"/>
+			<#if candidateidentity_duplicate_list?? && candidateidentity_duplicate_list?has_content>
+				<#list candidateidentity_duplicate_list as duplicate >
+					<@columns>
+						<@input type="hidden" id="connection_id" name="connection_id" value="${duplicate.connectionId!''}"/>
+						<@input type="hidden" id="customer_id" name="customer_id" value="${duplicate.customerId}"/>
 
-					<@table >
-						<@tr>
-							<@td>
-								${candidateidentity.resource.idBatch!''}
-							</@td>
-						</@tr>
-						<@tr>
-							<@td>
-								${duplicate.connectionId!''}
-							</@td>
-						</@tr>
-						<@tr>
-							<@td>
-								${duplicate.customerId!}
-							</@td>
-						</@tr>
-						<#list key_list as key >
+						<@table >
 							<@tr>
-								<#assign key_found = false>
-								<#list duplicate.attributes as attribute>
-									<#if key = attribute.key>
-										<@td>${attribute.value!}</@td>
-										<#assign key_found = true>
-									</#if>
-								</#list>
-								<#if key_found = false>
-									<@td><i>Non défini</i></@td>
-								</#if>
+								<@td>
+									${candidateidentity.resource.idBatch!''}
+								</@td>
 							</@tr>
-						</#list>
-						<@tr>
-							<td>
-								<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=importCandidateIdentity&id=${candidateidentity.resource.id}&customer_id=${duplicate.customerId}' title='#i18n{portal.util.labelUpload}' hideTitle=['all'] buttonIcon='upload' />
-							</td>
-						</@tr>
-					</@table>
-				</@columns >
-			</#list>
+							<@tr>
+								<@td>
+									${duplicate.connectionId!''}
+								</@td>
+							</@tr>
+							<@tr>
+								<@td>
+									${duplicate.customerId!}
+								</@td>
+							</@tr>
+							<#list key_list as key >
+								<@tr>
+									<#assign key_found = false>
+									<#list duplicate.attributes as attribute>
+										<#if key = attribute.key>
+											<@td>${attribute.value!}</@td>
+											<#assign key_found = true>
+										</#if>
+									</#list>
+									<#if key_found = false>
+										<@td><i>Non défini</i></@td>
+									</#if>
+								</@tr>
+							</#list>
+							<@tr>
+								<td>
+									<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=importCandidateIdentity&id=${candidateidentity.resource.id}&customer_id=${duplicate.customerId}' title='#i18n{portal.util.labelUpload}' hideTitle=['all'] buttonIcon='upload' />
+								</td>
+							</@tr>
+						</@table>
+					</@columns >
+				</#list>
+			</#if>
 		</div>
 
 		</@row>

@@ -33,7 +33,6 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;

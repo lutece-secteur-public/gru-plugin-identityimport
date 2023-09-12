@@ -1,0 +1,18 @@
+<table>
+    <tr>
+        <td>Status:</td>
+        <td>
+            <#if status == 'FAILURE' || status == 'BAD_REQUEST' || status = 'INTERNAL_SERVER_ERROR' >
+                <@tag color='danger'>${status}</@tag>
+            <#elseif status == 'CONFLICT' || status == 'NOT_FOUND' >
+                <@tag color='warning'>${status}</@tag>
+            <#else>
+                <@tag color='success'>${status}</@tag>
+            </#if>
+        </td>
+    </tr>
+    <tr>
+        <td>Comment:</td>
+        <td>${comment}</td>
+    </tr>
+</table>
