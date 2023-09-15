@@ -77,7 +77,7 @@ public class BatchRestService
         {
             response.setStatus( ResponseStatus.badRequest( ).setMessage( "You must provide a client_code or a client_token." )
                     .setMessageKey( Constants.PROPERTY_REST_ERROR_MUST_PROVIDE_CLIENT_CODE_OR_TOKEN ) );
-            return Response.status( response.getStatus( ).getCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
+            return Response.status( response.getStatus( ).getHttpCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
         }
         final String clientAppCode;
         if ( StringUtils.isBlank( strHeaderClientAppCode ) )
@@ -91,7 +91,7 @@ public class BatchRestService
             {
                 response.setStatus( ResponseStatus.notFound( ).setMessage( "No client found with provided token" )
                         .setMessageKey( Constants.PROPERTY_REST_ERROR_NO_CLIENT_FOUND_WITH_TOKEN ) );
-                return Response.status( response.getStatus( ).getCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
+                return Response.status( response.getStatus( ).getHttpCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
             }
         }
         else
@@ -100,7 +100,7 @@ public class BatchRestService
         }
         final IdentityBatchImportRequest identityBatchImportRequest = new IdentityBatchImportRequest( request, clientAppCode );
         response = (BatchImportResponse) identityBatchImportRequest.doRequest( );
-        return Response.status( response.getStatus( ).getCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
+        return Response.status( response.getStatus( ).getHttpCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
     }
 
 }
