@@ -42,10 +42,10 @@ import fr.paris.lutece.plugins.identitystore.v3.csv.CsvIdentityService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
-import fr.paris.lutece.plugins.progressmanager.service.ProgressManagerService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.progressmanager.ProgressManagerService;
 import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppException;
@@ -364,7 +364,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         _batch = ( _batch != null ) ? _batch : new Batch( );
 
         final Map<String, Object> model = getModel( );
-        model.put( MARK_NEW_IMPORT, "true" );
+        model.put( MARK_NEW_IMPORT, true );
         model.put( MARK_BATCH, _batch );
         model.put( MARK_FEED_TOKEN, _feedToken );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_BATCH ) );
@@ -395,7 +395,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         _batch = batch.get( );
 
         final Map<String, Object> model = getModel( );
-        model.put( MARK_NEW_IMPORT, "false" );
+        model.put( MARK_NEW_IMPORT, false );
         model.put( MARK_BATCH, _batch );
         model.put( MARK_FEED_TOKEN, _feedToken );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_BATCH ) );
