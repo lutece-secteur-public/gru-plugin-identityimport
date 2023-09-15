@@ -123,5 +123,16 @@ public interface IClientDAO
      *            liste of ids
      * @return The list which contains the data of all the avant objects
      */
-    List<Client> selectClientsListByIds( Plugin _plugin, List<Integer> listIds );
+    List<Client> selectClientsListByIds( Plugin plugin, List<Integer> listIds );
+
+    /**
+     * Load the data from the table of the Client corresponding to the given token.
+     * 
+     * @param plugin
+     *            the plugin
+     * @param token
+     *            the token
+     * @return The instance of the client
+     */
+    Optional<Client> selectClientByToken( Plugin plugin, String token );
 }

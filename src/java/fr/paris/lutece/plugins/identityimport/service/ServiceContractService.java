@@ -90,4 +90,16 @@ public class ServiceContractService
             }
         }
     }
+
+    /**
+     * Get active service contract corresponding to the provided client code.
+     * 
+     * @param clientCode
+     *            the client code
+     * @return ServiceContractDto instance
+     */
+    public ServiceContractDto getActiveServiceContract( final String clientCode ) throws IdentityStoreException
+    {
+        return _cache.get( clientCode );
+    }
 }

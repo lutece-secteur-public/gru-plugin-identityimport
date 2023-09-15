@@ -109,6 +109,18 @@ public final class ClientHome
     }
 
     /**
+     * Returns an instance of a client whose token is specified in parameter
+     *
+     * @param token
+     *            The client token
+     * @return an instance of Client
+     */
+    public static Optional<Client> findByToken( final String token )
+    {
+        return _dao.selectClientByToken( _plugin, token );
+    }
+
+    /**
      * Load the data of all the client objects and returns them as a list
      * 
      * @return the list which contains the data of all the client objects

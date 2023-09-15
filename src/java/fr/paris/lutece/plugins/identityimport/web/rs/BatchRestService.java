@@ -33,7 +33,10 @@
  */
 package fr.paris.lutece.plugins.identityimport.web.rs;
 
+import fr.paris.lutece.plugins.identityimport.business.Client;
+import fr.paris.lutece.plugins.identityimport.business.ClientHome;
 import fr.paris.lutece.plugins.identityimport.web.request.IdentityBatchImportRequest;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.ResponseStatus;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
@@ -48,6 +51,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Optional;
 
 /**
  * BatchRest
@@ -65,12 +69,38 @@ public class BatchRestService
     @Path( StringUtils.EMPTY )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response importBatch( final BatchImportRequest request, @HeaderParam( Constants.PARAM_CLIENT_CODE ) String strHeaderClientAppCode )
-            throws IdentityStoreException
+    public Response importBatch( final BatchImportRequest request, @HeaderParam( Constants.PARAM_CLIENT_CODE ) String strHeaderClientAppCode,
+            @HeaderParam( Constants.PARAM_CLIENT_TOKEN ) String strHeaderClientToken ) throws IdentityStoreException
     {
-        final IdentityBatchImportRequest identityBatchImportRequest = new IdentityBatchImportRequest( request, strHeaderClientAppCode );
-        final BatchImportResponse entity = (BatchImportResponse) identityBatchImportRequest.doRequest( );
-        return Response.status( entity.getStatus( ).getCode( ) ).entity( entity ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
+        BatchImportResponse response = new BatchImportResponse( );
+        if ( StringUtils.isAllBlank( strHeaderClientAppCode, strHeaderClientToken ) )
+        {
+            response.setStatus( ResponseStatus.badRequest( ).setMessage( "You must provide a client_code or a client_token." )
+                    .setMessageKey( Constants.PROPERTY_REST_ERROR_MUST_PROVIDE_CLIENT_CODE_OR_TOKEN ) );
+            return Response.status( response.getStatus( ).getCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
+        }
+        final String clientAppCode;
+        if ( StringUtils.isBlank( strHeaderClientAppCode ) )
+        {
+            final Optional<Client> client = ClientHome.findByToken( strHeaderClientToken );
+            if ( client.isPresent( ) )
+            {
+                clientAppCode = client.get( ).getAppCode( );
+            }
+            else
+            {
+                response.setStatus( ResponseStatus.notFound( ).setMessage( "No client found with provided token" )
+                        .setMessageKey( Constants.PROPERTY_REST_ERROR_NO_CLIENT_FOUND_WITH_TOKEN ) );
+                return Response.status( response.getStatus( ).getCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
+            }
+        }
+        else
+        {
+            clientAppCode = strHeaderClientAppCode;
+        }
+        final IdentityBatchImportRequest identityBatchImportRequest = new IdentityBatchImportRequest( request, clientAppCode );
+        response = (BatchImportResponse) identityBatchImportRequest.doRequest( );
+        return Response.status( response.getStatus( ).getCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
     }
 
 }

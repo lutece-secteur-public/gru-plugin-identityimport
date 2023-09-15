@@ -55,6 +55,7 @@ public final class ClientDAO implements IClientDAO
     private static final String SQL_QUERY_SELECTALL = "SELECT id_client, name, app_code, token FROM identityimport_client";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_client FROM identityimport_client";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_client, name, app_code, token FROM identityimport_client WHERE id_client IN (  ";
+    private static final String SQL_QUERY_SELECT_BY_TOKEN = "SELECT id_client, name, app_code, token FROM identityimport_client WHERE token = ?";
 
     /**
      * {@inheritDoc }
@@ -254,5 +255,29 @@ public final class ClientDAO implements IClientDAO
         }
         return clientList;
 
+    }
+
+    @Override
+    public Optional<Client> selectClientByToken( final Plugin plugin, final String token )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_TOKEN, plugin ) )
+        {
+            daoUtil.setString( 1, token );
+            daoUtil.executeQuery( );
+            Client client = null;
+
+            if ( daoUtil.next( ) )
+            {
+                client = new Client( );
+                int nIndex = 1;
+
+                client.setId( daoUtil.getInt( nIndex++ ) );
+                client.setName( daoUtil.getString( nIndex++ ) );
+                client.setAppCode( daoUtil.getString( nIndex++ ) );
+                client.setToken( daoUtil.getString( nIndex ) );
+            }
+
+            return Optional.ofNullable( client );
+        }
     }
 }

@@ -34,9 +34,11 @@
 package fr.paris.lutece.plugins.identityimport.web.request;
 
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
+import fr.paris.lutece.plugins.identityimport.service.ServiceContractService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.BatchRequestValidator;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.ResponseStatus;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
@@ -66,6 +68,17 @@ public class IdentityBatchImportRequest extends AbstractRequest
     protected BatchImportResponse doSpecificRequest( ) throws IdentityStoreException
     {
         final BatchImportResponse response = new BatchImportResponse( );
+        final ServiceContractDto activeServiceContract = ServiceContractService.instance( ).getActiveServiceContract( _strClientCode );
+        if ( activeServiceContract == null )
+        {
+            response.setStatus( ResponseStatus.notFound( ).setMessageKey( Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND ) );
+            return response;
+        }
+        if ( !activeServiceContract.isAuthorizedImport( ) )
+        {
+            response.setStatus( ResponseStatus.unauthorized( ).setMessageKey( Constants.PROPERTY_REST_ERROR_IMPORT_UNAUTHORIZED ) );
+            return response;
+        }
         final BatchDto batch = _request.getBatch( );
         batch.setAppCode( _strClientCode );
         if ( StringUtils.isEmpty( batch.getReference( ) ) )
