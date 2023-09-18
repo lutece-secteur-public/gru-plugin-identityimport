@@ -36,10 +36,10 @@ package fr.paris.lutece.plugins.identityimport.web.rs;
 import fr.paris.lutece.plugins.identityimport.business.Client;
 import fr.paris.lutece.plugins.identityimport.business.ClientHome;
 import fr.paris.lutece.plugins.identityimport.web.request.IdentityBatchImportRequest;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.ResponseStatus;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
 import org.apache.commons.lang3.StringUtils;
@@ -75,7 +75,7 @@ public class BatchRestService
         BatchImportResponse response = new BatchImportResponse( );
         if ( StringUtils.isAllBlank( strHeaderClientAppCode, strHeaderClientToken ) )
         {
-            response.setStatus( ResponseStatus.badRequest( ).setMessage( "You must provide a client_code or a client_token." )
+            response.setStatus( ResponseStatusFactory.badRequest( ).setMessage( "You must provide a client_code or a client_token." )
                     .setMessageKey( Constants.PROPERTY_REST_ERROR_MUST_PROVIDE_CLIENT_CODE_OR_TOKEN ) );
             return Response.status( response.getStatus( ).getHttpCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
         }
@@ -89,7 +89,7 @@ public class BatchRestService
             }
             else
             {
-                response.setStatus( ResponseStatus.notFound( ).setMessage( "No client found with provided token" )
+                response.setStatus( ResponseStatusFactory.notFound( ).setMessage( "No client found with provided token" )
                         .setMessageKey( Constants.PROPERTY_REST_ERROR_NO_CLIENT_FOUND_WITH_TOKEN ) );
                 return Response.status( response.getStatus( ).getHttpCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
             }

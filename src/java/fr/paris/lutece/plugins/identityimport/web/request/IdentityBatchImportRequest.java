@@ -37,11 +37,11 @@ import fr.paris.lutece.plugins.identityimport.service.BatchService;
 import fr.paris.lutece.plugins.identityimport.service.ServiceContractService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.BatchRequestValidator;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.ResponseStatus;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -71,12 +71,12 @@ public class IdentityBatchImportRequest extends AbstractRequest
         final ServiceContractDto activeServiceContract = ServiceContractService.instance( ).getActiveServiceContract( _strClientCode );
         if ( activeServiceContract == null )
         {
-            response.setStatus( ResponseStatus.notFound( ).setMessageKey( Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND ) );
+            response.setStatus( ResponseStatusFactory.notFound( ).setMessageKey( Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND ) );
             return response;
         }
         if ( !activeServiceContract.isAuthorizedImport( ) )
         {
-            response.setStatus( ResponseStatus.unauthorized( ).setMessageKey( Constants.PROPERTY_REST_ERROR_IMPORT_UNAUTHORIZED ) );
+            response.setStatus( ResponseStatusFactory.unauthorized( ).setMessageKey( Constants.PROPERTY_REST_ERROR_IMPORT_UNAUTHORIZED ) );
             return response;
         }
         final BatchDto batch = _request.getBatch( );
@@ -89,11 +89,12 @@ public class IdentityBatchImportRequest extends AbstractRequest
         try
         {
             BatchService.instance( ).importBatch( batch, null, null );
-            response.setStatus( ResponseStatus.success( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION ) );
+            response.setStatus( ResponseStatusFactory.success( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION ) );
         }
         catch( final IdentityStoreException e )
         {
-            response.setStatus( ResponseStatus.failure( ).setMessage( e.getMessage( ) ).setMessageKey( Constants.PROPERTY_REST_ERROR_DURING_TREATMENT ) );
+            response.setStatus(
+                    ResponseStatusFactory.failure( ).setMessage( e.getMessage( ) ).setMessageKey( Constants.PROPERTY_REST_ERROR_DURING_TREATMENT ) );
         }
 
         return response;
