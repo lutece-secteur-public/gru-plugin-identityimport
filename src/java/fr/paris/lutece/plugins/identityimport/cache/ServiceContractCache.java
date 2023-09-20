@@ -33,10 +33,13 @@
  */
 package fr.paris.lutece.plugins.identityimport.cache;
 
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AuthorType;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.RequestAuthor;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.service.ServiceContractService;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.portal.service.cache.AbstractCacheableService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import org.apache.log4j.Logger;
 
 public class ServiceContractCache extends AbstractCacheableService
@@ -45,6 +48,8 @@ public class ServiceContractCache extends AbstractCacheableService
     private static final String SERVICE_NAME = "Service Contract Cache Import";
 
     private final ServiceContractService _serviceContractService;
+
+    private final String _currentClientCode = AppPropertiesService.getProperty( "identitydesk.default.client.code" );
 
     public ServiceContractCache( ServiceContractService scService )
     {
@@ -85,7 +90,8 @@ public class ServiceContractCache extends AbstractCacheableService
 
     public ServiceContractDto getFromAPI( final String clientCode ) throws IdentityStoreException
     {
-        return _serviceContractService.getActiveServiceContract( clientCode ).getServiceContract( );
+        return _serviceContractService.getActiveServiceContract( clientCode, _currentClientCode,
+                new RequestAuthor( "IdentityImport_ServiceContractCache", AuthorType.application.name( ) ) ).getServiceContract( );
     }
 
     @Override

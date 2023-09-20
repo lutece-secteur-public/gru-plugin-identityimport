@@ -39,11 +39,14 @@ import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribut
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBean;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeTreatmentType;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AuthorType;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.RequestAuthor;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.*;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.IdentitySearchRequest;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.IdentitySearchResponse;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.SearchAttribute;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.SearchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
@@ -60,7 +63,11 @@ import fr.paris.lutece.util.url.UrlItem;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -429,7 +436,6 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
 
         // Appel API Recherche
         final IdentitySearchRequest searchRequest = new IdentitySearchRequest( );
-        searchRequest.setOrigin( buildAuthor( ) );
         final SearchDto searchDto = new SearchDto( );
         final List<SearchAttribute> searchAttributes = _candidateidentity.getAttributes( ).stream( )
                 .filter( attr -> attr.getCode( ).equals( "family_name" ) || attr.getCode( ).equals( "first_name" ) || attr.getCode( ).equals( "birthdate" ) )
@@ -455,7 +461,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
 
         try
         {
-            IdentitySearchResponse response = identityService.searchIdentities( searchRequest, _candidateidentity.getClientAppCode( ) );
+            IdentitySearchResponse response = identityService.searchIdentities( searchRequest, _candidateidentity.getClientAppCode( ), this.buildAuthor( ) );
 
             keyList.addAll( response.getIdentities( ).stream( ).flatMap( duplicate -> duplicate.getAttributes( ).stream( ) ).map( AttributeDto::getKey )
                     .distinct( ).collect( Collectors.toList( ) ) );
