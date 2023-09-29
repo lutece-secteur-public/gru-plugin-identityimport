@@ -52,5 +52,6 @@
 	<!-- REST -->
 	<bean id="identityimport.customObjectMapper"  class="fr.paris.lutece.plugins.identityimport.web.rs.CustomMapper" />
 	<bean id="identityimport.uncaughtExceptionMapper"  class="fr.paris.lutece.plugins.identityimport.web.rs.error.UncaughtExceptionMapper" />
+	<bean id="identityimport.uncaughtIdentityStoreExceptionMapper"  class="fr.paris.lutece.plugins.identityimport.web.rs.error.UncaughtIdentityStoreExceptionMapper" />
 	<bean id="identityimport.batchRestService"  class="fr.paris.lutece.plugins.identityimport.web.rs.BatchRestService" />
 </beans>

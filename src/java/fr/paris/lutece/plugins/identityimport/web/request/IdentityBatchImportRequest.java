@@ -38,6 +38,7 @@ import fr.paris.lutece.plugins.identityimport.business.ClientHome;
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
 import fr.paris.lutece.plugins.identityimport.service.ServiceContractService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.AbstractIdentityStoreRequest;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.BatchRequestValidator;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportRequest;
@@ -66,6 +67,7 @@ public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
     @Override
     protected void validateSpecificRequest( ) throws IdentityStoreException
     {
+        BatchRequestValidator.instance( ).checkImportRequest( _request );
     }
 
     @Override
