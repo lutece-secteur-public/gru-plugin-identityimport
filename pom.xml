@@ -75,4 +75,11 @@
         <jiraProjectName>IDENTITYIMPORT</jiraProjectName>
         <jiraComponentId></jiraComponentId>
     </properties>
+
+    <scm>
+        <connection>scm:git:https://github.com/lutece-secteur-public/gru-plugin-identityimport.git</connection>
+        <developerConnection>scm:git:https://github.com/lutece-secteur-public/gru-plugin-identityimport.git</developerConnection>
+        <url>https://github.com/lutece-secteur-public/gru-plugin-identityimport.git</url>
+    </scm>
+
 </project>
