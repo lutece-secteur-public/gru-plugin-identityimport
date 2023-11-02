@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Statement;
@@ -49,11 +50,13 @@ import java.util.stream.Collectors;
 public final class CandidateIdentityDAO implements ICandidateIdentityDAO
 {
     // Constants
+    private static final String ID_LIST = "%{id_list}";
     private static final String SQL_QUERY_SELECT_ALL = "WITH history AS ( select rh.id_resource, icih.status, icih.comment, max(creation_date) from workflow_resource_history rh left join identityimport_candidate_identity_history icih on icih.id_wf_resource_history = rh.id_history group by rh.id_resource ,icih.status, icih.comment ) "
             + "SELECT i.id_candidate_identity, i.id_batch, i.connection_id, i.customer_id, i.client_id, ib.app_code, history.status, history.comment FROM identityimport_candidate_identity i JOIN identityimport_batch ib ON i.id_batch = ib.id_batch LEFT JOIN history ON history.id_resource = i.id_candidate_identity";
     private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE i.id_candidate_identity = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_candidate_identity ( id_batch, connection_id, customer_id, client_id) VALUES ( ?, ?, ?, ?) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_candidate_identity WHERE id_candidate_identity = ? ";
+    private static final String SQL_QUERY_DELETE_LISTS = "DELETE FROM identityimport_candidate_identity WHERE id_candidate_identity IN ( " + ID_LIST + " )";
     private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity SET id_candidate_identity = ?, id_batch = ?, connection_id = ?, customer_id = ?, client_id = ? WHERE id_candidate_identity = ?";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_candidate_identity FROM identityimport_candidate_identity where id_batch = ?";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = SQL_QUERY_SELECT_ALL + " WHERE i.id_candidate_identity IN (  ";
@@ -62,13 +65,15 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
             + EXTERNAL_IDS + "))";
     private static final String SQL_QUERY_SELECTALL_BY_IDS_END = ")";
 
+    private static final String SQL_QUERY_SELECTSTATES = "SELECT ws.id_state, ws.name, ws.description, COUNT(wr.id_resource) as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' AND wr.id_external_parent = ? WHERE ws.id_workflow = 2 GROUP BY ws.id_state, ws.name, ws.description";
+
     /**
      * {@inheritDoc }
      */
     @Override
     public void insert( CandidateIdentity candidateIdentity, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
             int nIndex = 1;
             daoUtil.setInt( nIndex++, candidateIdentity.getIdBatch( ) );
@@ -91,7 +96,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     @Override
     public Optional<CandidateIdentity> load( int nKey, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
             daoUtil.setInt( 1, nKey );
             daoUtil.executeQuery( );
@@ -112,7 +117,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     @Override
     public void delete( int nKey, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
         {
             daoUtil.setInt( 1, nKey );
             daoUtil.executeUpdate( );
@@ -123,9 +128,25 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
      * {@inheritDoc }
      */
     @Override
+    public void deleteList( final List<Integer> idList, Plugin plugin )
+    {
+        if ( CollectionUtils.isNotEmpty( idList ) )
+        {
+            final String query = SQL_QUERY_DELETE_LISTS.replace( ID_LIST, idList.stream( ).map( String::valueOf ).collect( Collectors.joining( "," ) ) );
+            try ( final DAOUtil daoUtil = new DAOUtil( query, plugin ) )
+            {
+                daoUtil.executeUpdate( );
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public void store( CandidateIdentity candidateIdentity, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
         {
             int nIndex = 1;
 
@@ -147,7 +168,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     public List<CandidateIdentity> selectCandidateIdentitiesList( Plugin plugin )
     {
         List<CandidateIdentity> candidateIdentityList = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL, plugin ) )
         {
             daoUtil.executeQuery( );
 
@@ -168,7 +189,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     {
         List<Integer> candidateIdentityList = new ArrayList<>( );
 
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
         {
             daoUtil.setInt( 1, nBatchId );
             daoUtil.executeQuery( );
@@ -188,7 +209,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     @Override
     public List<CandidateIdentity> selectCandidateIdentitiesListByIds( Plugin plugin, List<Integer> listIds )
     {
-        List<CandidateIdentity> candidateIdentityList = new ArrayList<>( );
+        final List<CandidateIdentity> candidateIdentityList = new ArrayList<>( );
 
         StringBuilder builder = new StringBuilder( );
 
@@ -202,7 +223,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
             String placeHolders = builder.deleteCharAt( builder.length( ) - 1 ).toString( );
             String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + SQL_QUERY_SELECTALL_BY_IDS_END;
 
-            try ( DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
+            try ( final DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
             {
                 int index = 1;
                 for ( Integer n : listIds )
@@ -257,5 +278,29 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
             }
         }
         return false;
+    }
+
+    @Override
+    public List<ResourceState> selectIdentityStates( final int batchId, final Plugin plugin )
+    {
+        final List<ResourceState> states = new ArrayList<>( );
+
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTSTATES, plugin ) )
+        {
+            daoUtil.setInt( 1, batchId );
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                final ResourceState state = new ResourceState( );
+                state.setId( daoUtil.getInt( 1 ) );
+                state.setName( daoUtil.getString( 2 ) );
+                state.setDescription( daoUtil.getString( 3 ) );
+                state.setResourceCount( daoUtil.getInt( 4 ) );
+                states.add( state );
+            }
+
+            return states;
+        }
     }
 }

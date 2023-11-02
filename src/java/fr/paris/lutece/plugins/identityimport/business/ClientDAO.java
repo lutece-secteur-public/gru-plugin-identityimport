@@ -36,8 +36,8 @@ package fr.paris.lutece.plugins.identityimport.business;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.sql.DAOUtil;
-import java.sql.Statement;
 
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,14 +48,15 @@ import java.util.Optional;
 public final class ClientDAO implements IClientDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id_client, name, app_code, token FROM identityimport_client WHERE id_client = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_client ( name, app_code, token ) VALUES ( ?, ?, ? ) ";
+    private static final String SELECT_COLUMNS = "id_client, name, app_code, token, data_retention_period_in_months";
+    private static final String SQL_QUERY_SELECT = "SELECT " + SELECT_COLUMNS + " FROM identityimport_client WHERE id_client = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_client ( name, app_code, token, data_retention_period_in_months ) VALUES ( ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_client WHERE id_client = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_client SET id_client = ?, name = ?, app_code = ?, token = ? WHERE id_client = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_client, name, app_code, token FROM identityimport_client";
+    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_client SET id_client = ?, name = ?, app_code = ?, token = ?, data_retention_period_in_months = ? WHERE id_client = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT " + SELECT_COLUMNS + " FROM identityimport_client";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_client FROM identityimport_client";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_client, name, app_code, token FROM identityimport_client WHERE id_client IN (  ";
-    private static final String SQL_QUERY_SELECT_BY_TOKEN = "SELECT id_client, name, app_code, token FROM identityimport_client WHERE token = ?";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT " + SELECT_COLUMNS + " FROM identityimport_client WHERE id_client IN (  ";
+    private static final String SQL_QUERY_SELECT_BY_TOKEN = "SELECT " + SELECT_COLUMNS + " FROM identityimport_client WHERE token = ?";
 
     /**
      * {@inheritDoc }
@@ -63,12 +64,13 @@ public final class ClientDAO implements IClientDAO
     @Override
     public void insert( Client client, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
             int nIndex = 1;
             daoUtil.setString( nIndex++, client.getName( ) );
             daoUtil.setString( nIndex++, client.getAppCode( ) );
             daoUtil.setString( nIndex++, client.getToken( ) );
+            daoUtil.setInt( nIndex++, client.getDataRetentionPeriodInMonths( ) );
 
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )
@@ -85,7 +87,7 @@ public final class ClientDAO implements IClientDAO
     @Override
     public Optional<Client> load( int nKey, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
             daoUtil.setInt( 1, nKey );
             daoUtil.executeQuery( );
@@ -93,13 +95,7 @@ public final class ClientDAO implements IClientDAO
 
             if ( daoUtil.next( ) )
             {
-                client = new Client( );
-                int nIndex = 1;
-
-                client.setId( daoUtil.getInt( nIndex++ ) );
-                client.setName( daoUtil.getString( nIndex++ ) );
-                client.setAppCode( daoUtil.getString( nIndex++ ) );
-                client.setToken( daoUtil.getString( nIndex ) );
+                client = this.getClient( daoUtil );
             }
 
             return Optional.ofNullable( client );
@@ -112,7 +108,7 @@ public final class ClientDAO implements IClientDAO
     @Override
     public void delete( int nKey, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
         {
             daoUtil.setInt( 1, nKey );
             daoUtil.executeUpdate( );
@@ -125,7 +121,7 @@ public final class ClientDAO implements IClientDAO
     @Override
     public void store( Client client, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
         {
             int nIndex = 1;
 
@@ -133,6 +129,7 @@ public final class ClientDAO implements IClientDAO
             daoUtil.setString( nIndex++, client.getName( ) );
             daoUtil.setString( nIndex++, client.getAppCode( ) );
             daoUtil.setString( nIndex++, client.getToken( ) );
+            daoUtil.setInt( nIndex++, client.getDataRetentionPeriodInMonths( ) );
             daoUtil.setInt( nIndex, client.getId( ) );
 
             daoUtil.executeUpdate( );
@@ -145,22 +142,14 @@ public final class ClientDAO implements IClientDAO
     @Override
     public List<Client> selectClientsList( Plugin plugin )
     {
-        List<Client> clientList = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
+        final List<Client> clientList = new ArrayList<>( );
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
             daoUtil.executeQuery( );
 
             while ( daoUtil.next( ) )
             {
-                Client client = new Client( );
-                int nIndex = 1;
-
-                client.setId( daoUtil.getInt( nIndex++ ) );
-                client.setName( daoUtil.getString( nIndex++ ) );
-                client.setAppCode( daoUtil.getString( nIndex++ ) );
-                client.setToken( daoUtil.getString( nIndex ) );
-
-                clientList.add( client );
+                clientList.add( this.getClient( daoUtil ) );
             }
 
             return clientList;
@@ -173,8 +162,8 @@ public final class ClientDAO implements IClientDAO
     @Override
     public List<Integer> selectIdClientsList( Plugin plugin )
     {
-        List<Integer> clientList = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
+        final List<Integer> clientList = new ArrayList<>( );
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
         {
             daoUtil.executeQuery( );
 
@@ -193,8 +182,8 @@ public final class ClientDAO implements IClientDAO
     @Override
     public ReferenceList selectClientsReferenceList( Plugin plugin )
     {
-        ReferenceList clientList = new ReferenceList( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
+        final ReferenceList clientList = new ReferenceList( );
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
             daoUtil.executeQuery( );
 
@@ -213,9 +202,9 @@ public final class ClientDAO implements IClientDAO
     @Override
     public List<Client> selectClientsListByIds( Plugin plugin, List<Integer> listIds )
     {
-        List<Client> clientList = new ArrayList<>( );
+        final List<Client> clientList = new ArrayList<>( );
 
-        StringBuilder builder = new StringBuilder( );
+        final StringBuilder builder = new StringBuilder( );
 
         if ( !listIds.isEmpty( ) )
         {
@@ -224,10 +213,10 @@ public final class ClientDAO implements IClientDAO
                 builder.append( "?," );
             }
 
-            String placeHolders = builder.deleteCharAt( builder.length( ) - 1 ).toString( );
-            String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ")";
+            final String placeHolders = builder.deleteCharAt( builder.length( ) - 1 ).toString( );
+            final String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ")";
 
-            try ( DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
+            try ( final DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
             {
                 int index = 1;
                 for ( Integer n : listIds )
@@ -238,15 +227,7 @@ public final class ClientDAO implements IClientDAO
                 daoUtil.executeQuery( );
                 while ( daoUtil.next( ) )
                 {
-                    Client client = new Client( );
-                    int nIndex = 1;
-
-                    client.setId( daoUtil.getInt( nIndex++ ) );
-                    client.setName( daoUtil.getString( nIndex++ ) );
-                    client.setAppCode( daoUtil.getString( nIndex++ ) );
-                    client.setToken( daoUtil.getString( nIndex ) );
-
-                    clientList.add( client );
+                    clientList.add( this.getClient( daoUtil ) );
                 }
 
                 daoUtil.free( );
@@ -257,10 +238,21 @@ public final class ClientDAO implements IClientDAO
 
     }
 
+    private Client getClient( final DAOUtil daoUtil )
+    {
+        final Client client = new Client( );
+        client.setId( daoUtil.getInt( 1 ) );
+        client.setName( daoUtil.getString( 2 ) );
+        client.setAppCode( daoUtil.getString( 3 ) );
+        client.setToken( daoUtil.getString( 4 ) );
+        client.setDataRetentionPeriodInMonths( daoUtil.getInt( 5 ) );
+        return client;
+    }
+
     @Override
     public Optional<Client> selectClientByToken( final Plugin plugin, final String token )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_TOKEN, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_TOKEN, plugin ) )
         {
             daoUtil.setString( 1, token );
             daoUtil.executeQuery( );
@@ -268,13 +260,7 @@ public final class ClientDAO implements IClientDAO
 
             if ( daoUtil.next( ) )
             {
-                client = new Client( );
-                int nIndex = 1;
-
-                client.setId( daoUtil.getInt( nIndex++ ) );
-                client.setName( daoUtil.getString( nIndex++ ) );
-                client.setAppCode( daoUtil.getString( nIndex++ ) );
-                client.setToken( daoUtil.getString( nIndex ) );
+                client = this.getClient( daoUtil );
             }
 
             return Optional.ofNullable( client );

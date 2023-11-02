@@ -31,63 +31,30 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.identityimport.business;
+package fr.paris.lutece.plugins.identityimport.task;
 
-public class CandidateIdentityHistory
+import fr.paris.lutece.plugins.identityimport.service.BatchService;
+import fr.paris.lutece.portal.service.daemon.Daemon;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.StopWatch;
+import org.apache.log4j.Logger;
+
+public class BatchPurgeDaemon extends Daemon
 {
-    private int _nId;
-    private int _nCandidateIdentityId;
-    private int _nWfResourceHistoryId;
-    private String _strStatus;
-    private String _strComment;
+    private final static Logger _logger = Logger.getLogger( BatchPurgeDaemon.class );
+    private final static int _batchLimit = AppPropertiesService.getPropertyInt( "identityimport.daemon.purge.batch.limit", 10 );
 
-    public int getId( )
+    @Override
+    public void run( )
     {
-        return _nId;
-    }
-
-    public void setId( int _nId )
-    {
-        this._nId = _nId;
-    }
-
-    public int getCandidateIdentityId( )
-    {
-        return _nCandidateIdentityId;
-    }
-
-    public void setCandidateIdentityId( int _nCandidateIdentityId )
-    {
-        this._nCandidateIdentityId = _nCandidateIdentityId;
-    }
-
-    public int getWfResourceHistoryId( )
-    {
-        return _nWfResourceHistoryId;
-    }
-
-    public void setWfResourceHistoryId( int _nWfResourceHistoryId )
-    {
-        this._nWfResourceHistoryId = _nWfResourceHistoryId;
-    }
-
-    public String getStatus( )
-    {
-        return _strStatus;
-    }
-
-    public void setStatus( String _strStatus )
-    {
-        this._strStatus = _strStatus;
-    }
-
-    public String getComment( )
-    {
-        return _strComment;
-    }
-
-    public void setComment( String _strComment )
-    {
-        this._strComment = _strComment;
+        final StopWatch stopWatch = new StopWatch( );
+        stopWatch.start( );
+        final StringBuilder logs = BatchService.instance( ).purgeBatches( _batchLimit );
+        stopWatch.stop( );
+        final String execTime = "Execution time " + DurationFormatUtils.formatDurationWords( stopWatch.getTime( ), true, true );
+        _logger.info( execTime );
+        logs.append( execTime );
+        setLastRunLogs( logs.toString( ) );
     }
 }

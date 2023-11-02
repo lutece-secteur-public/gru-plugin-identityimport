@@ -33,61 +33,19 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
-public class CandidateIdentityHistory
+import fr.paris.lutece.plugins.workflowcore.business.state.State;
+
+public class ResourceState extends State
 {
-    private int _nId;
-    private int _nCandidateIdentityId;
-    private int _nWfResourceHistoryId;
-    private String _strStatus;
-    private String _strComment;
+    private int _nResourceCount;
 
-    public int getId( )
+    public int getResourceCount( )
     {
-        return _nId;
+        return _nResourceCount;
     }
 
-    public void setId( int _nId )
+    public void setResourceCount( int _nResourceCount )
     {
-        this._nId = _nId;
-    }
-
-    public int getCandidateIdentityId( )
-    {
-        return _nCandidateIdentityId;
-    }
-
-    public void setCandidateIdentityId( int _nCandidateIdentityId )
-    {
-        this._nCandidateIdentityId = _nCandidateIdentityId;
-    }
-
-    public int getWfResourceHistoryId( )
-    {
-        return _nWfResourceHistoryId;
-    }
-
-    public void setWfResourceHistoryId( int _nWfResourceHistoryId )
-    {
-        this._nWfResourceHistoryId = _nWfResourceHistoryId;
-    }
-
-    public String getStatus( )
-    {
-        return _strStatus;
-    }
-
-    public void setStatus( String _strStatus )
-    {
-        this._strStatus = _strStatus;
-    }
-
-    public String getComment( )
-    {
-        return _strComment;
-    }
-
-    public void setComment( String _strComment )
-    {
-        this._strComment = _strComment;
+        this._nResourceCount = _nResourceCount;
     }
 }

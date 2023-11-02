@@ -53,6 +53,8 @@ public interface ICandidateIdentityDAO
      */
     void insert( CandidateIdentity candidateIdentity, Plugin plugin );
 
+    void deleteList( List<Integer> idList, Plugin plugin );
+
     /**
      * Update the record in the table
      * 
@@ -128,4 +130,6 @@ public interface ICandidateIdentityDAO
      * @return true if at least one external id exists in the batch
      */
     boolean checkIfOneExists( Plugin plugin, final String batchReference, List<String> externalIds );
+
+    List<ResourceState> selectIdentityStates( final int batchId, final Plugin plugin );
 }

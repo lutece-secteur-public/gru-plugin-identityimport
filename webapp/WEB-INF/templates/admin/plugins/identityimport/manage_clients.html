@@ -14,6 +14,7 @@
             <th>#i18n{identityimport.manage_clients.columnName}</th>
             <th>#i18n{identityimport.manage_clients.columnAppCode}</th>
             <th>#i18n{identityimport.manage_clients.columnToken}</th>
+            <th>#i18n{identityimport.manage_clients.columnDataRetention}</th>
             <th>#i18n{portal.util.labelActions}</th>
         </tr>
         <@tableHeadBodySeparator />
@@ -28,11 +29,12 @@
             <td>
 				${client.token!}
 			</td>
+            <td>
+                ${client.dataRetentionPeriodInMonths!}
+            </td>
         	<td>
 				<@aButton href='jsp/admin/plugins/identityimport/ManageClients.jsp?view=modifyClient&id=${client.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
-						
 				<@aButton href='jsp/admin/plugins/identityimport/ManageClients.jsp?action=confirmRemoveClient&id=${client.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
-
 	        </td>
         </tr>
         </#list>

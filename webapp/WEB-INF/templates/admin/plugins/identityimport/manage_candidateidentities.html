@@ -1,60 +1,35 @@
+<#include "utils/functions.ftl" />
+<#include "components/identity_card.ftl" />
+<#include "components/batch_card.ftl" />
+<@pageContainer id="mediation">
+    <#include "components/menu.ftl" />
+    <#if batch_list?size gt 0>
+        <#include "components/batch_list.ftl" />
+    </#if>
+    <@pageColumn id="mediation-selection" class="pt-xl-4 bg-secondary ">
+        <@messages infos=infos />
+        <@messages errors=errors />
+        <@messages warnings=warnings />
 
-<@box>
-	<@boxHeader title='#i18n{identityimport.manage_candidateidentity.title}' boxTools=true>
-		<@tform class='form-inline pull-right' name='manage_candidateidentity' action='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp'>
-			<@input type="hidden" value="${id_batch}" name="id_batch" />
-			<@aButton href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=modifyBatch&id=${id_batch!}' title='Retour' buttonIcon='eye' />
-				
-			<@button type='submit' name='view_createCandidateIdentity' buttonIcon='plus' title='#i18n{identityimport.manage_candidateidentities.buttonAdd}' />
-			
-		</@tform>
-	</@boxHeader>
-	<@boxBody>    
-    <@messages infos=infos />
-    <@paginationAdmin paginator=paginator combo=1 />
-    <div class="clearfix"></div>
-    <@table>
-        <tr>
-            <th>#i18n{identityimport.manage_candidateidentities.columnIdBatch}</th>
-            <th>#i18n{identityimport.manage_candidateidentities.columnExternalCustomerId}</th>
-            <th>#i18n{identityimport.manage_candidateidentities.columnConnectionId}</th>
-            <th>#i18n{identityimport.manage_batchs.columnStatus}</th>
-            <th>#i18n{identityimport.manage_candidateidentities.columnAPIStatus}</th>
-            <th>#i18n{portal.util.labelActions}</th>
-        </tr>
-        <@tableHeadBodySeparator />
-        <#list candidateidentity_list as candidateidentity >
-        <tr>
-            <td>
-				${candidateidentity.resource.idBatch}
-			</td>
-            <td>
-				${candidateidentity.resource.externalCustomerId!}
-			</td>
-            <td>
-				${candidateidentity.resource.connectionId!}
-			</td>
-        	<td>
-        	  <#if candidateidentity.state??><@tag color='warning'>${candidateidentity.state.name}</@tag><#else> not set</#if>
-        	</td>
-        	<td>
-        	  ${candidateidentity.resource.status!}
-        	</td>
-        	<td>
-        		<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?view=importCandidateIdentity&id=${candidateidentity.resource.id}' title='#i18n{portal.util.labelUpload}' hideTitle=['all'] buttonIcon='upload' />
-				
-        	    <@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentityAttributes.jsp?id_identity=${candidateidentity.resource.id}&id_batch=${id_batch}' title='#i18n{identityimport.manage_candidateidentityattributes.title}' hideTitle=['all'] buttonIcon='list' />
-				
-				<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?view=modifyCandidateIdentity&id=${candidateidentity.resource.id}&id_batch=${id_batch}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
-						
-				<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=confirmRemoveCandidateIdentity&id=${candidateidentity.resource.id}&id_batch=${id_batch}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
-
-	        </td>
-        </tr>
-        </#list>
-    </@table>
-
-    <@paginationAdmin paginator=paginator />
-
-  </@boxBody>
-</@box>
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pills-batch-tab" data-bs-toggle="pill" data-bs-target="#pills-batch" type="button" role="tab" aria-controls="pills-batch" aria-selected="true">Détail du batch</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-identities-tab" data-bs-toggle="pill" data-bs-target="#pills-identities" type="button" role="tab" aria-controls="pills-identities" aria-selected="false">Liste des identités</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="pills-batch" role="tabpanel" aria-labelledby="pills-batch-tab">
+                <div class="row mx-0">
+                    <@batchCard batch=batch/>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pills-identities" role="tabpanel" aria-labelledby="pills-identities-tab">
+                <div class="row mx-0">
+                    <#include "components/identity_list.ftl" />
+                </div>
+            </div>
+        </div>
+    </@pageColumn>
+</@pageContainer>

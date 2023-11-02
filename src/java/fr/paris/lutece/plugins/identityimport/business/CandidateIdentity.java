@@ -50,6 +50,8 @@ public class CandidateIdentity implements Serializable
     // Variables declarations
     private int _nId;
 
+    private int _nWorkflowResourceId;
+
     private int _nIdBatch;
 
     @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.ConnectionId.size}" )
@@ -87,6 +89,16 @@ public class CandidateIdentity implements Serializable
     public void setId( int nId )
     {
         _nId = nId;
+    }
+
+    public int getWorkflowResourceId( )
+    {
+        return _nWorkflowResourceId;
+    }
+
+    public void setWorkflowResourceId( int _nWorkflowResourceId )
+    {
+        this._nWorkflowResourceId = _nWorkflowResourceId;
     }
 
     /**

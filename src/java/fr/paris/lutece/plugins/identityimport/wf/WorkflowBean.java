@@ -33,9 +33,12 @@
  */
 package fr.paris.lutece.plugins.identityimport.wf;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import fr.paris.lutece.api.user.User;
+import fr.paris.lutece.plugins.identityimport.business.ResourceState;
 import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.state.State;
 
@@ -51,6 +54,8 @@ public class WorkflowBean<T>
     private State _state;
     private Collection<Action> _listActions;
     private String _strHistory;
+    private int _nNbSubResource;
+    private List<ResourceState> _listSubResourceStates = new ArrayList<>( );
 
     /**
      * constructor
@@ -208,4 +213,23 @@ public class WorkflowBean<T>
         return _user;
     }
 
+    public int getNbSubResource( )
+    {
+        return _nNbSubResource;
+    }
+
+    public void setNbSubResource( int _nNbSubResource )
+    {
+        this._nNbSubResource = _nNbSubResource;
+    }
+
+    public List<ResourceState> getSubResourceStates( )
+    {
+        return _listSubResourceStates;
+    }
+
+    public void setSubResourceStates( List<ResourceState> _listSubResourceStates )
+    {
+        this._listSubResourceStates = _listSubResourceStates;
+    }
 }

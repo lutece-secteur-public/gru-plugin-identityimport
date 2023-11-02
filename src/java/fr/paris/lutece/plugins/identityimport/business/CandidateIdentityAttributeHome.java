@@ -96,6 +96,11 @@ public final class CandidateIdentityAttributeHome
         _dao.delete( nKey, _plugin );
     }
 
+    public static void delete( List<Integer> idIdentities )
+    {
+        _dao.deleteList( idIdentities, _plugin );
+    }
+
     /**
      * Returns an instance of a candidateIdentityAttribute whose identifier is specified in parameter
      * 
@@ -139,5 +144,4 @@ public final class CandidateIdentityAttributeHome
     {
         return _dao.selectCandidateIdentityAttributesListByIds( _plugin, listIds );
     }
-
 }

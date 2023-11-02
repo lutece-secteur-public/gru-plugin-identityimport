@@ -41,6 +41,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.api.user.User;
+import fr.paris.lutece.plugins.identityimport.business.BatchHome;
+import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
@@ -266,5 +268,20 @@ public class WorkflowBeanService<T> implements Serializable
     {
         wfBean.setHistory( WorkflowService.getInstance( ).getDisplayDocumentHistory( wfBean.getResourceId( ), _strResourceType, _nWorkflowKey, request, locale,
                 wfBean.getUser( ) ) );
+    }
+
+    /**
+     * Count bean sub resources if any
+     *
+     * @param wfBean
+     */
+    public void countSubResources( WorkflowBean<T> wfBean )
+    {
+        wfBean.setNbSubResource( BatchHome.getIdentitiesCount( wfBean.getResourceId( ) ) );
+    }
+
+    public void addSubResourceStates( WorkflowBean<T> wfBean )
+    {
+        wfBean.setSubResourceStates( CandidateIdentityHome.getCandidateIdentityStates( wfBean.getResourceId( ) ) );
     }
 }

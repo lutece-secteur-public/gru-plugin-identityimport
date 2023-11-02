@@ -193,4 +193,10 @@ public class Batch implements Serializable
     {
         _strComment = strComment;
     }
+
+    public String toLog( )
+    {
+        return "[ID : " + getId( ) + "]" + "[REFERENCE : " + getReference( ) + "]" + "[DATE : " + getDate( ) + "]" + "[USER : " + getUser( ) + "]"
+                + "[APP CODE : " + getAppCode( ) + "]";
+    }
 }

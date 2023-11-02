@@ -35,11 +35,14 @@ package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * This class provides Data Access methods for CandidateIdentityAttribute objects
@@ -47,10 +50,13 @@ import java.util.Optional;
 public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAttributeDAO
 {
     // Constants
+    private static final String ID_LIST = "%{id_list}";
     private static final String SQL_QUERY_SELECT = "SELECT id_candidate_identity_attribute, id_candidate_identity, code, value, cert_process, cert_date FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute = ?";
     private static final String SQL_QUERY_SELECT_ALL = "SELECT id_candidate_identity_attribute, id_candidate_identity, code, value, cert_process, cert_date FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_candidate_identity_attribute ( id_candidate_identity, code, value, cert_process, cert_date ) VALUES ( ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute = ? ";
+    private static final String SQL_QUERY_DELETE_LISTS = "DELETE FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute IN ("
+            + ID_LIST + ") ";
     private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity_attribute SET code = ?, value = ?, cert_process = ?, cert_date = ? WHERE id_candidate_identity_attribute = ?";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_candidate_identity_attribute FROM identityimport_candidate_identity_attribute where id_candidate_identity = ? ";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_candidate_identity_attribute, id_candidate_identity, code, value, cert_date, cert_process FROM identityimport_candidate_identity_attribute WHERE id_candidate_identity_attribute IN (  ";
@@ -118,6 +124,22 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
         {
             daoUtil.setInt( 1, nKey );
             daoUtil.executeUpdate( );
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void deleteList( final List<Integer> idIdentities, Plugin plugin )
+    {
+        if ( CollectionUtils.isNotEmpty( idIdentities ) )
+        {
+            final String query = SQL_QUERY_DELETE_LISTS.replace( ID_LIST, idIdentities.stream( ).map( String::valueOf ).collect( Collectors.joining( "," ) ) );
+            try ( final DAOUtil daoUtil = new DAOUtil( query, plugin ) )
+            {
+                daoUtil.executeUpdate( );
+            }
         }
     }
 

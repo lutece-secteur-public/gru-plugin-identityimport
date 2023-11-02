@@ -51,7 +51,7 @@ public interface ICandidateIdentityAttributeDAO
      * @param plugin
      *            the Plugin
      */
-    void insert( CandidateIdentityAttribute candidateIdentityAttribute, Plugin plugin );
+    void insert( final CandidateIdentityAttribute candidateIdentityAttribute, final Plugin plugin );
 
     /**
      * Update the record in the table
@@ -61,7 +61,7 @@ public interface ICandidateIdentityAttributeDAO
      * @param plugin
      *            the Plugin
      */
-    void store( CandidateIdentityAttribute candidateIdentityAttribute, Plugin plugin );
+    void store( final CandidateIdentityAttribute candidateIdentityAttribute, final Plugin plugin );
 
     /**
      * Delete a record from the table
@@ -71,7 +71,7 @@ public interface ICandidateIdentityAttributeDAO
      * @param plugin
      *            the Plugin
      */
-    void delete( int nKey, Plugin plugin );
+    void delete( final int nKey, final Plugin plugin );
 
     ///////////////////////////////////////////////////////////////////////////
     // Finders
@@ -85,7 +85,7 @@ public interface ICandidateIdentityAttributeDAO
      *            the Plugin
      * @return The instance of the candidateIdentityAttribute
      */
-    Optional<CandidateIdentityAttribute> load( int nKey, Plugin plugin );
+    Optional<CandidateIdentityAttribute> load( final int nKey, final Plugin plugin );
 
     /**
      * Load the id of all the candidateIdentityAttribute objects and returns them as a list
@@ -94,7 +94,7 @@ public interface ICandidateIdentityAttributeDAO
      *            the Plugin
      * @return The list which contains the id of all the candidateIdentityAttribute objects
      */
-    List<Integer> selectIdCandidateIdentityAttributesList( int idIdentity, Plugin plugin );
+    List<Integer> selectIdCandidateIdentityAttributesList( final int idIdentity, final Plugin plugin );
 
     /**
      * Load all the candidateIdentityAttribute objects and returns them as a list
@@ -103,7 +103,7 @@ public interface ICandidateIdentityAttributeDAO
      *            the Plugin
      * @return The list which contains the candidateIdentityAttribute objects
      */
-    List<CandidateIdentityAttribute> selectCandidateIdentityAttributesList( int idIdentity, Plugin plugin );
+    List<CandidateIdentityAttribute> selectCandidateIdentityAttributesList( final int idIdentity, final Plugin plugin );
 
     /**
      * Load the data of all the avant objects and returns them as a list
@@ -114,5 +114,7 @@ public interface ICandidateIdentityAttributeDAO
      *            liste of ids
      * @return The list which contains the data of all the avant objects
      */
-    List<CandidateIdentityAttribute> selectCandidateIdentityAttributesListByIds( Plugin _plugin, List<Integer> listIds );
+    List<CandidateIdentityAttribute> selectCandidateIdentityAttributesListByIds( final Plugin _plugin, final List<Integer> listIds );
+
+    void deleteList( final List<Integer> idIdentities, final Plugin plugin );
 }

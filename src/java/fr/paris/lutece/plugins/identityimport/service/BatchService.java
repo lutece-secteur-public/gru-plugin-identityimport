@@ -39,23 +39,23 @@ import fr.paris.lutece.plugins.identityimport.business.BatchHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentity;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribute;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeHome;
+import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHistoryHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBean;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusDto;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.portal.service.progressmanager.ProgressManagerService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.sql.TransactionManager;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class BatchService
 {
@@ -64,7 +64,7 @@ public class BatchService
     private final WorkflowBeanService<CandidateIdentity> _wfIdentityBeanService = SpringContextService.getBean( CANDIDATEIDENTITY_WFBEANSERVICE );
     private final WorkflowBeanService<Batch> _wfBatchBeanService = SpringContextService.getBean( BATCH_WFBEANSERVICE );
     private final ProgressManagerService progressManagerService = ProgressManagerService.getInstance( );
-    private final int importBatchLimit = AppPropertiesService.getPropertyInt( "identityimport.identitystore.api.batch.identity.limit", 100 );
+    private final BatchValidationService validationService = BatchValidationService.instance( );
 
     private static BatchService instance;
 
@@ -80,7 +80,7 @@ public class BatchService
     public int importBatch( final BatchDto batch, final User user, final String feedToken ) throws IdentityStoreException
     {
         // Ensure that provided batch size does not exceed the limit defined in properties
-        this.validateImportBatchLimit( batch );
+        validationService.validateImportBatchLimit( batch );
 
         TransactionManager.beginTransaction( null );
 
@@ -92,7 +92,7 @@ public class BatchService
                 progressManagerService.initFeed( feedToken, batch.getIdentities( ).size( ) );
                 progressManagerService.addReport( feedToken, "Validating batch ..." );
             }
-            this.validateBatch( batch );
+            validationService.validateBatch( batch );
 
             // Try to retrieve the batch by its reference, if exists ensure that both side information is consistent, if not, create it.
             if ( StringUtils.isNotEmpty( feedToken ) )
@@ -141,6 +141,8 @@ public class BatchService
                 final CandidateIdentity candidateIdentity = new CandidateIdentity( );
                 candidateIdentity.setIdBatch( batchId );
                 candidateIdentity.setExternalCustomerId( identity.getExternalCustomerId( ) );
+                candidateIdentity.setCustomerId( identity.getCustomerId( ) );
+                candidateIdentity.setConnectionId( identity.getConnectionId( ) );
                 candidateIdentity.setClientAppCode( appCode );
                 CandidateIdentityHome.create( candidateIdentity );
                 _wfIdentityBeanService.createWorkflowBean( candidateIdentity, candidateIdentity.getId( ), candidateIdentity.getIdBatch( ), user );
@@ -178,102 +180,40 @@ public class BatchService
         }
     }
 
-    private void validateImportBatchLimit( final BatchDto batch ) throws IdentityStoreException
-    {
-        if ( batch.getIdentities( ).size( ) > importBatchLimit )
-        {
-            throw new IdentityStoreException( "The imported batch exceeds limit of " + importBatchLimit + " identities." );
-        }
-    }
-
     /**
-     * Validate that batch definition is consistent. Check if the format and the compliance to the client Service Contract.
+     * Find expired batches (limited to batchLimit param) and purge them. Deletion of {@link CandidateIdentity}, {@link CandidateIdentityAttribute},
+     * {@link CandidateIdentityHistory}
      * 
-     * @param batch
-     *            the batch to validate
-     * @throws IdentityStoreException
-     *             in case of error
+     * @param batchLimit
+     * @return
      */
-    public void validateBatch( final BatchDto batch ) throws IdentityStoreException
+    public StringBuilder purgeBatches( final int batchLimit )
     {
-        if ( batch == null )
-        {
-            throw new IdentityStoreException( "The provided batch is null" );
-        }
+        final StringBuilder msg = new StringBuilder( );
+        TransactionManager.beginTransaction( null );
 
-        if ( StringUtils.isEmpty( batch.getUser( ) ) )
+        try
         {
-            throw new IdentityStoreException( "The provided batch user is null" );
-        }
 
-        if ( StringUtils.isEmpty( batch.getAppCode( ) ) )
-        {
-            throw new IdentityStoreException( "The provided batch application code is null" );
-        }
-
-        if ( StringUtils.isEmpty( batch.getReference( ) ) )
-        {
-            throw new IdentityStoreException( "The provided batch reference is null" );
-        }
-
-        if ( batch.getDate( ) == null )
-        {
-            throw new IdentityStoreException( "The provided batch date is null" );
-        }
-
-        if ( batch.getIdentities( ).isEmpty( ) )
-        {
-            throw new IdentityStoreException( "No identities found in imported batch" );
-        }
-
-        if ( CandidateIdentityHome.checkIfOneExists( batch.getReference( ),
-                batch.getIdentities( ).stream( ).map( IdentityDto::getExternalCustomerId ).collect( Collectors.toList( ) ) ) )
-        {
-            throw new IdentityStoreException( "At least one of the provided identities already exists in the current batch" );
-        }
-
-        final IdentityDto [ ] identitiesArray = batch.getIdentities( ).toArray( new IdentityDto [ ] { } );
-        for ( int index = 0; index < identitiesArray.length; index++ )
-        {
-            final IdentityDto identity = identitiesArray [index];
-
-            if ( StringUtils.isEmpty( identity.getExternalCustomerId( ) ) )
+            final List<Batch> expiredBatches = BatchHome.findExpiredBatches( batchLimit );
+            msg.append( expiredBatches.size( ) ).append( " expired batches found" ).append( System.lineSeparator( ) );
+            for ( final Batch expiredBatch : expiredBatches )
             {
-                throw new IdentityStoreException( "The provided external customer id of identity " + index + " is empty" );
+                msg.append( "Removing expired batch : " + expiredBatch.toLog( ) ).append( System.lineSeparator( ) );
+                final List<Integer> idCandidateIdentitiesList = CandidateIdentityHome.getIdCandidateIdentitiesList( expiredBatch.getId( ) );
+                CandidateIdentityHome.delete( idCandidateIdentitiesList );
+                CandidateIdentityAttributeHome.delete( idCandidateIdentitiesList );
+                CandidateIdentityHistoryHome.delete( idCandidateIdentitiesList );
+                TransactionManager.commitTransaction( null );
             }
-
-            for ( final AttributeDto attribute : identity.getAttributes( ) )
-            {
-                if ( StringUtils.isEmpty( attribute.getCertifier( ) ) )
-                {
-                    throw new IdentityStoreException(
-                            "The provided attribute " + attribute.getKey( ) + " certifier of identity " + identity.getExternalCustomerId( ) + " is null" );
-                }
-                if ( attribute.getCertificationDate( ) == null )
-                {
-                    throw new IdentityStoreException( "The provided attribute " + attribute.getKey( ) + " certification date of identity "
-                            + identity.getExternalCustomerId( ) + " is null" );
-                }
-            }
-
-            this.validateMinimumAttributes( identity );
-            ServiceContractService.instance( ).validateIdentity( identity, batch.getAppCode( ) );
+        }
+        catch( final Exception e )
+        {
+            TransactionManager.rollBack( null );
         }
 
-    }
-
-    private void validateMinimumAttributes( final IdentityDto identity ) throws IdentityStoreException
-    {
-        this.checkAttributeExists( identity, Constants.PARAM_FAMILY_NAME );
-        this.checkAttributeExists( identity, Constants.PARAM_FIRST_NAME );
-        this.checkAttributeExists( identity, Constants.PARAM_BIRTH_DATE );
-    }
-
-    private void checkAttributeExists( final IdentityDto identity, final String attributeKey ) throws IdentityStoreException
-    {
-        identity.getAttributes( ).stream( ).filter( attributeDto -> Objects.equals( attributeDto.getKey( ), attributeKey ) ).findAny( )
-                .orElseThrow( ( ) -> new IdentityStoreException(
-                        "No " + attributeKey + " attribute found in identity with external ID " + identity.getExternalCustomerId( ) ) );
+        // return message for daemons
+        return msg;
     }
 
     public Batch getBean( BatchDto batch )
@@ -296,5 +236,11 @@ public class BatchService
         dto.setUser( batch.getUser( ) );
         dto.setAppCode( batch.getAppCode( ) );
         return dto;
+    }
+
+    public BatchStatusDto getBatchStatus( String strBatchReference, String strMode ) throws IdentityStoreException
+    {
+        // TODO
+        return null;
     }
 }

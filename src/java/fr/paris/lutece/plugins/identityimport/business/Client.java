@@ -47,6 +47,8 @@ public class Client implements Serializable
     // Variables declarations
     private int _nId;
 
+    private int _nDataRetentionPeriodInMonths;
+
     @NotEmpty( message = "#i18n{identityimport.validation.client.Name.notEmpty}" )
     @Size( max = 255, message = "#i18n{identityimport.validation.client.Name.size}" )
     private String _strName;
@@ -141,4 +143,13 @@ public class Client implements Serializable
         _strToken = strToken;
     }
 
+    public int getDataRetentionPeriodInMonths( )
+    {
+        return _nDataRetentionPeriodInMonths;
+    }
+
+    public void setDataRetentionPeriodInMonths( int dataRetentionPeriodInMonths )
+    {
+        this._nDataRetentionPeriodInMonths = dataRetentionPeriodInMonths;
+    }
 }

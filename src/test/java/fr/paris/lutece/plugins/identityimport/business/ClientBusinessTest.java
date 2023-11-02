@@ -59,6 +59,7 @@ public class ClientBusinessTest extends LuteceTestCase
         client.setName( NAME1 );
         client.setAppCode( APPCODE1 );
         client.setToken( TOKEN1 );
+        client.setDataRetentionPeriodInMonths( 24 );
 
         // Create test
         ClientHome.create( client );

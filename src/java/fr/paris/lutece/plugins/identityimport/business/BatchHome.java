@@ -120,12 +120,12 @@ public final class BatchHome
 
     /**
      * Load the id of all the batch objects and returns them as a list
-     * 
+     *
      * @return the list which contains the id of all the batch objects
      */
-    public static List<Integer> getIdBatchsList( )
+    public static List<Integer> getIdBatchsList( final ResourceState resourceState, final String filterAppCode )
     {
-        return _dao.selectIdBatchsList( _plugin );
+        return _dao.selectIdBatchsList( resourceState.getId( ), filterAppCode, _plugin );
     }
 
     /**
@@ -158,5 +158,20 @@ public final class BatchHome
     public static Optional<Batch> getBatch( final int id )
     {
         return _dao.load( id, _plugin );
+    }
+
+    public static List<Batch> findExpiredBatches( final int batchLimit )
+    {
+        return _dao.selectExpiredBatchsList( batchLimit, _plugin );
+    }
+
+    public static List<ResourceState> getBatchStates( final String filterAppCode )
+    {
+        return _dao.selectBatchStates( filterAppCode, _plugin );
+    }
+
+    public static int getIdentitiesCount( final int resourceId )
+    {
+        return _dao.countIdentities( resourceId, _plugin );
     }
 }

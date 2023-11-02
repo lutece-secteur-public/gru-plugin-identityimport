@@ -65,6 +65,16 @@
         </admindashboard-component>
     </admindashboard-components>
     -->
+
+    <!-- Daemons -->
+    <daemons>
+        <daemon>
+            <daemon-id>daemon.purge.batch</daemon-id>
+            <daemon-name>identityimport.daemon.batch.purgeDaemon.name</daemon-name>
+            <daemon-description>identityimport.batch.daemon.purgeDaemon.description</daemon-description>
+            <daemon-class>fr.paris.lutece.plugins.identityimport.task.BatchPurgeDaemon</daemon-class>
+        </daemon>
+    </daemons>
     
 
 </plug-in>

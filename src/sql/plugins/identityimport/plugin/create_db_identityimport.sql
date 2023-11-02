@@ -55,9 +55,10 @@ ADD INDEX IDX_CANDIDATE_IDENTITIY_ATTRIBUTES_PARENT (id_candidate_identity) ;
 DROP TABLE IF EXISTS identityimport_client;
 CREATE TABLE identityimport_client (
 id_client int AUTO_INCREMENT,
-name varchar(255) default '' NOT NULL,
+name varchar(255) default '' NOT NULL UNIQUE,
 app_code varchar(50) default '' NOT NULL,
 token long varchar,
+data_retention_period_in_months INT DEFAULT 0 NOT NULL,
 PRIMARY KEY (id_client)
 );
 

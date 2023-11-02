@@ -111,4 +111,15 @@ public class CandidateIdentityHistoryHome
     {
         _dao.delete( nKey, _plugin );
     }
+
+    /**
+     * Delete a list of records from the table
+     *
+     * @param idList
+     *            The identifier list of the CandidateIdentity to delete
+     */
+    public static void delete( final List<Integer> idList )
+    {
+        _dao.deleteList( idList, _plugin );
+    }
 }

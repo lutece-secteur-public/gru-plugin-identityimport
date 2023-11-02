@@ -35,25 +35,31 @@ package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * This class provides Data Access methods for CandidateIdentity objects
  */
 public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHistoryDAO
 {
-    private static final String QUERY_SELECT_ALL = "SELECT id_history, id_wf_resource_history, status, comment FROM identityimport_candidate_identity_history";
     // Constants
+    private static final String QUERY_SELECT_ALL = "SELECT ih.id_history, ih.id_wf_resource_history, ih.status, ih.comment, wrh.id_resource as id_candidate_identity FROM identityimport_candidate_identity_history ih JOIN idimport.workflow_resource_history wrh on ih.id_wf_resource_history = wrh.id_history";
+    private static final String ID_LIST = "%{id_list}";
     private final static String SQL_QUERY_SELECT_BY_ID = QUERY_SELECT_ALL + " WHERE id_history = ?";
     private final static String SQL_QUERY_SELECT_BY_WF_RESOURCE_ID = QUERY_SELECT_ALL + " WHERE id_wf_resource_history = ?";
 
     private final static String SQL_QUERY_INSERT = "INSERT INTO identityimport_candidate_identity_history(id_wf_resource_history, status, comment) VALUES (?, ?, ?)";
 
     private final static String SQL_QUERY_DELETE = "DELETE FROM identityimport_candidate_identity_history WHERE id_history = ?";
+
+    private static final String SQL_QUERY_DELETE_LISTS = "DELETE wrh, cih FROM workflow_resource_history wrh JOIN identityimport_candidate_identity_history cih ON wrh.id_history = cih.id_wf_resource_history where wrh.id_resource IN ( "
+            + ID_LIST + " )";
 
     private final static String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity_history SET status = ?, comment = ? WHERE id_wf_resource_history = ?";
 
@@ -66,7 +72,7 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
     @Override
     public void insert( CandidateIdentityHistory candidateIdentityHistory, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
             int nIndex = 1;
             daoUtil.setInt( nIndex++, candidateIdentityHistory.getWfResourceHistoryId( ) );
@@ -88,7 +94,7 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
     @Override
     public Optional<CandidateIdentityHistory> select( int nId, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_ID, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_ID, plugin ) )
         {
             daoUtil.setInt( 1, nId );
             daoUtil.executeQuery( );
@@ -109,7 +115,7 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
     @Override
     public Optional<CandidateIdentityHistory> selectByWfHistory( int nWfResourceHistoryId, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_WF_RESOURCE_ID, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_WF_RESOURCE_ID, plugin ) )
         {
             daoUtil.setInt( 1, nWfResourceHistoryId );
             daoUtil.executeQuery( );
@@ -129,7 +135,7 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
     @Override
     public void delete( int nKey, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
         {
             daoUtil.setInt( 1, nKey );
             daoUtil.executeUpdate( );
@@ -140,9 +146,25 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
      * {@inheritDoc }
      */
     @Override
+    public void deleteList( final List<Integer> idList, Plugin plugin )
+    {
+        if ( CollectionUtils.isNotEmpty( idList ) )
+        {
+            final String query = SQL_QUERY_DELETE_LISTS.replace( ID_LIST, idList.stream( ).map( String::valueOf ).collect( Collectors.joining( "," ) ) );
+            try ( final DAOUtil daoUtil = new DAOUtil( query, plugin ) )
+            {
+                daoUtil.executeUpdate( );
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public void update( CandidateIdentityHistory candidateIdentityHistory, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
         {
             int nIndex = 1;
 
@@ -160,8 +182,8 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
     @Override
     public List<CandidateIdentityHistory> selectAll( int nCandidateIdentityId, Plugin plugin )
     {
-        List<CandidateIdentityHistory> histories = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL, plugin ) )
+        final List<CandidateIdentityHistory> histories = new ArrayList<>( );
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL, plugin ) )
         {
             daoUtil.executeQuery( );
 
@@ -181,7 +203,8 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
         history.setId( daoUtil.getInt( nIndex++ ) );
         history.setWfResourceHistoryId( daoUtil.getInt( nIndex++ ) );
         history.setStatus( daoUtil.getString( nIndex++ ) );
-        history.setComment( daoUtil.getString( nIndex ) );
+        history.setComment( daoUtil.getString( nIndex++ ) );
+        history.setCandidateIdentityId( daoUtil.getInt( nIndex ) );
         return history;
     }
 }

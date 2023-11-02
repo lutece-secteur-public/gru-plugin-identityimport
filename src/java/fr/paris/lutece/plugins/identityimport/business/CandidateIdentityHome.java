@@ -36,7 +36,6 @@ package fr.paris.lutece.plugins.identityimport.business;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.util.ReferenceList;
 
 import java.util.List;
 import java.util.Optional;
@@ -97,6 +96,17 @@ public final class CandidateIdentityHome
     }
 
     /**
+     * Remove the candidateIdentities whose identifier list is specified in parameter
+     *
+     * @param idList
+     *            The candidateIdentity Id list
+     */
+    public static void delete( List<Integer> idList )
+    {
+        _dao.deleteList( idList, _plugin );
+    }
+
+    /**
      * Returns an instance of a candidateIdentity whose identifier is specified in parameter
      * 
      * @param nKey
@@ -152,4 +162,8 @@ public final class CandidateIdentityHome
         return _dao.checkIfOneExists( _plugin, batchReference, externalIds );
     }
 
+    public static List<ResourceState> getCandidateIdentityStates( final int batchId )
+    {
+        return _dao.selectIdentityStates( batchId, _plugin );
+    }
 }

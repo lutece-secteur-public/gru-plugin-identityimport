@@ -14,4 +14,9 @@ id_wf_resource_history int,
 status VARCHAR(255) NOT NULL,
 comment VARCHAR(1024),
 PRIMARY KEY (id_history)
-)
+);
+
+-- #80 - [ Import ] Supression automatique des lots traités
+ALTER TABLE identityimport_client ADD COLUMN data_retention_period_in_months INT DEFAULT 0 NOT NULL;
+ALTER TABLE identityimport_client ADD UNIQUE (token);
+ALTER TABLE identityimport_client ADD UNIQUE (app_code);

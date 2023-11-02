@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -97,13 +98,26 @@ public interface IBatchDAO
     List<Batch> selectBatchsList( Plugin plugin );
 
     /**
-     * Load the id of all the batch objects and returns them as a list
-     * 
+     * Load the data of all the expired batch objects and returns them as a list
+     *
+     * @param plugin
+     *            the Plugin
+     * @return The list which contains the data of all the expired batch objects
+     */
+    List<Batch> selectExpiredBatchsList( final int batchLimit, Plugin plugin );
+
+    /**
+     * Load the id of all the batch objects that are in given state and returns them as a list
+     *
+     * @param batchStateId
+     *            the id of the batch state to filter results with
+     * @param filterAppCode
+     *            the application code to filter the results with
      * @param plugin
      *            the Plugin
      * @return The list which contains the id of all the batch objects
      */
-    List<Integer> selectIdBatchsList( Plugin plugin );
+    List<Integer> selectIdBatchsList( final Integer batchStateId, final String filterAppCode, Plugin plugin );
 
     /**
      * Load the data of all the batch objects and returns them as a referenceList
@@ -126,4 +140,8 @@ public interface IBatchDAO
     List<Batch> selectBatchsListByIds( Plugin _plugin, List<Integer> listIds );
 
     Batch selectBatchByReference( Plugin plugin, String reference );
+
+    List<ResourceState> selectBatchStates( final String filterAppCode, Plugin plugin );
+
+    int countIdentities( int resourceId, Plugin plugin );
 }

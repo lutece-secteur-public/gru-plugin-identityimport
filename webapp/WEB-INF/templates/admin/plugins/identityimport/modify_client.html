@@ -17,6 +17,9 @@
 			<@formGroup labelFor='token' labelKey='#i18n{identityimport.modify_client.labelToken}' mandatory=true>
 				<@input type='text' id='token' name='token'  value='${client.token!\'\'}' tabIndex='2' />
 			</@formGroup>
+			<@formGroup labelFor='dataRetentionPeriodInMonths' labelKey='#i18n{identityimport.modify_client.labelDataRetention}' mandatory=true>
+				<@input type='number' id='dataRetentionPeriodInMonths' name='dataRetentionPeriodInMonths'  value='${client.dataRetentionPeriodInMonths!\'\'}' tabIndex='3' />
+			</@formGroup>
         <@actionButtons button1Name="action_modifyClient" button2Name="view_manageClient"/>
     </@tform>
 	</@boxBody>

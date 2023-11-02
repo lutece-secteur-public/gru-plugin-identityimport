@@ -36,8 +36,8 @@ package fr.paris.lutece.plugins.identityimport.business;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.sql.DAOUtil;
-import java.sql.Statement;
 
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,13 +51,21 @@ public final class BatchDAO implements IBatchDAO
 
     // Constants
     private static final String SQL_QUERY_SELECT = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch WHERE id_batch = ?";
+    private static final String SQL_QUERY_SELECT_EXPIRED_BATCHES = "SELECT " + BATCH_SELECT_FIELDS
+            + " JOIN identityimport_client client ON client.app_code = batch.app_code where DATE_ADD(batch.date, INTERVAL client.data_retention_period_in_months MONTH ) < CURRENT_DATE";
     private static final String SQL_QUERY_SELECT_BY_REFERENCE = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch WHERE reference = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_batch ( reference, date, user, app_code, comment ) VALUES ( ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_batch WHERE id_batch = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_batch SET reference = ?, date = ?, user = ?, app_code = ?, comment = ? WHERE id_batch = ?";
+    private static final String SQL_QUERY_PURGE = "";
+    private static final String SQL_QUERY_SELECTSTATES = "SELECT ws.id_state, ws.name, ws.description, COUNT(wr.id_resource) as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' WHERE ws.id_workflow = 1 GROUP BY ws.id_state, ws.name, ws.description";
+    private static final String SQL_QUERY_SELECTSTATES_BY_APP_CODE = "SELECT ws.id_state, ws.name, ws.description, COUNT(b.app_code) as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' LEFT JOIN identityimport_batch b ON b.id_batch = wr.id_resource AND b.app_code = '${app_code}' WHERE ws.id_workflow = 1 GROUP BY ws.id_state, ws.name, ws.description";
     private static final String SQL_QUERY_SELECTALL = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch";
-    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_batch FROM identityimport_batch";
+    private static final String SQL_QUERY_SELECTALL_ID = "SELECT b.id_batch FROM identityimport_batch b ";
+    private static final String SQL_QUERY_SELECTALL_ID_BY_STATE = "JOIN workflow_resource_workflow wr ON wr.id_resource = b.id_batch AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' WHERE wr.id_state = ${id_state} ";
+    private static final String SQL_QUERY_SELECTALL_ID_BY_APP_CODE = "b.app_code = ${app_code}";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch WHERE id_batch IN (  ";
+    private static final String SQL_QUERY_COUNT_IDENTITIES = "SELECT count(identity.id_resource) FROM workflow_resource_workflow identity WHERE identity.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' and identity.id_external_parent = ?";
 
     /**
      * {@inheritDoc }
@@ -109,7 +117,7 @@ public final class BatchDAO implements IBatchDAO
     @Override
     public void delete( int nKey, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
         {
             daoUtil.setInt( 1, nKey );
             daoUtil.executeUpdate( );
@@ -122,7 +130,7 @@ public final class BatchDAO implements IBatchDAO
     @Override
     public void store( Batch batch, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
         {
             int nIndex = 1;
 
@@ -144,7 +152,82 @@ public final class BatchDAO implements IBatchDAO
     public List<Batch> selectBatchsList( Plugin plugin )
     {
         List<Batch> batchList = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
+        {
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                batchList.add( getBatch( daoUtil ) );
+            }
+
+            return batchList;
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<ResourceState> selectBatchStates( final String filterAppCode, final Plugin plugin )
+    {
+        final List<ResourceState> states = new ArrayList<>( );
+
+        String query = SQL_QUERY_SELECTSTATES;
+        if ( filterAppCode != null && !filterAppCode.isEmpty( ) )
+        {
+            query = SQL_QUERY_SELECTSTATES_BY_APP_CODE.replace( "${app_code}", filterAppCode );
+        }
+
+        try ( final DAOUtil daoUtil = new DAOUtil( query, plugin ) )
+        {
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                final ResourceState state = new ResourceState( );
+                state.setId( daoUtil.getInt( 1 ) );
+                state.setName( daoUtil.getString( 2 ) );
+                state.setDescription( daoUtil.getString( 3 ) );
+                state.setResourceCount( daoUtil.getInt( 4 ) );
+                states.add( state );
+            }
+
+            return states;
+        }
+    }
+
+    @Override
+    public int countIdentities( int resourceId, Plugin plugin )
+    {
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_COUNT_IDENTITIES, plugin ) )
+        {
+            daoUtil.setInt( 1, resourceId );
+            daoUtil.executeQuery( );
+
+            if ( daoUtil.next( ) )
+            {
+                return daoUtil.getInt( 1 );
+            }
+
+            return 0;
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<Batch> selectExpiredBatchsList( final int batchLimit, final Plugin plugin )
+    {
+        final List<Batch> batchList = new ArrayList<>( );
+        String query = SQL_QUERY_SELECT_EXPIRED_BATCHES;
+        if ( batchLimit > 0 )
+        {
+            query += " LIMIT " + batchLimit;
+        }
+
+        try ( DAOUtil daoUtil = new DAOUtil( query, plugin ) )
         {
             daoUtil.executeQuery( );
 
@@ -178,10 +261,26 @@ public final class BatchDAO implements IBatchDAO
      * {@inheritDoc }
      */
     @Override
-    public List<Integer> selectIdBatchsList( Plugin plugin )
+    public List<Integer> selectIdBatchsList( final Integer batchStateId, final String filterAppCode, Plugin plugin )
     {
-        List<Integer> batchList = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, plugin ) )
+        final List<Integer> batchList = new ArrayList<>( );
+        String query = SQL_QUERY_SELECTALL_ID;
+
+        if ( batchStateId != null && batchStateId > 0 )
+        {
+            query += SQL_QUERY_SELECTALL_ID_BY_STATE.replace( "${id_state}", String.valueOf( batchStateId ) );
+            if ( filterAppCode != null && !filterAppCode.isEmpty( ) )
+            {
+                query += " AND " + SQL_QUERY_SELECTALL_ID_BY_APP_CODE.replace( "${app_code}", "'" + filterAppCode + "'" );
+            }
+        }
+        else
+            if ( filterAppCode != null && !filterAppCode.isEmpty( ) )
+            {
+                query += " WHERE " + SQL_QUERY_SELECTALL_ID_BY_APP_CODE.replace( "${app_code}", "'" + filterAppCode + "'" );
+            }
+
+        try ( final DAOUtil daoUtil = new DAOUtil( query, plugin ) )
         {
             daoUtil.executeQuery( );
 
@@ -201,7 +300,7 @@ public final class BatchDAO implements IBatchDAO
     public ReferenceList selectBatchsReferenceList( Plugin plugin )
     {
         ReferenceList batchList = new ReferenceList( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
             daoUtil.executeQuery( );
 

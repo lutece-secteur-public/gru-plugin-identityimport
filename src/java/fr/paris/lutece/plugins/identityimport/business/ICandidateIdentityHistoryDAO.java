@@ -103,4 +103,5 @@ public interface ICandidateIdentityHistoryDAO
      */
     void delete( int nKey, Plugin plugin );
 
+    void deleteList( List<Integer> idList, Plugin plugin );
 }
