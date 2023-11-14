@@ -73,5 +73,17 @@
                 </div>
             </div>
         </div>
+        <div class="accordion-item bg-transparent">
+            <h2 class="accordion-header" id="actionsHeader">
+                <button class="accordion-button collapsed px-2 bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#actionsContent" aria-expanded="false" aria-controls="actionsContent">
+                    <i class="ti ti-hammer me-2 fs-2"></i> #i18n{identityimport.manage_batchs.actions.title}
+                </button>
+            </h2>
+            <div id="actionsContent" class="accordion-collapse collapse" aria-labelledby="actionsHeader" data-bs-parent="#searchAccordion">
+                <div class="accordion-body">
+                    <@aButton href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=importBatch' buttonIcon='upload' title='#i18n{identityimport.manage_batchs.buttonImport}' />
+                </div>
+            </div>
+        </div>
     </div>
 </@pageColumn>

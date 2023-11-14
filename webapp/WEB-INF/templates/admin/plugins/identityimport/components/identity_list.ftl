@@ -25,18 +25,27 @@
                             ${candidateidentity.resource.status!}
                         </td>
                         <td>
-                            <@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?view=importCandidateIdentity&id=${candidateidentity.resource.id}' title='#i18n{portal.util.labelUpload}' hideTitle=['all'] buttonIcon='upload' />
-
-                            <@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentityAttributes.jsp?id_identity=${candidateidentity.resource.id}&id_batch=${current_batch_id}' title='#i18n{identityimport.manage_candidateidentityattributes.title}' hideTitle=['all'] buttonIcon='list' />
-
-<#--                            <@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?view=modifyCandidateIdentity&id=${candidateidentity.resource.id}&id_batch=${current_batch_id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />-->
-
-<#--                            <@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=confirmRemoveCandidateIdentity&id=${candidateidentity.resource.id}&id_batch=${current_batch_id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />-->
-
+                            <#if candidateidentity.state?? && candidateidentity.state.id == 7 >
+                                <@aButton class="manualImportButton" href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=importCandidateIdentity&id_identity=${candidateidentity.resource.id}&return_url=jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}" title='#i18n{identityimport.manage_candidateidentity.labelManualImport}' hideTitle=['all'] buttonIcon='hammer' />
+                            </#if>
+                            <#if candidateidentity.resource.attributes?? && candidateidentity.resource.attributes?size gt 0>
+                                <@customPageColumnBtn idPageColumn="candidateidentity-attribute-list-${candidateidentity.resource.externalCustomerId}" />
+                            </#if>
+                            <@customPageColumnBtn idPageColumn="candidateidentity-history-${candidateidentity.resource.externalCustomerId}" buttonIcon='th-list'/>
                         </td>
                     </tr>
                 </#list>
             </@table>
+            <#list identity_list as candidateidentity >
+                <#if candidateidentity.resource.attributes?? && candidateidentity.resource.attributes?size gt 0>
+                    <@pageColumn width="100%" flush=true responsiveMenuSize="xxl" responsiveMenuPlacement="end" responsiveMenuTitle="#i18n{identityimport.manage_candidateidentityattributes.title} ${candidateidentity.resource.externalCustomerId}" id="candidateidentity-attribute-list-${candidateidentity.resource.externalCustomerId}" class="border-start-0" responsiveMenuClose=true>
+                        <@attributeList candidateIdentity=candidateidentity.resource />
+                    </@pageColumn>
+                    <@pageColumn width="100%" flush=true responsiveMenuSize="xxl" responsiveMenuPlacement="end" responsiveMenuTitle="#i18n{identityimport.manage_candidateidentityattributes.history} ${candidateidentity.resource.externalCustomerId}" id="candidateidentity-history-${candidateidentity.resource.externalCustomerId}" class="border-start-0" responsiveMenuClose=true>
+                        ${candidateidentity.history! }
+                    </@pageColumn>
+                </#if>
+            </#list>
         <#else>
             Pas d'identités trouvées
         </#if>
@@ -84,5 +93,11 @@
             const ulElement = document.getElementById("candidate-identity-list");
             ulElement.scrollTop = selectedItem.offsetTop - (ulElement.clientHeight / 2) + (selectedItem.clientHeight / 2);
         }, 100);
+    }
+</script>
+<script>
+
+    function getManualImportCancelUrl(candidateidentity_resource_id, current_batch_state_id, batch_resource_id, batch_current_page, application_code) {
+        return '&return_url=' + encodeURIComponent('jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}');
     }
 </script>

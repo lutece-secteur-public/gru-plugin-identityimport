@@ -35,13 +35,28 @@
 	</bean>
 
 	<!-- IdentityService impl -->
-	<bean id="identityService.rest.httpAccess.v3" class="fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService">
+	<bean id="identityService.rest" class="fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService">
 		<constructor-arg ref="restTransport.identity.httpAccess"/>
 	</bean>
 
 	<!-- ServiceContractService impl -->
 	<bean id="identity.serviceContractService" class="fr.paris.lutece.plugins.identitystore.v3.web.service.ServiceContractService">
 		<constructor-arg ref="restTransport.serviceContract.httpAccess"/>
+	</bean>
+
+	<!-- IHttpTransportProvider declarations -->
+	<bean id="httpAccessTransport-quality" class="fr.paris.lutece.plugins.identityquality.v3.web.rs.service.HttpAccessTransport" >
+		<property name="apiEndPointUrl">
+			<value>${identityimport.identitystore.api.endpoint.url}</value>
+		</property>
+	</bean>
+	<bean id="restTransport.quality.httpAccess" class="fr.paris.lutece.plugins.identityquality.v3.web.rs.service.IdentityQualityTransportRest">
+		<constructor-arg ref="httpAccessTransport-quality" />
+	</bean>
+
+	<!-- IdentityService impl -->
+	<bean id="qualityService.rest" class="fr.paris.lutece.plugins.identityquality.v3.web.service.IdentityQualityService">
+		<constructor-arg ref="restTransport.quality.httpAccess"/>
 	</bean>
 
 	<!-- Cache -->

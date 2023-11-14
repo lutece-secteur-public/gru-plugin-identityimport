@@ -143,7 +143,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
 
     private WorkflowBeanService<CandidateIdentity> _wfBeanService = SpringContextService.getBean( CANDIDATEIDENTITY_WFBEANSERVICE );
 
-    private IdentityService identityService = SpringContextService.getBean( "identityService.rest.httpAccess.v3" );
+    private IdentityService identityService = SpringContextService.getBean( "identityService.rest" );
 
     // Session variable to store working values
     private CandidateIdentity _candidateidentity;

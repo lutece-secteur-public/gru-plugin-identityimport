@@ -30,18 +30,18 @@
 			<@columns >
 				<@table >
 					<@tr>
-						<@td>${candidateidentity.resource.idBatch!''}</@td>
+						<@td>${identity.resource.idBatch!''}</@td>
 					</@tr>
 					<@tr>
-						<@td>${candidateidentity.resource.connectionId!''}</@td>
+						<@td>${identity.resource.connectionId!''}</@td>
 					</@tr>
 					<@tr>
-						<@td>${candidateidentity.resource.customerId!''}</@td>
+						<@td>${identity.resource.customerId!''}</@td>
 					</@tr>
 					<#list key_list as key >
 						<@tr>
 							<#assign key_found = false>
-							<#list candidateidentity.resource.attributes as attribute>
+							<#list identity.resource.attributes as attribute>
 								<#if attribute.code??>
 									<#if key == attribute.code>
 										<@td>${attribute.value!}</@td>
@@ -59,8 +59,8 @@
 					</@tr>
 				</@table>
 			</@columns >
-			<#if candidateidentity_duplicate_list?? && candidateidentity_duplicate_list?has_content>
-				<#list candidateidentity_duplicate_list as duplicate >
+			<#if duplicate_list?? && duplicate_list?size gt 0>
+				<#list duplicate_list as duplicate >
 					<@columns>
 						<@input type="hidden" id="connection_id" name="connection_id" value="${duplicate.connectionId!''}"/>
 						<@input type="hidden" id="customer_id" name="customer_id" value="${duplicate.customerId}"/>
@@ -68,7 +68,7 @@
 						<@table >
 							<@tr>
 								<@td>
-									${candidateidentity.resource.idBatch!''}
+									${identity.resource.idBatch!''}
 								</@td>
 							</@tr>
 							<@tr>
@@ -97,7 +97,7 @@
 							</#list>
 							<@tr>
 								<td>
-									<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=importCandidateIdentity&id=${candidateidentity.resource.id}&customer_id=${duplicate.customerId}' title='#i18n{portal.util.labelUpload}' hideTitle=['all'] buttonIcon='upload' />
+									<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=importCandidateIdentity&id=${identity.resource.id}&customer_id=${duplicate.customerId}' title='#i18n{portal.util.labelDownload}' hideTitle=['all'] buttonIcon='upload' />
 								</td>
 							</@tr>
 						</@table>
@@ -116,23 +116,26 @@
 	<@boxHeader title='Workflow' />
 	<@boxBody>
         
-        statut : <#if candidateidentity.state??><@tag  color='warning'>${candidateidentity.state.name}</@tag><#else> not set</#if>   
+        statut : <#if identity.state??><@tag  color='warning'>${identity.state.name}</@tag><#else> not set</#if>
 
         <br>
         <br>
         
-        <#if candidateidentity.actions??>actions : 
-        <#list candidateidentity.actions as action >
-            <@aButton href="jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=processWorkflowAction&action_id=${action.id}&id=${candidateidentity.resource.id}"
-                        title="${action.name}" alt="${action.name}"/>
-            <!--  img src="image?resource_type=workflow_icon_img&id=${action.icon.id}" -->
-		     </a>
-		</#list>
+        <#if identity.actions??>actions :
+			<#list identity.actions as action >
+				<@aButton href="jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=processWorkflowAction&action_id=${action.id}&id=${identity.resource.id}"
+							title="${action.name}" alt="${action.name}"/>
+				<!--  img src="image?resource_type=workflow_icon_img&id=${action.icon.id}" -->
+				 </a>
+			</#list>
 		<#else>no action
+		</#if>
+		<#if return_url??>
+			<@aButton href="${return_url}" title="#i18n{portal.util.labelCancel}" alt="#i18n{portal.util.labelCancel}"/>
 		</#if>
 		
 		<br><br>
-		History : ${candidateidentity.history! }
+		History : ${identity.history! }
 
 	</@boxBody>
 </@box>
