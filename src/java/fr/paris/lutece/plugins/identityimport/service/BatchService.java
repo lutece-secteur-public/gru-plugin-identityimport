@@ -39,15 +39,23 @@ import fr.paris.lutece.plugins.identityimport.business.BatchHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentity;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribute;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeHome;
+import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHistory;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHistoryHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
+import fr.paris.lutece.plugins.identityimport.business.ResourceState;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBean;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusMode;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusResponse;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.ImportingHistoryDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.progressmanager.ProgressManagerService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.sql.TransactionManager;
@@ -238,9 +246,58 @@ public class BatchService
         return dto;
     }
 
-    public BatchStatusDto getBatchStatus( String strBatchReference, String strMode ) throws IdentityStoreException
+    public BatchStatusResponse getBatchStatus( final String strBatchReference, final BatchStatusMode mode ) throws IdentityStoreException
     {
-        // TODO
-        return null;
+        final BatchStatusResponse response = new BatchStatusResponse( );
+        final Batch batch = BatchHome.getBatch( strBatchReference );
+        if ( batch == null )
+        {
+            response.setStatus(
+                    ResponseStatusFactory.notFound( ).setMessageKey( Constants.PROPERTY_REST_ERROR_BATCH_NOT_FOUND ).setMessage( "Batch not found." ) );
+            return response;
+        }
+        final ResourceState batchState = BatchHome.getBatchState( batch.getId( ) );
+        if ( batchState == null )
+        {
+            response.setStatus( ResponseStatusFactory.notFound( ).setMessageKey( Constants.PROPERTY_REST_ERROR_BATCH_STATE_NOT_FOUND )
+                    .setMessage( "State of batch not found." ) );
+            return response;
+        }
+
+        final BatchStatusDto batchStatus = new BatchStatusDto( );
+
+        batchStatus.setReference( batch.getReference( ) );
+        batchStatus.setLaunchDate( batch.getDate( ) );
+        batchStatus.setStatus( batchState.getName( ) );
+        batchStatus.setStatusDescription( batchState.getDescription( ) );
+
+        if ( mode != BatchStatusMode.IDENTITIES_ONLY )
+        {
+            final List<ResourceHistory> batchHistory = BatchHome.getBatchHistory( batch.getId( ) );
+            for ( final ResourceHistory history : batchHistory )
+            {
+                final ImportingHistoryDto historyDto = new ImportingHistoryDto( );
+                historyDto.setActionName( history.getAction( ).getName( ) );
+                historyDto.setActionDescription( history.getAction( ).getDescription( ) );
+                historyDto.setDate( history.getCreationDate( ) );
+                historyDto.setUserAccessCode( history.getUserAccessCode( ) );
+                batchStatus.getBatchHistory( ).add( historyDto );
+            }
+        }
+        if ( mode != BatchStatusMode.BATCH_ONLY )
+        {
+            final List<CandidateIdentity> identities = CandidateIdentityHome
+                    .getCandidateIdentitiesListByIds( CandidateIdentityHome.getIdCandidateIdentitiesList( batch.getId( ) ) );
+            identities.forEach( candidate -> {
+                candidate.setAttributes( CandidateIdentityAttributeHome.getCandidateIdentityAttributesList( candidate.getId( ) ) );
+                batchStatus.getIdentities( ).add( CandidateIdentityService.instance( ).getDto( candidate,
+                        CandidateIdentityHistoryHome.selectAll( candidate.getId( ) ), CandidateIdentityHome.getHistory( candidate.getId( ) ) ) );
+            } );
+        }
+
+        response.setBatchStatus( batchStatus );
+        response.setStatus( ResponseStatusFactory.success( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION )
+                .setMessage( "Status du batch récupéré avec succès" ) );
+        return response;
     }
 }

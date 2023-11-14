@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
+import fr.paris.lutece.plugins.workflowcore.business.action.Action;
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.sql.DAOUtil;
@@ -60,12 +62,15 @@ public final class BatchDAO implements IBatchDAO
     private static final String SQL_QUERY_PURGE = "";
     private static final String SQL_QUERY_SELECTSTATES = "SELECT ws.id_state, ws.name, ws.description, COUNT(wr.id_resource) as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' WHERE ws.id_workflow = 1 GROUP BY ws.id_state, ws.name, ws.description";
     private static final String SQL_QUERY_SELECTSTATES_BY_APP_CODE = "SELECT ws.id_state, ws.name, ws.description, COUNT(b.app_code) as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' LEFT JOIN identityimport_batch b ON b.id_batch = wr.id_resource AND b.app_code = '${app_code}' WHERE ws.id_workflow = 1 GROUP BY ws.id_state, ws.name, ws.description";
+    private static final String SQL_QUERY_SELECTSTATE_BY_BATCH_ID = "SELECT ws.id_state, ws.name, ws.description, 1 as batch_count FROM workflow_resource_workflow wr LEFT JOIN workflow_state ws ON ws.id_state = wr.id_state LEFT JOIN identityimport_batch b ON b.id_batch = wr.id_resource WHERE ws.id_workflow = 1 AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' AND b.id_batch = ?";
     private static final String SQL_QUERY_SELECTALL = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT b.id_batch FROM identityimport_batch b ";
     private static final String SQL_QUERY_SELECTALL_ID_BY_STATE = "JOIN workflow_resource_workflow wr ON wr.id_resource = b.id_batch AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' WHERE wr.id_state = ${id_state} ";
     private static final String SQL_QUERY_SELECTALL_ID_BY_APP_CODE = "b.app_code = ${app_code}";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch WHERE id_batch IN (  ";
     private static final String SQL_QUERY_COUNT_IDENTITIES = "SELECT count(identity.id_resource) FROM workflow_resource_workflow identity WHERE identity.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' and identity.id_external_parent = ?";
+
+    private static final String SQL_QUERY_SELECT_BATCH_HISTORY = "SELECT a.name, a.description, h.creation_date, h.user_access_code FROM workflow_resource_history h JOIN workflow_action a ON a.id_action = h.id_action WHERE h.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' AND h.id_resource = ?";
 
     /**
      * {@inheritDoc }
@@ -195,6 +200,27 @@ public final class BatchDAO implements IBatchDAO
 
             return states;
         }
+    }
+
+    @Override
+    public ResourceState selectBatchState( final int batchId, final Plugin plugin )
+    {
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTSTATE_BY_BATCH_ID, plugin ) )
+        {
+            daoUtil.setInt( 1, batchId );
+            daoUtil.executeQuery( );
+
+            if ( daoUtil.next( ) )
+            {
+                final ResourceState state = new ResourceState( );
+                state.setId( daoUtil.getInt( 1 ) );
+                state.setName( daoUtil.getString( 2 ) );
+                state.setDescription( daoUtil.getString( 3 ) );
+                state.setResourceCount( daoUtil.getInt( 4 ) );
+                return state;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -353,6 +379,30 @@ public final class BatchDAO implements IBatchDAO
         }
         return batchList;
 
+    }
+
+    @Override
+    public List<ResourceHistory> getBatchHistory( final int batchId, final Plugin plugin )
+    {
+        final List<ResourceHistory> list = new ArrayList<>( );
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BATCH_HISTORY, plugin ) )
+        {
+            daoUtil.setInt( 1, batchId );
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                final ResourceHistory history = new ResourceHistory( );
+                final Action action = new Action( );
+                action.setName( daoUtil.getString( 1 ) );
+                action.setDescription( daoUtil.getString( 2 ) );
+                history.setAction( action );
+                history.setCreationDate( daoUtil.getTimestamp( 3 ) );
+                history.setUserAccessCode( daoUtil.getString( 4 ) );
+                list.add( history );
+            }
+        }
+        return list;
     }
 
     private Batch getBatch( final DAOUtil daoUtil )

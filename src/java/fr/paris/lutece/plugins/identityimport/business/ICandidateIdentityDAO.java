@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceList;
 import java.util.List;
@@ -132,4 +133,6 @@ public interface ICandidateIdentityDAO
     boolean checkIfOneExists( Plugin plugin, final String batchReference, List<String> externalIds );
 
     List<ResourceState> selectIdentityStates( final int batchId, final Plugin plugin );
+
+    List<ResourceHistory> getHistory( final int identityId, final Plugin plugin );
 }

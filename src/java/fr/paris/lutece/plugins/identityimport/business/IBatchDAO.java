@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceList;
 
@@ -143,5 +144,9 @@ public interface IBatchDAO
 
     List<ResourceState> selectBatchStates( final String filterAppCode, Plugin plugin );
 
+    ResourceState selectBatchState( final int batchId, final Plugin plugin );
+
     int countIdentities( int resourceId, Plugin plugin );
+
+    List<ResourceHistory> getBatchHistory( final int batchId, final Plugin plugin );
 }

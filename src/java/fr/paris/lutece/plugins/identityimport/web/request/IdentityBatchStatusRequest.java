@@ -42,6 +42,9 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.BatchRequestValidator;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportResponse;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusRequest;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
@@ -52,30 +55,27 @@ import java.util.UUID;
 
 public class IdentityBatchStatusRequest extends AbstractIdentityStoreRequest
 {
-    protected String _strBatchReference;
-    protected String _strMode;
+    protected BatchStatusRequest _request;
     protected String _strHeaderClientToken;
 
-    public IdentityBatchStatusRequest( final String strBatchReference, final String strMode, final String strHeaderClientToken, final String strClientCode,
+    public IdentityBatchStatusRequest( final BatchStatusRequest request, final String strHeaderClientToken, final String strClientCode,
             final String strAuthorName, final String strAuthorType ) throws IdentityStoreException
     {
         super( strClientCode, strAuthorName, strAuthorType );
-        this._strBatchReference = strBatchReference;
-        this._strMode = strMode;
+        this._request = request;
         this._strHeaderClientToken = strHeaderClientToken;
     }
 
     @Override
     protected void validateSpecificRequest( ) throws IdentityStoreException
     {
-        BatchRequestValidator.instance( ).checkBatchReference( _strBatchReference );
-        BatchRequestValidator.instance( ).checkBatchStatusMode( _strMode );
+        BatchRequestValidator.instance( ).checkBatchStatusRequest( _request );
     }
 
     @Override
-    protected BatchImportResponse doSpecificRequest( ) throws IdentityStoreException
+    protected BatchStatusResponse doSpecificRequest( ) throws IdentityStoreException
     {
-        final BatchImportResponse response = new BatchImportResponse( );
+        final BatchStatusResponse response = new BatchStatusResponse( );
         if ( StringUtils.isAllBlank( _strClientCode, _strHeaderClientToken ) )
         {
             response.setStatus( ResponseStatusFactory.badRequest( ).setMessage( "You must provide a client_code or a client_token." )
@@ -114,8 +114,7 @@ public class IdentityBatchStatusRequest extends AbstractIdentityStoreRequest
         }
         try
         {
-            BatchService.instance( ).getBatchStatus( _strBatchReference, _strMode );
-            response.setStatus( ResponseStatusFactory.success( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION ) );
+            return BatchService.instance( ).getBatchStatus( _request.getBatchReference( ), _request.getMode( ) );
         }
         catch( final IdentityStoreException e )
         {

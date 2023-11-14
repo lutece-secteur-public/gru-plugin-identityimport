@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
@@ -165,5 +166,10 @@ public final class CandidateIdentityHome
     public static List<ResourceState> getCandidateIdentityStates( final int batchId )
     {
         return _dao.selectIdentityStates( batchId, _plugin );
+    }
+
+    public static List<ResourceHistory> getHistory( final int identityId )
+    {
+        return _dao.getHistory( identityId, _plugin );
     }
 }

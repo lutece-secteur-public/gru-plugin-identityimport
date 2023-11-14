@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
+import fr.paris.lutece.plugins.workflowcore.business.action.Action;
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -66,6 +68,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     private static final String SQL_QUERY_SELECTALL_BY_IDS_END = ")";
 
     private static final String SQL_QUERY_SELECTSTATES = "SELECT ws.id_state, ws.name, ws.description, COUNT(wr.id_resource) as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' AND wr.id_external_parent = ? WHERE ws.id_workflow = 2 GROUP BY ws.id_state, ws.name, ws.description";
+    private static final String SQL_QUERY_SELECT_HISTORY = "SELECT a.name, a.description, h.creation_date, h.user_access_code FROM workflow_resource_history h JOIN workflow_action a ON a.id_action = h.id_action WHERE h.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' AND h.id_resource = ?";
 
     /**
      * {@inheritDoc }
@@ -302,5 +305,29 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
 
             return states;
         }
+    }
+
+    @Override
+    public List<ResourceHistory> getHistory( final int identityId, final Plugin plugin )
+    {
+        final List<ResourceHistory> list = new ArrayList<>( );
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_HISTORY, plugin ) )
+        {
+            daoUtil.setInt( 1, identityId );
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                final ResourceHistory history = new ResourceHistory( );
+                final Action action = new Action( );
+                action.setName( daoUtil.getString( 1 ) );
+                action.setDescription( daoUtil.getString( 2 ) );
+                history.setAction( action );
+                history.setCreationDate( daoUtil.getTimestamp( 3 ) );
+                history.setUserAccessCode( daoUtil.getString( 4 ) );
+                list.add( history );
+            }
+        }
+        return list;
     }
 }
