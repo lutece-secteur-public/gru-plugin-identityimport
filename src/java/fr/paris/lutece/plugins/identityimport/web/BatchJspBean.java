@@ -307,21 +307,17 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         {
             this.addInfo( e.getLocalizedMessage( ), getLocale( ) );
         }
-        //return_url=jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities
-        // &id_state=${current_batch_state.id}
-        // &id_batch=${batch.resource.id}
-        // &batch_page=${batch_current_page}
-        // &application_code=${application_code!}
-        //
+
         final Optional<String> returnUrlOpt = Optional.ofNullable( request.getParameter( PARAMETER_RETURN_URL ) );
         returnUrlOpt.ifPresent( url -> {
-            final String idState = request.getParameter(PARAMETER_ID_BATCH_STATE);
-            final String idBatch = request.getParameter(PARAMETER_ID_BATCH);
-            final String batchPage = request.getParameter(PARAMETER_BATCH_PAGE);
-            final String applicationCode = request.getParameter(PARAMETER_FILTER_APP_CODE);
-            final String returnUrl = String.format("%s&%s=%s&%s=%s&%s=%s&%s=%s", url, PARAMETER_ID_BATCH_STATE, idState, PARAMETER_ID_BATCH, idBatch, PARAMETER_BATCH_PAGE, batchPage, PARAMETER_FILTER_APP_CODE, applicationCode);
-            model.put( MARK_RETURN_URL, returnUrl);
-        } );
+            final String idState = request.getParameter( PARAMETER_ID_BATCH_STATE );
+            final String idBatch = request.getParameter( PARAMETER_ID_BATCH );
+            final String batchPage = request.getParameter( PARAMETER_BATCH_PAGE );
+            final String applicationCode = request.getParameter( PARAMETER_FILTER_APP_CODE );
+            final String returnUrl = String.format( "%s&%s=%s&%s=%s&%s=%s&%s=%s", url, PARAMETER_ID_BATCH_STATE, idState, PARAMETER_ID_BATCH, idBatch,
+                    PARAMETER_BATCH_PAGE, batchPage, PARAMETER_FILTER_APP_CODE, applicationCode );
+            model.put( MARK_RETURN_URL, returnUrl );
+        });
 
         model.put( MARK_CANDIDATE_IDENTITY, _wfCandidateIdentityBean );
         model.put( MARK_ATTRIBUTE_KEY_LIST, keyList.stream( ).distinct( ).collect( Collectors.toList( ) ) );
@@ -679,7 +675,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         idStateOpt.ifPresent( idState -> {
             final Integer nCurrentBatchId = Integer.parseInt( idState );
             _current_batch_state = _batchStates.stream( ).filter( resourceState -> nCurrentBatchId.equals( resourceState.getId( ) ) ).findAny( ).orElse( null );
-            _batchCurrentPage = Optional.ofNullable( request.getParameter(PARAMETER_BATCH_PAGE) ).map( Integer::parseInt ).orElse( 1 );
+            _batchCurrentPage = Optional.ofNullable( request.getParameter( PARAMETER_BATCH_PAGE ) ).map( Integer::parseInt ).orElse( 1 );
 
             if ( _current_batch_state != null && _current_batch_state.getResourceCount( ) > 0 )
             {
