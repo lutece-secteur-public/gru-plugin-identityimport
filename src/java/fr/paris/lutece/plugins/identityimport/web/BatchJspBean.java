@@ -317,7 +317,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             final String returnUrl = String.format( "%s&%s=%s&%s=%s&%s=%s&%s=%s", url, PARAMETER_ID_BATCH_STATE, idState, PARAMETER_ID_BATCH, idBatch,
                     PARAMETER_BATCH_PAGE, batchPage, PARAMETER_FILTER_APP_CODE, applicationCode );
             model.put( MARK_RETURN_URL, returnUrl );
-        });
+        } );
 
         model.put( MARK_CANDIDATE_IDENTITY, _wfCandidateIdentityBean );
         model.put( MARK_ATTRIBUTE_KEY_LIST, keyList.stream( ).distinct( ).collect( Collectors.toList( ) ) );
