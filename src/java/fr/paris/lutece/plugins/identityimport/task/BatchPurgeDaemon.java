@@ -35,14 +35,13 @@ package fr.paris.lutece.plugins.identityimport.task;
 
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
 import fr.paris.lutece.portal.service.daemon.Daemon;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.log4j.Logger;
 
 public class BatchPurgeDaemon extends Daemon
 {
-    private final static Logger _logger = Logger.getLogger( BatchPurgeDaemon.class );
     private final static int _batchLimit = AppPropertiesService.getPropertyInt( "identityimport.daemon.purge.batch.limit", 10 );
 
     @Override
@@ -53,7 +52,7 @@ public class BatchPurgeDaemon extends Daemon
         final StringBuilder logs = BatchService.instance( ).purgeBatches( _batchLimit );
         stopWatch.stop( );
         final String execTime = "Execution time " + DurationFormatUtils.formatDurationWords( stopWatch.getTime( ), true, true );
-        _logger.info( execTime );
+        AppLogService.info( execTime );
         logs.append( execTime );
         setLastRunLogs( logs.toString( ) );
     }

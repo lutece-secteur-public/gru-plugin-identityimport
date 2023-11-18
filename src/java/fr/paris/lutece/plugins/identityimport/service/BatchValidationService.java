@@ -41,14 +41,12 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class BatchValidationService
 {
-    private static final Logger _logger = Logger.getLogger( BatchValidationService.class );
     private final int importBatchLimit = AppPropertiesService.getPropertyInt( "identityimport.identitystore.api.batch.identity.limit", 100 );
 
     private static BatchValidationService _instance;
