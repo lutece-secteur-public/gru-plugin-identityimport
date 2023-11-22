@@ -39,12 +39,11 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContr
 import fr.paris.lutece.plugins.identitystore.v3.web.service.ServiceContractService;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.portal.service.cache.AbstractCacheableService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import org.apache.log4j.Logger;
 
 public class ServiceContractCache extends AbstractCacheableService
 {
-    private static final Logger LOGGER = Logger.getLogger( ServiceContractCache.class );
     private static final String SERVICE_NAME = "Service Contract Cache Import";
 
     private final ServiceContractService _serviceContractService;
@@ -64,7 +63,7 @@ public class ServiceContractCache extends AbstractCacheableService
             this.removeKey( clientCode );
         }
         this.putInCache( clientCode, serviceContract );
-        LOGGER.info( "ServiceContractDto added to cache: " + clientCode );
+        AppLogService.debug( "ServiceContractDto added to cache: " + clientCode );
     }
 
     public void remove( final String clientCode )
@@ -74,7 +73,7 @@ public class ServiceContractCache extends AbstractCacheableService
             this.removeKey( clientCode );
         }
 
-        LOGGER.info( "ServiceContractDto removed from cache: " + clientCode );
+        AppLogService.debug( "ServiceContractDto removed from cache: " + clientCode );
     }
 
     public ServiceContractDto get( final String clientCode ) throws IdentityStoreException
