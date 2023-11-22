@@ -74,7 +74,7 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getCode( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getValue( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getCertProcess( ) );
-            daoUtil.setDate( nIndex++, candidateIdentityAttribute.getCertDate( ) );
+            daoUtil.setDate( nIndex, candidateIdentityAttribute.getCertDate( ) );
 
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )

@@ -95,9 +95,3 @@
         }, 100);
     }
 </script>
-<script>
-
-    function getManualImportCancelUrl(candidateidentity_resource_id, current_batch_state_id, batch_resource_id, batch_current_page, application_code) {
-        return '&return_url=' + encodeURIComponent('jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}');
-    }
-</script>

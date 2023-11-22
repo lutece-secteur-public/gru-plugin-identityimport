@@ -77,7 +77,7 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
             int nIndex = 1;
             daoUtil.setInt( nIndex++, candidateIdentityHistory.getWfResourceHistoryId( ) );
             daoUtil.setString( nIndex++, candidateIdentityHistory.getStatus( ) );
-            daoUtil.setString( nIndex++, candidateIdentityHistory.getComment( ) );
+            daoUtil.setString( nIndex, candidateIdentityHistory.getComment( ) );
 
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )

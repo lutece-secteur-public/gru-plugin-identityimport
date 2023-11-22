@@ -39,10 +39,7 @@ import fr.paris.lutece.plugins.identityimport.service.BatchService;
 import fr.paris.lutece.plugins.identityimport.service.ServiceContractService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.AbstractIdentityStoreRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.BatchRequestValidator;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportResponse;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
@@ -51,7 +48,6 @@ import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreExceptio
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public class IdentityBatchStatusRequest extends AbstractIdentityStoreRequest
 {

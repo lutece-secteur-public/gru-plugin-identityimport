@@ -50,8 +50,8 @@ public class CandidateIdentityAttributeBusinessTest extends LuteceTestCase
     private static final String VALUE2 = "Value2";
     private static final String CERTPROCESS1 = "CertProcess1";
     private static final String CERTPROCESS2 = "CertProcess2";
-    private static final Date CERTDATE1 = new Date( 1000000l );
-    private static final Date CERTDATE2 = new Date( 2000000l );
+    private static final Date CERTDATE1 = new Date( 1000000L );
+    private static final Date CERTDATE2 = new Date( 2000000L );
 
     /**
      * test CandidateIdentityAttribute

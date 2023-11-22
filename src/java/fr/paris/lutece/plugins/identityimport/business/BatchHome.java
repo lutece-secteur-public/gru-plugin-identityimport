@@ -62,7 +62,7 @@ public final class BatchHome
      * Create an instance of the batch class
      * 
      * @param batch
-     *            The instance of the Batch which contains the informations to store
+     *            The instance of the Batch which contains the information to store
      * @return The instance of batch which has been created with its primary key.
      */
     public static Batch create( Batch batch )

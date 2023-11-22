@@ -143,9 +143,6 @@ public class WorkflowBean<T>
     /**
      * get workflow history of the resource
      * 
-     * @param request
-     * @param locale
-     * 
      * @return the history
      */
     public String getHistory( )

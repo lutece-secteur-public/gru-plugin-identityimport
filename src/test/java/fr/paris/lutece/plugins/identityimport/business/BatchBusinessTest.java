@@ -44,8 +44,8 @@ import java.sql.Date;
  */
 public class BatchBusinessTest extends LuteceTestCase
 {
-    private static final Date DATE1 = new Date( 1000000l );
-    private static final Date DATE2 = new Date( 2000000l );
+    private static final Date DATE1 = new Date( 1000000L );
+    private static final Date DATE2 = new Date( 2000000L );
     private static final String USER1 = "User1";
     private static final String USER2 = "User2";
     private static final String APPCODE1 = "AppCode1";

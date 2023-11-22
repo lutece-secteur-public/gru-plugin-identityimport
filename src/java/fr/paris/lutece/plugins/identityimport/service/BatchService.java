@@ -207,7 +207,7 @@ public class BatchService
             msg.append( expiredBatches.size( ) ).append( " expired batches found" ).append( System.lineSeparator( ) );
             for ( final Batch expiredBatch : expiredBatches )
             {
-                msg.append( "Removing expired batch : " + expiredBatch.toLog( ) ).append( System.lineSeparator( ) );
+                msg.append( "Removing expired batch : " ).append( expiredBatch.toLog( ) ).append( System.lineSeparator( ) );
                 final List<Integer> idCandidateIdentitiesList = CandidateIdentityHome.getIdCandidateIdentitiesList( expiredBatch.getId( ) );
                 CandidateIdentityHome.delete( idCandidateIdentitiesList );
                 CandidateIdentityAttributeHome.delete( idCandidateIdentitiesList );

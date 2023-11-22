@@ -61,7 +61,7 @@ public final class CandidateIdentityHome
      * Create an instance of the candidateIdentity class
      * 
      * @param candidateIdentity
-     *            The instance of the CandidateIdentity which contains the informations to store
+     *            The instance of the CandidateIdentity which contains the information to store
      * @return The instance of candidateIdentity which has been created with its primary key.
      */
     public static CandidateIdentity create( CandidateIdentity candidateIdentity )
@@ -152,11 +152,11 @@ public final class CandidateIdentityHome
     }
 
     /**
-     * Load the data of all the avant objects and returns them as a list
+     * Check if external IDs exist in a batch identified by its reference
      *
      * @param externalIds
      *            liste of external ids
-     * @return the list which contains the data of all the avant objects
+     * @return true if one of the given externalIds exists in the batch
      */
     public static boolean checkIfOneExists( final String batchReference, final List<String> externalIds )
     {

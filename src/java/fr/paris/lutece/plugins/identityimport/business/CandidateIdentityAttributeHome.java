@@ -36,7 +36,6 @@ package fr.paris.lutece.plugins.identityimport.business;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.util.ReferenceList;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,8 +46,8 @@ import java.util.Optional;
 public final class CandidateIdentityAttributeHome
 {
     // Static variable pointed at the DAO instance
-    private static ICandidateIdentityAttributeDAO _dao = SpringContextService.getBean( "identityimport.candidateIdentityAttributeDAO" );
-    private static Plugin _plugin = PluginService.getPlugin( "identityimport" );
+    private static final ICandidateIdentityAttributeDAO _dao = SpringContextService.getBean( "identityimport.candidateIdentityAttributeDAO" );
+    private static final Plugin _plugin = PluginService.getPlugin( "identityimport" );
 
     /**
      * Private constructor - this class need not be instantiated
@@ -61,7 +60,7 @@ public final class CandidateIdentityAttributeHome
      * Create an instance of the candidateIdentityAttribute class
      * 
      * @param candidateIdentityAttribute
-     *            The instance of the CandidateIdentityAttribute which contains the informations to store
+     *            The instance of the CandidateIdentityAttribute which contains the information to store
      * @return The instance of candidateIdentityAttribute which has been created with its primary key.
      */
     public static CandidateIdentityAttribute create( CandidateIdentityAttribute candidateIdentityAttribute )

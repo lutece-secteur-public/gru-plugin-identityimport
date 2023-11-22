@@ -61,7 +61,7 @@ public final class ClientHome
      * Create an instance of the client class
      * 
      * @param client
-     *            The instance of the Client which contains the informations to store
+     *            The instance of the Client which contains the information to store
      * @return The instance of client which has been created with its primary key.
      */
     public static Client create( Client client )

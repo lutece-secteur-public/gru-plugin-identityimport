@@ -208,8 +208,7 @@ public class CandidateIdentity implements Serializable
 
     /**
      * get attributes
-     * 
-     * @param list
+     *
      */
     public List<CandidateIdentityAttribute> getAttributes( )
     {

@@ -33,23 +33,22 @@
  */
 package fr.paris.lutece.plugins.identityimport.web;
 
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockServletConfig;
+import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeHome;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.admin.AdminAuthenticationService;
-import fr.paris.lutece.portal.service.security.UserNotSignedException;
-import java.util.List;
-import java.io.IOException;
-import fr.paris.lutece.test.LuteceTestCase;
 import fr.paris.lutece.portal.service.security.SecurityTokenService;
-import fr.paris.lutece.portal.web.LocalVariables;
-import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribute;
-import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeHome;
-import java.sql.Date;
-import fr.paris.lutece.util.date.DateUtil;
+import fr.paris.lutece.portal.service.security.UserNotSignedException;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
+import fr.paris.lutece.test.LuteceTestCase;
+import fr.paris.lutece.util.date.DateUtil;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockServletConfig;
+
+import java.io.IOException;
+import java.sql.Date;
+import java.util.List;
 
 /**
  * This is the business class test for the object CandidateIdentityAttribute
@@ -64,13 +63,12 @@ public class CandidateIdentityAttributeJspBeanTest extends LuteceTestCase
     private static final String VALUE2 = "Value2";
     private static final String CERTPROCESS1 = "CertProcess1";
     private static final String CERTPROCESS2 = "CertProcess2";
-    private static final Date CERTDATE1 = new Date( 1000000l );
-    private static final Date CERTDATE2 = new Date( 2000000l );
+    private static final Date CERTDATE1 = new Date( 1000000L );
+    private static final Date CERTDATE2 = new Date( 2000000L );
 
     public void testJspBeans( ) throws AccessDeniedException, IOException
     {
         MockHttpServletRequest request = new MockHttpServletRequest( );
-        MockHttpServletResponse response = new MockHttpServletResponse( );
         MockServletConfig config = new MockServletConfig( );
 
         // display admin CandidateIdentityAttribute management JSP
@@ -85,7 +83,7 @@ public class CandidateIdentityAttributeJspBeanTest extends LuteceTestCase
         // action create CandidateIdentityAttribute
         request = new MockHttpServletRequest( );
 
-        response = new MockHttpServletResponse( );
+        MockHttpServletResponse response = new MockHttpServletResponse( );
         AdminUser adminUser = new AdminUser( );
         adminUser.setAccessCode( "admin" );
 
@@ -122,7 +120,7 @@ public class CandidateIdentityAttributeJspBeanTest extends LuteceTestCase
         request.addParameter( "cert_process", CERTPROCESS1 );
         request.addParameter( "cert_date", DateUtil.getDateString( CERTDATE1, LocaleService.getDefault( ) ) );
         List<Integer> listIds = CandidateIdentityAttributeHome.getIdCandidateIdentityAttributesList( IDENTITY1 );
-        assertTrue( !listIds.isEmpty( ) );
+        assertFalse( listIds.isEmpty( ) );
         request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
         jspbean = new CandidateIdentityAttributeJspBean( );
 

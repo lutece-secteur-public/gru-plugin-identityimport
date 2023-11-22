@@ -35,7 +35,7 @@ package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.util.ReferenceList;
+
 import java.util.List;
 import java.util.Optional;
 

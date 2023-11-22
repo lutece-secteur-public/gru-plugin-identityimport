@@ -132,7 +132,7 @@ public interface IBatchDAO
     /**
      * Load the data of all the avant objects and returns them as a list
      * 
-     * @param plugin
+     * @param _plugin
      *            the Plugin
      * @param listIds
      *            liste of ids

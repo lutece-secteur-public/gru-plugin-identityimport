@@ -596,7 +596,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             throw new AccessDeniedException( "Invalid security token" );
         }
 
-        int batchId = 0;
+        int batchId;
 
         try
         {

@@ -102,11 +102,7 @@ public abstract class AbstractManageItemsJspBean<S, T> extends MVCAdminJspBean
 
     /**
      * Get Items from Ids list
-     * 
-     * @param <S>
-     *            the generic type of the Ids
-     * @param <T>
-     *            the generic type of the items
+     *
      * @param listIds
      * @return the populated list of items corresponding to the id List
      */

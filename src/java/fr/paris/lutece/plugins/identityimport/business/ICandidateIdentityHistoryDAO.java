@@ -66,7 +66,7 @@ public interface ICandidateIdentityHistoryDAO
     /**
      * Select a record from the table
      * 
-     * @param nKey
+     * @param nWfResourceHistoryId
      *            The identifier to select
      * @param plugin
      *            the Plugin

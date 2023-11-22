@@ -33,20 +33,19 @@
  */
 package fr.paris.lutece.plugins.identityimport.web;
 
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockServletConfig;
+import fr.paris.lutece.plugins.identityimport.business.ClientHome;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.admin.AdminAuthenticationService;
-import fr.paris.lutece.portal.service.security.UserNotSignedException;
-import java.util.List;
-import java.io.IOException;
-import fr.paris.lutece.test.LuteceTestCase;
 import fr.paris.lutece.portal.service.security.SecurityTokenService;
-import fr.paris.lutece.portal.web.LocalVariables;
-import fr.paris.lutece.plugins.identityimport.business.Client;
-import fr.paris.lutece.plugins.identityimport.business.ClientHome;
+import fr.paris.lutece.portal.service.security.UserNotSignedException;
+import fr.paris.lutece.test.LuteceTestCase;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockServletConfig;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * This is the business class test for the object Client
@@ -63,7 +62,6 @@ public class ClientJspBeanTest extends LuteceTestCase
     public void testJspBeans( ) throws AccessDeniedException, IOException
     {
         MockHttpServletRequest request = new MockHttpServletRequest( );
-        MockHttpServletResponse response = new MockHttpServletResponse( );
         MockServletConfig config = new MockServletConfig( );
 
         // display admin Client management JSP
@@ -78,7 +76,7 @@ public class ClientJspBeanTest extends LuteceTestCase
         // action create Client
         request = new MockHttpServletRequest( );
 
-        response = new MockHttpServletResponse( );
+        MockHttpServletResponse response = new MockHttpServletResponse( );
         AdminUser adminUser = new AdminUser( );
         adminUser.setAccessCode( "admin" );
 
@@ -112,7 +110,7 @@ public class ClientJspBeanTest extends LuteceTestCase
         request.addParameter( "app_code", APPCODE1 );
         request.addParameter( "token", TOKEN1 );
         List<Integer> listIds = ClientHome.getIdClientsList( );
-        assertTrue( !listIds.isEmpty( ) );
+        assertFalse( listIds.isEmpty( ) );
         request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
         jspbean = new ClientJspBean( );
 

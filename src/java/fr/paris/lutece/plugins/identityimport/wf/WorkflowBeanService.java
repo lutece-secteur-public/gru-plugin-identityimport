@@ -154,7 +154,7 @@ public class WorkflowBeanService<T> implements Serializable
     /**
      * process action
      * 
-     * @param workflowBean
+     * @param wfBean
      * @param nAction
      * @param request
      * @param locale

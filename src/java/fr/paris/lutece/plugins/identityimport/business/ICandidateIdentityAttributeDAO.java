@@ -34,7 +34,7 @@
 package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.util.ReferenceList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -108,7 +108,7 @@ public interface ICandidateIdentityAttributeDAO
     /**
      * Load the data of all the avant objects and returns them as a list
      * 
-     * @param plugin
+     * @param _plugin
      *            the Plugin
      * @param listIds
      *            liste of ids
