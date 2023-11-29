@@ -48,7 +48,7 @@ public class ServiceContractCache extends AbstractCacheableService
 
     private final ServiceContractService _serviceContractService;
 
-    private final String _currentClientCode = AppPropertiesService.getProperty( "identitydesk.default.client.code" );
+    private final String _currentClientCode = AppPropertiesService.getProperty( "identityimport.client.code" );
 
     public ServiceContractCache( ServiceContractService scService )
     {
