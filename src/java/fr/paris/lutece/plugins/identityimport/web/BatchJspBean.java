@@ -67,6 +67,7 @@ import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
 import fr.paris.lutece.util.url.UrlItem;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -77,6 +78,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -101,6 +103,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String PARAMETER_ID_BATCH_STATE = "id_state";
     private static final String PARAMETER_ID_ACTION = "id_action";
     private static final String PARAMETER_CSV_FILE = "csvFile";
+    private static final String PARAMETER_REFERENCE = "reference";
     private static final String PARAMETER_FILTER_APP_CODE = "application_code";
     private final static String PARAMETER_BATCH_PAGE = "batch_page";
     private final static String IDENTITIES_PARAMETER_PAGE = "identities_page";
@@ -605,6 +608,10 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             final FileItem fileItem = multipartRequest.getFile( PARAMETER_CSV_FILE );
 
             final BatchDto batchDto = BatchService.instance( ).getDto( _batch );
+            if ( StringUtils.isBlank( request.getParameter( PARAMETER_REFERENCE ) ) )
+            {
+                batchDto.setReference( UUID.randomUUID( ).toString( ) );
+            }
             final List<IdentityDto> importedIdentities = CsvIdentityService.instance( ).read( fileItem.getInputStream( ) );
             batchDto.getIdentities( ).addAll( importedIdentities );
             // Check constraints

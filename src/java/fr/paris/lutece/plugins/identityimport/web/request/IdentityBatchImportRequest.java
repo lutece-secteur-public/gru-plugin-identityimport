@@ -112,11 +112,8 @@ public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
         }
         final BatchDto batch = _request.getBatch( );
         batch.setAppCode( clientAppCode );
-        if ( StringUtils.isEmpty( batch.getReference( ) ) )
-        {
-            batch.setReference( UUID.randomUUID( ).toString( ) );
-            response.setReference( batch.getReference( ) );
-        }
+        batch.setReference( UUID.randomUUID( ).toString( ) );
+        response.setReference( batch.getReference( ) );
         try
         {
             BatchService.instance( ).importBatch( batch, null, null );
