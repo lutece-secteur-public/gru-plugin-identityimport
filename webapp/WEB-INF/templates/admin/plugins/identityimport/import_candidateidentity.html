@@ -1,141 +1,82 @@
+<#include "utils/functions.ftl" />
+<#include "components/identity_card.ftl" />
+<@pageContainer id="mediation">
+    <@pageColumn width="22rem" responsiveMenuSize="xl" responsiveMenuPlacement="start" responsiveMenuTitle="#i18n{identityimport.import_identity.pageTitle}" class="pt-xl-4 px-md-4">
+        <@messages infos=infos />
+        <@messages errors=errors />
+        <@messages warnings=warnings />
+        <div class="">
+            <h1 class="mb-0 py-2 pb-1">#i18n{identityimport.import_identity.pageTitle}</h1>
+            <h3 class="mb-0 py-2 pb-1">${identity.externalCustomerId!''}</h3>
+        </div>
+        <hr class="d-none d-xxl-block">
+        <div class="accordion accordion-flush" id="actionsAccordion">
+            <div class="accordion-item bg-transparent">
+                <h2 class="accordion-header" id="rulesHeader">
+                    <button class="accordion-button collapsed px-2 bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#rulesContent" aria-expanded="false" aria-controls="rulesContent">
+                        <i class="ti ti-filters fs-2 me-2"></i> <strong>#i18n{identityimport.import_identity.actionsLabel}</strong>
+                    </button>
+                </h2>
+                <div id="rulesContent" class="accordion-collapse collapse show" aria-labelledby="rulesHeader" data-bs-parent="#actionsAccordion">
+                    <div class="accordion-body p-0">
+                        <ul class="list-group list-group-flush">
 
-<@box>
-	<@boxHeader title='#i18n{identityimport.modify_candidateidentity.title}' />
-	<@boxBody>
-	
-			<@messages errors=errors />
-	   <@row >
+                            <#if identity_workflow.actions??>
+                            <#list identity_workflow.actions as action >
+                            <div class="list-group-item list-group-item-action border-bottom-0">
+                                <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processIdentityAction&action_id=${action.id}&id=${identity_workflow.resource.id}"
+                                title="${action.name}" alt="${action.name}"/>
+                            </div>
+                            </#list>
+                            <#else>
+                                no action
+                            </#if>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item bg-transparent">
+                <h2 class="accordion-header" id="actionsHeader">
+                    <button class="accordion-button collapsed px-2 bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#actionsContent" aria-expanded="false" aria-controls="actionsContent">
+                        <i class="ti ti-hammer me-2 fs-2"></i> #i18n{identityimport.import_identity.otherActionsLabel}
+                    </button>
+                </h2>
+                <div id="actionsContent" class="accordion-collapse collapse" aria-labelledby="actionsHeader" data-bs-parent="#actionsAccordion">
+                    <div class="accordion-body">
+                        <#if return_url??>
+                            <@aButton href="${return_url}" title="#i18n{portal.util.labelCancel}" alt="#i18n{portal.util.labelCancel}"/>
+                        </#if>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </@pageColumn>
+    <@pageColumn id="mediation-selection" width="100rem" class="pt-xl-4 bg-secondary" >
+        <div id="lutece-compare" class="row flex-nowrap overflow-auto rounded-5 mt-3 pb-4 position-relative  mx-1">
+            <@identityCard identity=identity index=0 width="21.9rem" />
+            <#list duplicate_list as identity>
+                <#assign current_index=identity?index + 1>
+                <#if identity?is_last>
+                    <@identityCard identity=identity index=current_index width="21.9rem" class="rounded-end-5" />
+                <#else>
+                    <@identityCard identity=identity index=current_index width="21.9rem" />
+                </#if>
+            </#list>
+        </div>
+    </@pageColumn>
+</@pageContainer>
+<script type="module">
+    import MediationCompare from './js/admin/plugins/identityimport/mediation-compare.js'
+    document.addEventListener('DOMContentLoaded', function () {
+        new MediationCompare(document.querySelector('#lutece-compare'), {
+            autoHeight: true,
+            hoverHighlight: true,
+            dragScroll: true,
+            tooltips: false,
+        });
+    });
 
-		<div class="col-auto left-col">
-			<@columns>
-				<@table >
-					<@tr>
-						<@td>#i18n{identityimport.modify_candidateidentity.labelIdBatch} :</@td>
-					</@tr>
-					<@tr>
-						<@td>#i18n{identityimport.modify_candidateidentity.labelConnectionId} :</@td>
-					</@tr>
-					<@tr>
-						<@td>#i18n{identityimport.import_candidateidentity.labelCustomerId} :</@td>
-					</@tr>
-					<#list key_list as key >
-						<@tr>
-							<@td>${key!} :</@td>
-						</@tr>
-					</#list>
-				</@table>
-			</@columns >
-		</div>
-		<div class="col right-col d-flex flex-nowrap" style="overflow-x: auto">
-			<@columns >
-				<@table >
-					<@tr>
-						<@td>${identity.resource.idBatch!''}</@td>
-					</@tr>
-					<@tr>
-						<@td>${identity.resource.connectionId!''}</@td>
-					</@tr>
-					<@tr>
-						<@td>${identity.resource.customerId!''}</@td>
-					</@tr>
-					<#list key_list as key >
-						<@tr>
-							<#assign key_found = false>
-							<#list identity.resource.attributes as attribute>
-								<#if attribute.code??>
-									<#if key == attribute.code>
-										<@td>${attribute.value!}</@td>
-										<#assign key_found = true>
-									</#if>
-								</#if>
-							</#list>
-							<#if key_found = false>
-								<@td><i>Non défini</i></@td>
-							</#if>
-						</@tr>
-					</#list>
-					<@tr>
-						<@td><i style="font-weight: bold">Candidat</i></@td>
-					</@tr>
-				</@table>
-			</@columns >
-			<#if duplicate_list?? && duplicate_list?size gt 0>
-				<#list duplicate_list as duplicate >
-					<@columns>
-						<@input type="hidden" id="connection_id" name="connection_id" value="${duplicate.connectionId!''}"/>
-						<@input type="hidden" id="customer_id" name="customer_id" value="${duplicate.customerId}"/>
-
-						<@table >
-							<@tr>
-								<@td>
-									${identity.resource.idBatch!''}
-								</@td>
-							</@tr>
-							<@tr>
-								<@td>
-									${duplicate.connectionId!''}
-								</@td>
-							</@tr>
-							<@tr>
-								<@td>
-									${duplicate.customerId!}
-								</@td>
-							</@tr>
-							<#list key_list as key >
-								<@tr>
-									<#assign key_found = false>
-									<#list duplicate.attributes as attribute>
-										<#if key = attribute.key>
-											<@td>${attribute.value!}</@td>
-											<#assign key_found = true>
-										</#if>
-									</#list>
-									<#if key_found = false>
-										<@td><i>Non défini</i></@td>
-									</#if>
-								</@tr>
-							</#list>
-							<@tr>
-								<td>
-									<@aButton href='jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=importCandidateIdentity&id=${identity.resource.id}&customer_id=${duplicate.customerId}' title='#i18n{portal.util.labelDownload}' hideTitle=['all'] buttonIcon='upload' />
-								</td>
-							</@tr>
-						</@table>
-					</@columns >
-				</#list>
-			</#if>
-		</div>
-
-		</@row>
-    
-	</@boxBody>
-</@box>
-
-
-<@box>
-	<@boxHeader title='Workflow' />
-	<@boxBody>
-        
-        statut : <#if identity.state??><@tag  color='warning'>${identity.state.name}</@tag><#else> not set</#if>
-
-        <br>
-        <br>
-        
-        <#if identity.actions??>actions :
-			<#list identity.actions as action >
-				<@aButton href="jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp?action=processWorkflowAction&action_id=${action.id}&id=${identity.resource.id}"
-							title="${action.name}" alt="${action.name}"/>
-				<!--  img src="image?resource_type=workflow_icon_img&id=${action.icon.id}" -->
-				 </a>
-			</#list>
-		<#else>no action
-		</#if>
-		<#if return_url??>
-			<@aButton href="${return_url}" title="#i18n{portal.util.labelCancel}" alt="#i18n{portal.util.labelCancel}"/>
-		</#if>
-		
-		<br><br>
-		History : ${identity.history! }
-
-	</@boxBody>
-</@box>
+    $('[data-toggle="tooltip"]').on( "click", function() {
+        $(this).tooltip('toggle');
+    });
+</script>

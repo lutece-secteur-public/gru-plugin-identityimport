@@ -41,6 +41,7 @@ import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribut
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
 import fr.paris.lutece.plugins.identityimport.business.ResourceState;
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
+import fr.paris.lutece.plugins.identityimport.service.CandidateIdentityService;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBean;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
 import fr.paris.lutece.plugins.identityquality.v3.web.service.IdentityQualityService;
@@ -95,6 +96,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String TEMPLATE_MODIFY_BATCH = "/admin/plugins/identityimport/modify_batch.html";
     private static final String TEMPLATE_PROCESS_BATCH = "/admin/plugins/identityimport/process_batch.html";
     private static final String TEMPLATE_IMPORT_CANDIDATE_IDENTITY = "/admin/plugins/identityimport/import_candidateidentity.html";
+    private static final String JSP_MANAGE_CANDIDATEIDENTITIES = "jsp/admin/plugins/identityimport/ManageBatchs.jsp";
 
     // Parameters
     private static final String PARAMETER_ID_BATCH = "id_batch";
@@ -134,6 +136,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String MARK_FILTER_APP_CODE = "application_code";
     private static final String MARK_CANDIDATE_IDENTITY_DUPLICATE_LIST = "duplicate_list";
     private static final String MARK_CANDIDATE_IDENTITY = "identity";
+    private static final String MARK_CANDIDATE_IDENTITY_WORKFLOW = "identity_workflow";
     private static final String MARK_ATTRIBUTE_KEY_LIST = "key_list";
     private static final String MARK_RETURN_URL = "return_url";
 
@@ -159,7 +162,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String ACTION_MODIFY_BATCH = "modifyBatch";
     private static final String ACTION_REMOVE_BATCH = "removeBatch";
     private static final String ACTION_CONFIRM_REMOVE_BATCH = "confirmRemoveBatch";
-    private static final String ACTION_PROCESS_WORKFLOW_ACTION = "processAction";
+    private static final String ACTION_PROCESS_BATCH_WORKFLOW_ACTION = "processAction";
+    private static final String ACTION_PROCESS_IDENTITY_WORKFLOW_ACTION = "processIdentityAction";
 
     // Infos
     private static final String INFO_BATCH_CREATED = "identityimport.info.batch.created";
@@ -209,11 +213,11 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return The page
      */
     @View( value = VIEW_MANAGE_BATCHS, defaultView = true )
-    public String getManageBatchs( HttpServletRequest request )
+    public String getManageBatchs( final HttpServletRequest request )
     {
         this.globalInit( request );
         this.unregisterFeed( );
-        final Map<String, Object> model = this.globalModel( );
+        final Map<String, Object> model = this.globalModel( request );
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_BATCHS, TEMPLATE_MANAGE_BATCHS, model );
     }
 
@@ -262,7 +266,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             }
         } );
 
-        final Map<String, Object> model = this.globalModel( );
+        final Map<String, Object> model = this.globalModel( request );
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_BATCHS, TEMPLATE_MANAGE_IDENTITIES, model );
     }
 
@@ -287,7 +291,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             _wfIdentitiesBeanService.addHistory( _wfCandidateIdentityBean, request, getLocale( ) );
         } );
 
-        Map<String, Object> model = getModel( );
+        final Map<String, Object> model = getModel( );
 
         // Appel API Recherche
         final DuplicateSearchRequest searchRequest = new DuplicateSearchRequest( );
@@ -322,7 +326,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             model.put( MARK_RETURN_URL, returnUrl );
         } );
 
-        model.put( MARK_CANDIDATE_IDENTITY, _wfCandidateIdentityBean );
+        model.put( MARK_CANDIDATE_IDENTITY_WORKFLOW, _wfCandidateIdentityBean );
+        model.put( MARK_CANDIDATE_IDENTITY, CandidateIdentityService.instance( ).getIdentityDto( _wfCandidateIdentityBean.getResource( ) ) );
         model.put( MARK_ATTRIBUTE_KEY_LIST, keyList.stream( ).distinct( ).collect( Collectors.toList( ) ) );
 
         return getPage( PROPERTY_PAGE_TITLE_IMPORT_CANDIDATEIDENTITY, TEMPLATE_IMPORT_CANDIDATE_IDENTITY, model );
@@ -347,7 +352,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         } ).collect( Collectors.toList( ) );
     }
 
-    protected List<WorkflowBean<CandidateIdentity>> getIdentitiesFromIds( List<Integer> listIds )
+    protected List<WorkflowBean<CandidateIdentity>> getIdentitiesFromIds( final List<Integer> listIds, final HttpServletRequest request )
     {
         final List<CandidateIdentity> listCandidateIdentity = CandidateIdentityHome.getCandidateIdentitiesListByIds( listIds );
 
@@ -358,7 +363,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
                 .sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) ).map( b -> {
                     final WorkflowBean<CandidateIdentity> workflowBean = _wfIdentitiesBeanService.createWorkflowBean( b, b.getId( ), b.getIdBatch( ),
                             getUser( ) );
-                    _wfIdentitiesBeanService.addHistory( workflowBean, null, getLocale( ) );
+                    _wfIdentitiesBeanService.addHistory( workflowBean, request, getLocale( ) );
                     return workflowBean;
                 } ).collect( Collectors.toList( ) );
     }
@@ -641,8 +646,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      *            The Http request
      * @return the jsp URL to display the form to manage batchs
      */
-    @Action( ACTION_PROCESS_WORKFLOW_ACTION )
-    public String doProcessAction( HttpServletRequest request )
+    @Action( ACTION_PROCESS_BATCH_WORKFLOW_ACTION )
+    public String doProcessBatchAction( HttpServletRequest request )
     {
         final int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
         final int nAction = Integer.parseInt( request.getParameter( PARAMETER_ID_ACTION ) );
@@ -665,6 +670,62 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         params.put( PARAMETER_FILTER_APP_CODE, appCode );
 
         return redirect( request, VIEW_MANAGE_IDENTITIES, params );
+    }
+
+    /**
+     * process a workflow action
+     *
+     * @param request
+     *            The Http request
+     * @return the jsp URL to display the form to manage batchs
+     */
+    @Action( ACTION_PROCESS_IDENTITY_WORKFLOW_ACTION )
+    public String doProcessIdentityAction( HttpServletRequest request )
+    {
+        int nResourceId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_RESOURCE_ID ) );
+        int nActionId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_ACTION_ID ) );
+
+        // check and refresh resource if necessary
+        if ( _candidateidentity == null || ( _candidateidentity.getId( ) != nResourceId ) )
+        {
+            Optional<CandidateIdentity> optIdentity = CandidateIdentityHome.findByPrimaryKey( nResourceId );
+            _candidateidentity = optIdentity.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+
+            _wfCandidateIdentityBean = _wfIdentitiesBeanService.createWorkflowBean( _candidateidentity, _candidateidentity.getId( ),
+                    _candidateidentity.getIdBatch( ), getUser( ) );
+        }
+
+        // Process the action, and redirect,
+        // or redirect to the task form if exists
+
+        if ( !_wfIdentitiesBeanService.existsTaskForm( nActionId, getLocale( ) ) )
+        {
+            // The task does not need a form
+            _wfIdentitiesBeanService.processAction( _wfCandidateIdentityBean, nActionId, request, getLocale( ) );
+
+            return redirect( request, VIEW_IMPORT_CANDIDATEIDENTITY, PARAMETER_ID_CANDIDATEIDENTITY, _wfCandidateIdentityBean.getResourceId( ) );
+        }
+        else
+            if ( request.getParameter( WorkflowBeanService.PARAMETER_SUBMITTED_TASK_FORM ) == null )
+            {
+                // A task form should be displayed
+                return _wfIdentitiesBeanService.getTaskForm( _wfCandidateIdentityBean, nActionId, request, getLocale( ), JSP_MANAGE_CANDIDATEIDENTITIES,
+                        ACTION_PROCESS_IDENTITY_WORKFLOW_ACTION );
+            }
+            else
+            {
+                // The task form was submitted
+                final String errMsg = _wfIdentitiesBeanService.validateTaskForm( _wfCandidateIdentityBean, nActionId, request, getLocale( ) );
+                if ( errMsg == null )
+                {
+                    return redirect( request, VIEW_IMPORT_CANDIDATEIDENTITY, PARAMETER_ID_CANDIDATEIDENTITY, _wfCandidateIdentityBean.getResourceId( ) );
+                }
+                else
+                {
+                    // error message
+                    return redirect( request, errMsg );
+                }
+            }
     }
 
     private void globalInit( final HttpServletRequest request )
@@ -702,7 +763,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         } );
     }
 
-    private Map<String, Object> globalModel( )
+    private Map<String, Object> globalModel( final HttpServletRequest request )
     {
         final Map<String, Object> model = new HashMap<>( );
         model.put( MARK_BATCH, _wfBatchBean );
@@ -713,7 +774,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         model.put( MARK_CURRENT_BATCH_PAGE, _batchCurrentPage );
         model.put( MARK_BATCH_TOTAL_PAGES, _batchTotalPages );
 
-        model.put( MARK_IDENTITY_LIST, this.getIdentitiesFromIds( _listIdCandidateIdentities ) );
+        model.put( MARK_IDENTITY_LIST, this.getIdentitiesFromIds( _listIdCandidateIdentities, request ) );
         model.put( MARK_CURRENT_IDENTITIES_PAGE, _identitiesCurrentPage );
         model.put( MARK_IDENTITIES_TOTAL_PAGES, _identitiesTotalPages );
 

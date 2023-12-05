@@ -364,52 +364,52 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
      *            The Http request
      * @return the jsp URL to display the form to manage batchs
      */
-    @Action( ACTION_PROCESS_WORKFLOW_ACTION )
-    public String doProcessAction( HttpServletRequest request )
-    {
-        int nResourceId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_RESOURCE_ID ) );
-        int nActionId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_ACTION_ID ) );
-
-        // check and refresh resource if necessary
-        if ( _candidateidentity == null || ( _candidateidentity.getId( ) != nResourceId ) )
-        {
-            Optional<CandidateIdentity> optIdentity = CandidateIdentityHome.findByPrimaryKey( nResourceId );
-            _candidateidentity = optIdentity.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
-
-            _wfBean = _wfBeanService.createWorkflowBean( _candidateidentity, _candidateidentity.getId( ), _candidateidentity.getIdBatch( ), getUser( ) );
-        }
-
-        // Process the action, and redirect,
-        // or redirect to the task form if exists
-
-        if ( !_wfBeanService.existsTaskForm( nActionId, getLocale( ) ) )
-        {
-            // The task does not need a form
-            _wfBeanService.processAction( _wfBean, nActionId, request, getLocale( ) );
-
-            return redirect( request, VIEW_IMPORT_CANDIDATEIDENTITY, PARAMETER_ID_CANDIDATEIDENTITY, _wfBean.getResourceId( ) );
-        }
-        else
-            if ( request.getParameter( WorkflowBeanService.PARAMETER_SUBMITTED_TASK_FORM ) == null )
-            {
-                // A task form should be displayed
-                return _wfBeanService.getTaskForm( _wfBean, nActionId, request, getLocale( ), JSP_MANAGE_CANDIDATEIDENTITIES );
-            }
-            else
-            {
-                // The task form was submitted
-                String errMsg = _wfBeanService.validateTaskForm( _wfBean, nActionId, request, getLocale( ) );
-                if ( errMsg == null )
-                {
-                    return redirect( request, VIEW_IMPORT_CANDIDATEIDENTITY, PARAMETER_ID_CANDIDATEIDENTITY, _wfBean.getResourceId( ) );
-                }
-                else
-                {
-                    // error message
-                    return redirect( request, errMsg );
-                }
-            }
-    }
+    // @Action( ACTION_PROCESS_WORKFLOW_ACTION )
+    // public String doProcessAction( HttpServletRequest request )
+    // {
+    // int nResourceId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_RESOURCE_ID ) );
+    // int nActionId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_ACTION_ID ) );
+    //
+    // // check and refresh resource if necessary
+    // if ( _candidateidentity == null || ( _candidateidentity.getId( ) != nResourceId ) )
+    // {
+    // Optional<CandidateIdentity> optIdentity = CandidateIdentityHome.findByPrimaryKey( nResourceId );
+    // _candidateidentity = optIdentity.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+    //
+    // _wfBean = _wfBeanService.createWorkflowBean( _candidateidentity, _candidateidentity.getId( ), _candidateidentity.getIdBatch( ), getUser( ) );
+    // }
+    //
+    // // Process the action, and redirect,
+    // // or redirect to the task form if exists
+    //
+    // if ( !_wfBeanService.existsTaskForm( nActionId, getLocale( ) ) )
+    // {
+    // // The task does not need a form
+    // _wfBeanService.processAction( _wfBean, nActionId, request, getLocale( ) );
+    //
+    // return redirect( request, VIEW_IMPORT_CANDIDATEIDENTITY, PARAMETER_ID_CANDIDATEIDENTITY, _wfBean.getResourceId( ) );
+    // }
+    // else
+    // if ( request.getParameter( WorkflowBeanService.PARAMETER_SUBMITTED_TASK_FORM ) == null )
+    // {
+    // // A task form should be displayed
+    // return _wfBeanService.getTaskForm( _wfBean, nActionId, request, getLocale( ), JSP_MANAGE_CANDIDATEIDENTITIES );
+    // }
+    // else
+    // {
+    // // The task form was submitted
+    // String errMsg = _wfBeanService.validateTaskForm( _wfBean, nActionId, request, getLocale( ) );
+    // if ( errMsg == null )
+    // {
+    // return redirect( request, VIEW_IMPORT_CANDIDATEIDENTITY, PARAMETER_ID_CANDIDATEIDENTITY, _wfBean.getResourceId( ) );
+    // }
+    // else
+    // {
+    // // error message
+    // return redirect( request, errMsg );
+    // }
+    // }
+    // }
 
     /**
      * Returns the form to update info about a candidateidentity
@@ -432,7 +432,7 @@ public class CandidateIdentityJspBean extends AbstractManageItemsJspBean<Integer
 
             _wfBean = _wfBeanService.createWorkflowBean( _candidateidentity, _candidateidentity.getId( ), _candidateidentity.getIdBatch( ), getUser( ) );
         }
-        Map<String, Object> model = getModel( );
+        final Map<String, Object> model = getModel( );
 
         // Appel API Recherche
         final IdentitySearchRequest searchRequest = new IdentitySearchRequest( );

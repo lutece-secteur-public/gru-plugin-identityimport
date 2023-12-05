@@ -58,6 +58,7 @@ public class WorkflowBeanService<T> implements Serializable
     private static final String MARK_RESOURCE_ID = "resource_id";
     private static final String MARK_RESOURCE_TYPE_ID = "resource_type_id";
     private static final String MARK_WORKFLOW_ACTION_ID = "action_id";
+    private static final String MARK_WORKFLOW_ACTION_JSP = "workflowAction";
     private static final String TEMPLATE_TASKS_FORM_WORKFLOW = "admin/plugins/workflow/default_task_form_wrapper.html";
 
     public static final String PARAMETER_SUBMITTED_TASK_FORM = "submitted_task_form";
@@ -178,7 +179,7 @@ public class WorkflowBeanService<T> implements Serializable
      * @param strTargetJsp
      * @return the HTML
      */
-    public String getTaskForm( WorkflowBean<T> wfBean, int nAction, HttpServletRequest request, Locale locale, String strTargetJsp )
+    public String getTaskForm( WorkflowBean<T> wfBean, int nAction, HttpServletRequest request, Locale locale, String strTargetJsp, String strWorkflowAction )
     {
         if ( WorkflowService.getInstance( ).isDisplayTasksForm( nAction, locale ) )
         {
@@ -192,6 +193,7 @@ public class WorkflowBeanService<T> implements Serializable
             model.put( MARK_RESOURCE_ID, wfBean.getResourceId( ) );
             model.put( MARK_RESOURCE_TYPE_ID, wfBean.getResourceType( ) );
             model.put( MARK_WORKFLOW_ACTION_ID, nAction );
+            model.put( MARK_WORKFLOW_ACTION_JSP, strWorkflowAction );
 
             HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASKS_FORM_WORKFLOW, locale, model );
 

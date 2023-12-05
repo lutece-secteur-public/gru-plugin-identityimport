@@ -64,7 +64,7 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
     private final static String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity_history SET status = ?, comment = ? WHERE id_wf_resource_history = ?";
 
     private final static String SQL_QUERY_SELECT_ALL = QUERY_SELECT_ALL
-            + " ih JOIN workflow_resource_history rh ON rh.id_history = ih.id_wf_resource_history WHERE rh.id_resource = ?";
+            + " JOIN workflow_resource_history rh ON rh.id_history = ih.id_wf_resource_history WHERE rh.id_resource = ?";
 
     /**
      * {@inheritDoc }
@@ -185,6 +185,7 @@ public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHist
         final List<CandidateIdentityHistory> histories = new ArrayList<>( );
         try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL, plugin ) )
         {
+            daoUtil.setInt( 1, nCandidateIdentityId );
             daoUtil.executeQuery( );
 
             while ( daoUtil.next( ) )

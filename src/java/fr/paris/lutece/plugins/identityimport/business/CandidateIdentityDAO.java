@@ -53,8 +53,9 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
 {
     // Constants
     private static final String ID_LIST = "%{id_list}";
-    private static final String SQL_QUERY_SELECT_ALL = "WITH history AS ( select rh.id_resource, icih.status, icih.comment, max(creation_date) from workflow_resource_history rh left join identityimport_candidate_identity_history icih on icih.id_wf_resource_history = rh.id_history group by rh.id_resource ,icih.status, icih.comment ) "
-            + "SELECT i.id_candidate_identity, i.id_batch, i.connection_id, i.customer_id, i.client_id, ib.app_code, history.status, history.comment FROM identityimport_candidate_identity i JOIN identityimport_batch ib ON i.id_batch = ib.id_batch LEFT JOIN history ON history.id_resource = i.id_candidate_identity";
+    private static final String SQL_QUERY_SELECT_ALL = "WITH filtered_date AS (SELECT max(rh.creation_date) AS creation_date, rh.id_resource FROM workflow_resource_history rh GROUP BY rh.id_resource), "
+            + "     filtered_history AS (SELECT rh.id_resource, icih.status, icih.comment, rh.creation_date FROM workflow_resource_history rh LEFT JOIN identityimport_candidate_identity_history icih ON icih.id_wf_resource_history = rh.id_history JOIN filtered_date ON filtered_date.id_resource = rh.id_resource AND filtered_date.creation_date = rh.creation_date) "
+            + " SELECT i.id_candidate_identity, i.id_batch, i.connection_id, i.customer_id, i.client_id, ib.app_code, filtered_history.status, filtered_history.comment FROM identityimport_candidate_identity i JOIN identityimport_batch ib ON i.id_batch = ib.id_batch LEFT JOIN filtered_history ON filtered_history.id_resource = i.id_candidate_identity ";
     private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE i.id_candidate_identity = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_candidate_identity ( id_batch, connection_id, customer_id, client_id) VALUES ( ?, ?, ?, ?) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_candidate_identity WHERE id_candidate_identity = ? ";

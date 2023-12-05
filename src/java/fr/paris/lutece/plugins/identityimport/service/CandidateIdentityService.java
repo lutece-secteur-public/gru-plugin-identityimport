@@ -36,6 +36,9 @@ package fr.paris.lutece.plugins.identityimport.service;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentity;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribute;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHistory;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.QualityDefinition;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.CandidateIdentityAttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.CandidateIdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.ImportingHistoryDto;
@@ -125,5 +128,33 @@ public class CandidateIdentityService
             } );
         }
         return bean;
+    }
+
+    public IdentityDto getIdentityDto( final CandidateIdentity bean )
+    {
+        if ( bean == null )
+        {
+            return null;
+        }
+        final IdentityDto dto = new IdentityDto( );
+        dto.setCustomerId( bean.getCustomerId( ) );
+        dto.setConnectionId( bean.getConnectionId( ) );
+        dto.setExternalCustomerId( bean.getExternalCustomerId( ) );
+        dto.setMonParisActive( false );
+        final QualityDefinition quality = new QualityDefinition( );
+        quality.setCoverage( 1 );
+        quality.setScoring( 1.0 );
+        quality.setQuality( 1.0 );
+        dto.setQuality( quality );
+
+        bean.getAttributes( ).forEach( attr -> {
+            final AttributeDto attrDto = new AttributeDto( );
+            attrDto.setKey( attr.getCode( ) );
+            attrDto.setValue( attr.getValue( ) );
+            attrDto.setCertifier( attr.getCertProcess( ) );
+            attrDto.setCertificationDate( attr.getCertDate( ) );
+            dto.getAttributes( ).add( attrDto );
+        } );
+        return dto;
     }
 }
