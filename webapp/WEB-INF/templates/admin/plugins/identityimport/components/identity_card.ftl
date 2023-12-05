@@ -67,7 +67,7 @@
                 <#if !merge>
                     <div class="mt-3">
                         <#if index!=0>
-                            <button type="button" class="btn btn-info" data-name="identity-cuid-${index}" data-cuid="${identity.customerId!''}">
+                            <button type="button" class="btn btn-success" data-name="identity-cuid-${index}" data-cuid="${identity.customerId!''}">
                                 ${identity.duplicateDefinition.duplicateSuspicion.duplicateRuleCode!''}
                             </button>
                         <#else>
@@ -126,6 +126,13 @@
                     </li>
                 </#list>
             </ul>
+            <div class="py-4 text-center">
+                <#if index!=0>
+                    <button type="button" class="btn btn-info" data-name="identity-cuid-${index}" data-cuid="${identity.customerId!''}">
+                        #i18n{identityimport.import_identity.selectButton}
+                    </button>
+                </#if>
+            </div>
         </div>
     </div>
 </#macro>
