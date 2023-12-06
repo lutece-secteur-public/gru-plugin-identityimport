@@ -63,6 +63,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class BatchService
@@ -207,6 +208,43 @@ public class BatchService
         }
 
         // return message for daemons
+        return msg;
+    }
+
+    /**
+     * Find newly created batches (limited to batchLimit param) and launch them automatically.
+     *
+     * @param batchLimit
+     *            the limit
+     * @return logs
+     */
+    public StringBuilder launchBatches( final int batchLimit )
+    {
+        final StringBuilder msg = new StringBuilder( );
+        try
+        {
+            final List<Batch> initialStateBatches = BatchHome.findInitialStateBatches( batchLimit );
+            if ( !initialStateBatches.isEmpty( ) )
+            {
+                msg.append( initialStateBatches.size( ) ).append( " initial state batches found" ).append( System.lineSeparator( ) );
+                final int actionId = BatchHome.getBatchInitialActionId( );
+                for ( final Batch batch : initialStateBatches )
+                {
+                    msg.append( "Launching batch : " ).append( batch.toLog( ) ).append( System.lineSeparator( ) );
+                    final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean( batch, batch.getId( ), null );
+                    _wfBatchBeanService.processAutomaticAction( workflowBean, actionId, null, Locale.getDefault( ) );
+                }
+            }
+            else
+            {
+                msg.append( "No initial state batches found." ).append( System.lineSeparator( ) );
+            }
+        }
+        catch( final Exception e )
+        {
+            msg.append( "Error occured while launching batches automatically :: " ).append( System.lineSeparator( ) ).append( e.getMessage( ) )
+                    .append( System.lineSeparator( ) );
+        }
         return msg;
     }
 

@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
+import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceList;
@@ -108,6 +109,17 @@ public interface IBatchDAO
     List<Batch> selectExpiredBatchsList( final int batchLimit, Plugin plugin );
 
     /**
+     * Load the data of all the batches in the initial workflow state and returns them as a list
+     * 
+     * @param batchLimit
+     *            the limit
+     * @param plugin
+     *            the plugin
+     * @return batches in the initial workflow state
+     */
+    List<Batch> selectInitialStateBatches( final int batchLimit, final Plugin plugin );
+
+    /**
      * Load the id of all the batch objects that are in given state and returns them as a list
      *
      * @param batchStateId
@@ -149,4 +161,13 @@ public interface IBatchDAO
     int countIdentities( int resourceId, Plugin plugin );
 
     List<ResourceHistory> getBatchHistory( final int batchId, final Plugin plugin );
+
+    /**
+     * Get the id of the action for batches in initial state
+     * 
+     * @param plugin
+     *            the plugin
+     * @return the action id
+     */
+    int getBatchInitialActionId( final Plugin plugin ) throws IdentityStoreException;
 }

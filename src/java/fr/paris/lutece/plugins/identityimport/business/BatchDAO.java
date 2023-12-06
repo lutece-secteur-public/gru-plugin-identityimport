@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
+import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -71,6 +72,10 @@ public final class BatchDAO implements IBatchDAO
     private static final String SQL_QUERY_COUNT_IDENTITIES = "SELECT count(identity.id_resource) FROM workflow_resource_workflow identity WHERE identity.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' and identity.id_external_parent = ?";
 
     private static final String SQL_QUERY_SELECT_BATCH_HISTORY = "SELECT a.name, a.description, h.creation_date, h.user_access_code FROM workflow_resource_history h JOIN workflow_action a ON a.id_action = h.id_action WHERE h.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' AND h.id_resource = ?";
+
+    private static final String SQL_QUERY_SELECT_INITIAL_STATE_BATCHES = "SELECT " + BATCH_SELECT_FIELDS
+            + " FROM identityimport_batch b JOIN workflow_resource_workflow r ON b.id_batch = r.id_resource AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' JOIN workflow_state s ON s.id_state = r.id_state WHERE s.is_initial_state = 1 ";
+    private static final String SQL_QUERY_SELECT_BATCHES_INITIAL_ACTION_ID = "SELECT sb.id_action FROM workflow_action_state_before sb JOIN workflow_state s ON s.id_state = sb.id_state_before AND s.is_initial_state = 1 JOIN workflow_resource_workflow r ON r.id_workflow = s.id_workflow AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE'";
 
     /**
      * {@inheritDoc }
@@ -266,6 +271,29 @@ public final class BatchDAO implements IBatchDAO
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Batch> selectInitialStateBatches( final int batchLimit, final Plugin plugin )
+    {
+        final List<Batch> batchList = new ArrayList<>( );
+        final StringBuilder query = new StringBuilder( SQL_QUERY_SELECT_INITIAL_STATE_BATCHES );
+        if ( batchLimit > 0 )
+        {
+            query.append( " LIMIT " ).append( batchLimit );
+        }
+        try ( DAOUtil daoUtil = new DAOUtil( query.toString( ), plugin ) )
+        {
+            daoUtil.executeQuery( );
+            while ( daoUtil.next( ) )
+            {
+                batchList.add( getBatch( daoUtil ) );
+            }
+            return batchList;
+        }
+    }
+
     @Override
     public Batch selectBatchByReference( final Plugin plugin, final String reference )
     {
@@ -403,6 +431,22 @@ public final class BatchDAO implements IBatchDAO
             }
         }
         return list;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getBatchInitialActionId( final Plugin plugin ) throws IdentityStoreException
+    {
+        try ( final DAOUtil daoUtil = new DAOUtil(SQL_QUERY_SELECT_BATCHES_INITIAL_ACTION_ID, plugin ) )
+        {
+            daoUtil.executeQuery( );
+            if ( daoUtil.next( ) )
+            {
+                return daoUtil.getInt( 1 );
+            }
+        }
+        throw new IdentityStoreException( "The initial state for batches doesn't have any linked action." );
     }
 
     private Batch getBatch( final DAOUtil daoUtil )

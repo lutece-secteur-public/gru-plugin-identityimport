@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
+import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
@@ -166,6 +167,18 @@ public final class BatchHome
         return _dao.selectExpiredBatchsList( batchLimit, _plugin );
     }
 
+    /**
+     * Load the data of all the batches in the initial workflow state and returns them as a list
+     * 
+     * @param batchLimit
+     *            the limit
+     * @return batches in the initial workflow state
+     */
+    public static List<Batch> findInitialStateBatches( final int batchLimit )
+    {
+        return _dao.selectInitialStateBatches( batchLimit, _plugin );
+    }
+
     public static List<ResourceState> getBatchStates( final String filterAppCode )
     {
         return _dao.selectBatchStates( filterAppCode, _plugin );
@@ -184,5 +197,15 @@ public final class BatchHome
     public static List<ResourceHistory> getBatchHistory( final int batchId )
     {
         return _dao.getBatchHistory( batchId, _plugin );
+    }
+
+    /**
+     * Get the id of the action for batches in initial state
+     * 
+     * @return the action id
+     */
+    public static int getBatchInitialActionId( ) throws IdentityStoreException
+    {
+        return _dao.getBatchInitialActionId( _plugin );
     }
 }

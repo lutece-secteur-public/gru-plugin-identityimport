@@ -74,6 +74,12 @@
             <daemon-description>identityimport.batch.daemon.purgeDaemon.description</daemon-description>
             <daemon-class>fr.paris.lutece.plugins.identityimport.task.BatchPurgeDaemon</daemon-class>
         </daemon>
+        <daemon>
+            <daemon-id>daemon.launch.batch</daemon-id>
+            <daemon-name>identityimport.daemon.batch.lauchDaemon.name</daemon-name>
+            <daemon-description>identityimport.batch.daemon.lauchDaemon.description</daemon-description>
+            <daemon-class>fr.paris.lutece.plugins.identityimport.task.BatchLaunchDaemon</daemon-class>
+        </daemon>
     </daemons>
     
 
