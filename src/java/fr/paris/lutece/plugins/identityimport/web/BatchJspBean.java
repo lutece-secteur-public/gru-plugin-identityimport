@@ -366,14 +366,16 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         final Map<String, Object> model = getModel( );
         // init attributes key list
         final List<String> keyList = _candidateidentity.getAttributes( ).stream( ).map( CandidateIdentityAttribute::getCode ).collect( Collectors.toList( ) );
-        final String selectedCustomerId = request.getParameter(PARAMETER_SELECTED_CUSTOMER_ID);
+        final String selectedCustomerId = request.getParameter( PARAMETER_SELECTED_CUSTOMER_ID );
         try
         {
-            final IdentitySearchResponse response = identityService.getIdentity( selectedCustomerId, _candidateidentity.getClientAppCode( ), this.buildAuthor( ) );
-            if ( ResponseStatusFactory.ok( ).equals( response.getStatus() ) ) {
-                keyList.addAll(response.getIdentities().stream().flatMap(duplicate -> duplicate.getAttributes().stream()).map(AttributeDto::getKey)
-                        .distinct().collect(Collectors.toList()));
-                model.put(MARK_IDENTITY_TO_MERGE, response.getIdentities().get(0));
+            final IdentitySearchResponse response = identityService.getIdentity( selectedCustomerId, _candidateidentity.getClientAppCode( ),
+                    this.buildAuthor( ) );
+            if ( ResponseStatusFactory.ok( ).equals( response.getStatus( ) ) )
+            {
+                keyList.addAll( response.getIdentities( ).stream( ).flatMap( duplicate -> duplicate.getAttributes( ).stream( ) ).map( AttributeDto::getKey )
+                        .distinct( ).collect( Collectors.toList( ) ) );
+                model.put( MARK_IDENTITY_TO_MERGE, response.getIdentities( ).get( 0 ) );
             }
         }
         catch( IdentityStoreException e )
