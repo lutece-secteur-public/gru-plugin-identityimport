@@ -1,5 +1,5 @@
 <#-- static files -->
-<link href="css/admin/plugins/identitymediation/import.css" rel="stylesheet" />
+<link href="css/admin/plugins/identityimport/import.css" rel="stylesheet" />
 
 <#-- 
   Retrieves the name associated with a given keyName in the list of attribute definitions.
