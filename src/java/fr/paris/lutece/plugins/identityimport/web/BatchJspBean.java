@@ -702,8 +702,16 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         {
             // The task does not need a form
             _wfIdentitiesBeanService.processAction( _wfCandidateIdentityBean, nActionId, request, getLocale( ) );
+            final int batchId = _wfCandidateIdentityBean.getExternalParentId( );
+            Optional<Batch> optBatch = BatchHome.findByPrimaryKey( batchId );
+            _batch = optBatch.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+            _wfBatchBean = _wfBatchBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
 
-            return redirect( request, VIEW_IMPORT_CANDIDATEIDENTITY, PARAMETER_ID_CANDIDATEIDENTITY, _wfCandidateIdentityBean.getResourceId( ) );
+            final Map<String, String> params = new HashMap<>( );
+            params.put( PARAMETER_ID_BATCH_STATE, String.valueOf( _wfBatchBean.getState( ).getId( ) ) );
+            params.put( PARAMETER_ID_BATCH, String.valueOf( batchId ) );
+
+            return redirect( request, VIEW_MANAGE_IDENTITIES, params );
         }
         else
             if ( request.getParameter( WorkflowBeanService.PARAMETER_SUBMITTED_TASK_FORM ) == null )

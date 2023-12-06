@@ -282,7 +282,7 @@ public class BatchService
         }
 
         response.setBatchStatus( batchStatus );
-        response.setStatus( ResponseStatusFactory.success( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION )
+        response.setStatus( ResponseStatusFactory.ok( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION )
                 .setMessage( "Status du batch récupéré avec succès" ) );
         return response;
     }

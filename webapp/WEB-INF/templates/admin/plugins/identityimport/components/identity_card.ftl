@@ -8,7 +8,7 @@
   @param width Optional width for the card.
   @returns A rendered identity card based on provided parameters.
 -->
-<#macro identityCard identity index merge=false class="" width="">
+<#macro identityCard identity identity_workflow index merge=false class="" width="">
     <#assign familyNameAttr = identity.attributes?filter(a -> a.key == "family_name")?first!{}>
     <#assign firstNameAttr = identity.attributes?filter(a -> a.key == "first_name")?first!{}>
     <#assign emailAttr = identity.attributes?filter(a -> a.key == "email")?first!{}>
@@ -128,9 +128,20 @@
             </ul>
             <div class="py-4 text-center">
                 <#if index!=0>
-                    <button type="button" class="btn btn-info" data-name="identity-cuid-${index}" data-cuid="${identity.customerId!''}">
-                        #i18n{identityimport.import_identity.selectButton}
-                    </button>
+<#--                    <button type="button" class="btn btn-info" data-name="identity-cuid-${index}" data-cuid="${identity.customerId!''}">-->
+<#--                        #i18n{identityimport.import_identity.selectButton}-->
+<#--                    </button>-->
+                    <#list identity_workflow.actions as action >
+                        <#if action.id == 6>
+                            <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processIdentityAction&action_id=${action.id}&id=${identity_workflow.resource.id}&customer_id=${identity.customerId}" title="${action.name}" alt="${action.name}"/>
+                        </#if>
+                    </#list>
+                <#else>
+                    <#list identity_workflow.actions as action >
+                        <#if action.id == 4>
+                            <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processIdentityAction&action_id=${action.id}&id=${identity_workflow.resource.id}" title="${action.name}" alt="${action.name}"/>
+                        </#if>
+                    </#list>
                 </#if>
             </div>
         </div>
