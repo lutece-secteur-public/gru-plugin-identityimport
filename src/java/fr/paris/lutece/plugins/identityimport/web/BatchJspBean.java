@@ -53,6 +53,9 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.RequestAuthor;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.DuplicateSearchRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.DuplicateSearchResponse;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.IdentitySearchResponse;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
+import fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.message.AdminMessage;
@@ -96,11 +99,13 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String TEMPLATE_MODIFY_BATCH = "/admin/plugins/identityimport/modify_batch.html";
     private static final String TEMPLATE_PROCESS_BATCH = "/admin/plugins/identityimport/process_batch.html";
     private static final String TEMPLATE_IMPORT_CANDIDATE_IDENTITY = "/admin/plugins/identityimport/import_candidateidentity.html";
+    private static final String TEMPLATE_RESOLVE_DUPLICATES = "/admin/plugins/identityimport/resolve_duplicates.html";
     private static final String JSP_MANAGE_CANDIDATEIDENTITIES = "jsp/admin/plugins/identityimport/ManageBatchs.jsp";
 
     // Parameters
     private static final String PARAMETER_ID_BATCH = "id_batch";
     private static final String PARAMETER_ID_CANDIDATEIDENTITY = "id_identity";
+    private static final String PARAMETER_SELECTED_CUSTOMER_ID = "selected_customer_id";
     private static final String PARAMETER_RETURN_URL = "return_url";
     private static final String PARAMETER_ID_BATCH_STATE = "id_state";
     private static final String PARAMETER_ID_ACTION = "id_action";
@@ -120,6 +125,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE = "identityimport.listItems.itemsPerPage";
     private static final String PROPERTY_PAGE_TITLE_IMPORT_CANDIDATEIDENTITY = "identityimport.import_candidateidentity.pageTitle";
     private static final String PROPERTY_DUPLICATE_RULES = "identityimport.duplicate.search.rules";
+    private static final String PROPERTY_PAGE_TITLE_RESOLVE_DUPLICATES = "identityimport.resolve_duplicates.pageTitle";
 
     // Markers
     private static final String MARK_BATCH_LIST = "batch_list";
@@ -137,6 +143,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String MARK_CANDIDATE_IDENTITY_DUPLICATE_LIST = "duplicate_list";
     private static final String MARK_CANDIDATE_IDENTITY = "identity";
     private static final String MARK_CANDIDATE_IDENTITY_WORKFLOW = "identity_workflow";
+    private static final String MARK_IDENTITY_TO_MERGE = "identity_to_merge";
     private static final String MARK_ATTRIBUTE_KEY_LIST = "key_list";
     private static final String MARK_RETURN_URL = "return_url";
 
@@ -155,6 +162,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String VIEW_MODIFY_BATCH = "modifyBatch";
     private static final String VIEW_PROCESS_BATCH = "processBatch";
     private static final String VIEW_IMPORT_CANDIDATEIDENTITY = "importCandidateIdentity";
+    private static final String VIEW_RESOLVE_DUPLICATES = "resolveDuplicates";
 
     // Actions
     private static final String ACTION_IMPORT_BATCH = "importBatch";
@@ -203,6 +211,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
     // Services
     private final IdentityQualityService identityQualityService = SpringContextService.getBean( "qualityService.rest" );
+    private final IdentityService identityService = SpringContextService.getBean( "identityService.rest" );
     private final List<String> DUPLICATE_RULE_CODES = Arrays.asList( AppPropertiesService.getProperty( PROPERTY_DUPLICATE_RULES, "" ).split( "," ) );
 
     /**
@@ -331,6 +340,63 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         model.put( MARK_ATTRIBUTE_KEY_LIST, keyList.stream( ).distinct( ).collect( Collectors.toList( ) ) );
 
         return getPage( PROPERTY_PAGE_TITLE_IMPORT_CANDIDATEIDENTITY, TEMPLATE_IMPORT_CANDIDATE_IDENTITY, model );
+    }
+
+    /**
+     * Returns the form to manually resolve an identity duplicates
+     *
+     * @param request
+     *            The Http request
+     * @return the html code of the form
+     */
+    @View( value = VIEW_RESOLVE_DUPLICATES )
+    public String getResolveDuplicates( final HttpServletRequest request )
+    {
+        final Optional<String> idIdentityOpt = Optional.ofNullable( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
+        idIdentityOpt.ifPresent( idIdentity -> {
+            _currentIdentityId = Integer.parseInt( idIdentity );
+            final Optional<CandidateIdentity> optCandidateIdentity = CandidateIdentityHome.findByPrimaryKey( _currentIdentityId );
+            _candidateidentity = optCandidateIdentity.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+            _candidateidentity.setAttributes( CandidateIdentityAttributeHome.getCandidateIdentityAttributesList( _currentIdentityId ) );
+            _wfCandidateIdentityBean = _wfIdentitiesBeanService.createWorkflowBean( _candidateidentity, _candidateidentity.getId( ),
+                    _candidateidentity.getIdBatch( ), getUser( ) );
+            _wfIdentitiesBeanService.addHistory( _wfCandidateIdentityBean, request, getLocale( ) );
+        } );
+
+        final Map<String, Object> model = getModel( );
+        // init attributes key list
+        final List<String> keyList = _candidateidentity.getAttributes( ).stream( ).map( CandidateIdentityAttribute::getCode ).collect( Collectors.toList( ) );
+        final String selectedCustomerId = request.getParameter(PARAMETER_SELECTED_CUSTOMER_ID);
+        try
+        {
+            final IdentitySearchResponse response = identityService.getIdentity( selectedCustomerId, _candidateidentity.getClientAppCode( ), this.buildAuthor( ) );
+            if ( ResponseStatusFactory.ok( ).equals( response.getStatus() ) ) {
+                keyList.addAll(response.getIdentities().stream().flatMap(duplicate -> duplicate.getAttributes().stream()).map(AttributeDto::getKey)
+                        .distinct().collect(Collectors.toList()));
+                model.put(MARK_IDENTITY_TO_MERGE, response.getIdentities().get(0));
+            }
+        }
+        catch( IdentityStoreException e )
+        {
+            this.addInfo( e.getLocalizedMessage( ), getLocale( ) );
+        }
+
+        final Optional<String> returnUrlOpt = Optional.ofNullable( request.getParameter( PARAMETER_RETURN_URL ) );
+        returnUrlOpt.ifPresent( url -> {
+            final String idState = request.getParameter( PARAMETER_ID_BATCH_STATE );
+            final String idBatch = request.getParameter( PARAMETER_ID_BATCH );
+            final String batchPage = request.getParameter( PARAMETER_BATCH_PAGE );
+            final String applicationCode = request.getParameter( PARAMETER_FILTER_APP_CODE );
+            final String returnUrl = String.format( "%s&%s=%s&%s=%s&%s=%s&%s=%s", url, PARAMETER_ID_BATCH_STATE, idState, PARAMETER_ID_BATCH, idBatch,
+                    PARAMETER_BATCH_PAGE, batchPage, PARAMETER_FILTER_APP_CODE, applicationCode );
+            model.put( MARK_RETURN_URL, returnUrl );
+        } );
+
+        model.put( MARK_CANDIDATE_IDENTITY_WORKFLOW, _wfCandidateIdentityBean );
+        model.put( MARK_CANDIDATE_IDENTITY, CandidateIdentityService.instance( ).getIdentityDto( _wfCandidateIdentityBean.getResource( ) ) );
+        model.put( MARK_ATTRIBUTE_KEY_LIST, keyList.stream( ).distinct( ).collect( Collectors.toList( ) ) );
+
+        return getPage( PROPERTY_PAGE_TITLE_RESOLVE_DUPLICATES, TEMPLATE_RESOLVE_DUPLICATES, model );
     }
 
     /**

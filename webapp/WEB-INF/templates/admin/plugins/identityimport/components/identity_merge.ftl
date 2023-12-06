@@ -21,21 +21,13 @@
 <#macro identityMerge>
     <div id="lutece-merge" class="p-0 m-0 position-absolute start-50 translate-middle-x z-2" style="width:100px;">
 		<ul class="list-group list-group-flush">
-			<li class="position-relative d-flex justify-content-center align-items-center" style="height:155px;">
-				<div class="position-absolute top-50 start-0 end-0 bg-dark border-top border-primary-subtle mediation-line-merge" style="z-index:-1"></div>
-				<div class="text-center w-100">
-					<a href="jsp/admin/plugins/identitymediation/IdentityDuplicate.jsp?action_swapIdentities&cuid=${identity_to_keep.customerId}&code=${current_rule_code}&page=${current_page}&identity-cuid-1=${identity_to_keep.customerId}&identity-cuid-2=${identity_to_merge.customerId}" class="btn btn-rounded border-primary-subtle btn-light m-auto mediation-btn-merge" data-bs-toggle="tooltip" data-bs-placement="top" title="Inverser">
-						<i class="ti ti-switch-horizontal"></i>
-					</a>
-				</div>
-			</li>
-			<#list service_contract.attributeDefinitions?filter(a -> a.attributeRight.readable) as readableAttr>
-				<li class="list-group-item text-center d-flex justify-content-center align-items-center border-0" data-name="${readableAttr.name}" style="min-height:55px">
-					<#assign attributesList = identity_to_merge.attributes?filter(a -> a.key == readableAttr.keyName)>
+			<#list key_list as current_key >
+				<li class="list-group-item text-center d-flex justify-content-center align-items-center border-0" data-name="${current_key}" style="min-height:55px">
+					<#assign attributesList = identity_to_merge.attributes?filter(a -> a.key == current_key)>
 					<#if attributesList?size gt 0>
 						<#list attributesList as attr>
-							<#assign attrToKeep = (identity_to_keep.attributes?filter(a -> a.key == readableAttr.keyName)?first)!{} >
-							<#if (!identity_to_keep.monParisActive && !identity_to_merge.monParisActive && identity_to_keep.attributes?filter(a -> a.key == readableAttr.keyName)?size == 1 && readableAttr.attributeRight.writable && (attrToKeep?exists && attr.certificationLevel > (attrToKeep.certificationLevel)!0) ) || attrToKeep?size == 0 >
+							<#assign attrToKeep = (identity.attributes?filter(a -> a.key == current_key)?first)!{} >
+							<#if (!identity.monParisActive && !identity_to_merge.monParisActive && identity.attributes?filter(a -> a.key == current_key)?size == 1 && (attrToKeep?? && attr.certificationLevel > (attrToKeep.certificationLevel)!0) ) || attrToKeep?size == 0 >
 								<div class="position-absolute top-50 start-0 end-0 bg-dark border-top border-primary-subtle mediation-line-merge" style="z-index:-1"></div>
 								<div class="text-center w-100">
 									<@button class='btn btn-rounded border-primary-subtle btn-light m-auto mediation-btn-merge' color='-' buttonIcon='arrow-left' params=' data-key="${attr.key}" data-value="${attr.value}" data-certif="${attr.certifier}" data-certifdate="${attr.certificationDate?date}" data-timestamp-certif="${attr.certificationDate?long}"' />  

@@ -136,6 +136,9 @@
                             <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processIdentityAction&action_id=${action.id}&id=${identity_workflow.resource.id}&customer_id=${identity.customerId}" title="${action.name}" alt="${action.name}"/>
                         </#if>
                     </#list>
+                    <a class="btn btn-outline-primary" href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_resolveDuplicates=&id_identity=${identity_workflow.resource.id}&selected_customer_id=${identity.customerId}">
+                        <i class="ti ti-arrow-big-left-filled"></i> #i18n{identityimport.select_identities.buttonMergeDuplicate}
+                    </a>
                 <#else>
                     <#list identity_workflow.actions as action >
                         <#if action.id == 4>
