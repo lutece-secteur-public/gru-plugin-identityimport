@@ -702,7 +702,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             return redirectView( request, VIEW_IMPORT_BATCH );
         }
 
-        return redirect( request, VIEW_MODIFY_BATCH, PARAMETER_ID_BATCH, batchId );
+        return redirect( request, VIEW_MANAGE_BATCHS, PARAMETER_ID_BATCH, batchId );
     }
 
     /**

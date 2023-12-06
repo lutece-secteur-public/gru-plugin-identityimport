@@ -102,12 +102,13 @@ public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
         final ServiceContractDto activeServiceContract = ServiceContractService.instance( ).getActiveServiceContract( clientAppCode );
         if ( activeServiceContract == null )
         {
-            response.setStatus( ResponseStatusFactory.notFound( ).setMessageKey( Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND ) );
+            response.setStatus( ResponseStatusFactory.unauthorized( ).setMessageKey( Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND ) );
+            response.getStatus().setMessage("Unauthorized Client code " + clientAppCode);
             return response;
         }
         if ( !activeServiceContract.isAuthorizedImport( ) )
         {
-            response.setStatus( ResponseStatusFactory.unauthorized( ).setMessageKey( Constants.PROPERTY_REST_ERROR_IMPORT_UNAUTHORIZED ) );
+            response.setStatus( ResponseStatusFactory.failure( ).setMessageKey( Constants.PROPERTY_REST_ERROR_IMPORT_UNAUTHORIZED ) );
             return response;
         }
         final BatchDto batch = _request.getBatch( );

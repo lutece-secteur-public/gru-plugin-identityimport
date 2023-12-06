@@ -50,9 +50,6 @@ public class Batch implements Serializable
 
     // Variables declarations
     private int _nId;
-
-    @NotEmpty( message = "#i18n{identityimport.validation.batch.Reference.notEmpty}" )
-    @Size( max = 255, message = "#i18n{identityimport.validation.Reference.User.size}" )
     private String _strReference;
 
     @NotNull( message = "#i18n{portal.validation.message.notEmpty}" )

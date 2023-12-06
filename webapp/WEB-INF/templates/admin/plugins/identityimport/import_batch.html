@@ -21,7 +21,7 @@
 			<@input type='text' id='comment' name='comment'  value='${batch.comment!\'\'}' tabIndex='4' disabled=(!newImport) />
 		</@formGroup>
 		<@formGroup labelFor='csvFile' labelKey='#i18n{identityimport.import_batch.labelCsvFile}' mandatory=true>
-			<@input type='file' id='csvFile' name='csvFile'  value='${batch.reference!\'\'}' tabIndex='5' />
+			<@input type='file' id='csvFile' name='csvFile'  tabIndex='5' />
 		</@formGroup>
 
 		<div id="report-container" class="my-3">
