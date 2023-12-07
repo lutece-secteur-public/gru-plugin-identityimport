@@ -213,6 +213,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private final IdentityQualityService identityQualityService = SpringContextService.getBean( "qualityService.rest" );
     private final IdentityService identityService = SpringContextService.getBean( "identityService.rest" );
     private final List<String> DUPLICATE_RULE_CODES = Arrays.asList( AppPropertiesService.getProperty( PROPERTY_DUPLICATE_RULES, "" ).split( "," ) );
+    private static final int NB_ITEMS_PER_PAGES = AppPropertiesService.getPropertyInt(PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 10);
 
     /**
      * Build the Manage View
@@ -238,7 +239,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return The page
      */
     @View( value = VIEW_MANAGE_IDENTITIES )
-    public String getManageBatchIdentities( HttpServletRequest request )
+    public String getManageBatchIdentities( final HttpServletRequest request )
     {
         this.globalInit( request );
         this.unregisterFeed( );
@@ -248,21 +249,20 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             _currentBatchId = Integer.parseInt( idBatch );
             _identitiesCurrentPage = Optional.ofNullable( request.getParameter( IDENTITIES_PARAMETER_PAGE ) ).map( Integer::parseInt ).orElse( 1 );
             _listIdCandidateIdentities = CandidateIdentityHome.getIdCandidateIdentitiesList( _currentBatchId );
-            final int nbItemsPerPages = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 10 );
             final int totalRecords = _listIdCandidateIdentities.size( );
-            _identitiesTotalPages = (int) Math.ceil( (double) totalRecords / nbItemsPerPages );
+            _identitiesTotalPages = (int) Math.ceil( (double) totalRecords / NB_ITEMS_PER_PAGES );
             if ( _identitiesTotalPages == 0 )
             {
                 _identitiesTotalPages = 1;
             }
 
-            final int start = ( _identitiesCurrentPage - 1 ) * nbItemsPerPages;
-            final int end = Math.min( start + nbItemsPerPages, totalRecords );
+            final int start = ( _identitiesCurrentPage - 1 ) * NB_ITEMS_PER_PAGES;
+            final int end = Math.min( start + NB_ITEMS_PER_PAGES, totalRecords );
             _listIdCandidateIdentities = _listIdCandidateIdentities.subList( start, end );
 
             if ( _batch == null || ( _batch.getId( ) != _currentBatchId ) )
             {
-                Optional<Batch> optBatch = BatchHome.findByPrimaryKey( _currentBatchId );
+                final Optional<Batch> optBatch = BatchHome.findByPrimaryKey( _currentBatchId );
                 _batch = optBatch.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
             }
 
@@ -287,7 +287,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return The HTML form to update info
      */
     @View( VIEW_IMPORT_CANDIDATEIDENTITY )
-    public String getImportCandidateIdentity( HttpServletRequest request )
+    public String getImportCandidateIdentity( final HttpServletRequest request )
     {
         final Optional<String> idIdentityOpt = Optional.ofNullable( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
         idIdentityOpt.ifPresent( idIdentity -> {
@@ -408,7 +408,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return the populated list of items corresponding to the id List
      */
     @Override
-    protected List<WorkflowBean<Batch>> getItemsFromIds( List<Integer> listIds )
+    protected List<WorkflowBean<Batch>> getItemsFromIds( final List<Integer> listIds )
     {
         final List<Batch> listBatch = BatchHome.getBatchsListByIds( listIds );
 
@@ -452,12 +452,12 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return the html code of the batch form
      */
     @View( VIEW_CREATE_BATCH )
-    public String getCreateBatch( HttpServletRequest request )
+    public String getCreateBatch( final HttpServletRequest request )
     {
         _batch = ( _batch != null ) ? _batch : new Batch( );
-        unregisterFeed( );
+        this.unregisterFeed( );
 
-        Map<String, Object> model = getModel( );
+        final Map<String, Object> model = getModel( );
         model.put( MARK_BATCH, _batch );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_BATCH ) );
 
@@ -473,9 +473,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @throws AccessDeniedException
      */
     @Action( ACTION_CREATE_BATCH )
-    public String doCreateBatch( HttpServletRequest request ) throws AccessDeniedException
+    public String doCreateBatch( final HttpServletRequest request ) throws AccessDeniedException
     {
-        populate( _batch, request, getLocale( ) );
+        this.populate( _batch, request, getLocale( ) );
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_BATCH ) )
         {
@@ -483,14 +483,14 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         }
 
         // Check constraints
-        if ( !validateBean( _batch, VALIDATION_ATTRIBUTES_PREFIX ) )
+        if ( !this.validateBean( _batch, VALIDATION_ATTRIBUTES_PREFIX ) )
         {
             return redirectView( request, VIEW_CREATE_BATCH );
         }
 
         BatchHome.create( _batch );
-        addInfo( INFO_BATCH_CREATED, getLocale( ) );
-        resetListId( );
+        this.addInfo( INFO_BATCH_CREATED, getLocale( ) );
+        this.resetListId( );
 
         _wfBatchBean = _wfBatchBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
 
@@ -505,13 +505,13 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return the html code to confirm
      */
     @Action( ACTION_CONFIRM_REMOVE_BATCH )
-    public String getConfirmRemoveBatch( HttpServletRequest request )
+    public String getConfirmRemoveBatch( final HttpServletRequest request )
     {
-        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
-        UrlItem url = new UrlItem( getActionUrl( ACTION_REMOVE_BATCH ) );
+        final int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
+        final UrlItem url = new UrlItem( getActionUrl( ACTION_REMOVE_BATCH ) );
         url.addParameter( PARAMETER_ID_BATCH, nId );
 
-        String strMessageUrl = AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_BATCH, url.getUrl( ), AdminMessage.TYPE_CONFIRMATION );
+        final String strMessageUrl = AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_BATCH, url.getUrl( ), AdminMessage.TYPE_CONFIRMATION );
 
         return redirect( request, strMessageUrl );
     }
@@ -524,13 +524,13 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return the jsp URL to display the form to manage batchs
      */
     @Action( ACTION_REMOVE_BATCH )
-    public String doRemoveBatch( HttpServletRequest request )
+    public String doRemoveBatch( final HttpServletRequest request )
     {
-        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
+        final int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
 
         BatchHome.remove( nId );
-        addInfo( INFO_BATCH_REMOVED, getLocale( ) );
-        resetListId( );
+        this.addInfo( INFO_BATCH_REMOVED, getLocale( ) );
+        this.resetListId( );
 
         _batch = null;
         _wfBatchBean = null;
@@ -546,14 +546,14 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return The HTML form to update info
      */
     @View( VIEW_MODIFY_BATCH )
-    public String getModifyBatch( HttpServletRequest request )
+    public String getModifyBatch( final HttpServletRequest request )
     {
-        unregisterFeed( );
-        int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
+        this.unregisterFeed( );
+        final int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
 
         if ( _batch == null || ( _batch.getId( ) != nId ) )
         {
-            Optional<Batch> optBatch = BatchHome.findByPrimaryKey( nId );
+            final Optional<Batch> optBatch = BatchHome.findByPrimaryKey( nId );
             _batch = optBatch.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
         }
 
@@ -564,7 +564,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
         _wfBatchBeanService.addHistory( _wfBatchBean, request, getLocale( ) );
 
-        Map<String, Object> model = getModel( );
+        final Map<String, Object> model = getModel( );
         model.put( MARK_BATCH, _wfBatchBean );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_BATCH ) );
 
@@ -580,9 +580,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @throws AccessDeniedException
      */
     @Action( ACTION_MODIFY_BATCH )
-    public String doModifyBatch( HttpServletRequest request ) throws AccessDeniedException
+    public String doModifyBatch( final HttpServletRequest request ) throws AccessDeniedException
     {
-        populate( _batch, request, getLocale( ) );
+        this.populate( _batch, request, getLocale( ) );
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_MODIFY_BATCH ) )
         {
@@ -596,8 +596,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         }
 
         BatchHome.update( _batch );
-        addInfo( INFO_BATCH_UPDATED, getLocale( ) );
-        resetListId( );
+        this.addInfo( INFO_BATCH_UPDATED, getLocale( ) );
+        this.resetListId( );
 
         return redirectView( request, VIEW_MANAGE_BATCHS );
     }
@@ -611,9 +611,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @throws AccessDeniedException
      */
     @View( VIEW_IMPORT_BATCH )
-    public String getViewImportBatch( HttpServletRequest request ) throws AccessDeniedException
+    public String getViewImportBatch( final HttpServletRequest request ) throws AccessDeniedException
     {
-        registerFeed( );
+        this.registerFeed( );
         _batch = ( _batch != null ) ? _batch : new Batch( );
 
         final Map<String, Object> model = getModel( );
@@ -634,14 +634,14 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @throws AccessDeniedException
      */
     @View( VIEW_COMPLETE_BATCH )
-    public String getViewCompletetBatch( HttpServletRequest request ) throws AccessDeniedException
+    public String getViewCompletetBatch( final HttpServletRequest request ) throws AccessDeniedException
     {
-        registerFeed( );
+        this.registerFeed( );
         final int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
         final Optional<Batch> batch = BatchHome.getBatch( nId );
         if ( !batch.isPresent( ) )
         {
-            addError( "Aucun batch n'a pu être trouvé avec l'id " + nId );
+            this.addError( "Aucun batch n'a pu être trouvé avec l'id " + nId );
             return redirectView( request, VIEW_MANAGE_BATCHS );
         }
 
@@ -665,7 +665,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @throws AccessDeniedException
      */
     @Action( ACTION_IMPORT_BATCH )
-    public String doImportBatch( HttpServletRequest request ) throws AccessDeniedException
+    public String doImportBatch( final HttpServletRequest request ) throws AccessDeniedException
     {
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_BATCH ) )
         {
@@ -676,7 +676,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
         try
         {
-            populate( _batch, request, getLocale( ) );
+            this.populate( _batch, request, getLocale( ) );
             final MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
             final FileItem fileItem = multipartRequest.getFile( PARAMETER_CSV_FILE );
 
@@ -695,12 +695,12 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
             batchId = BatchService.instance( ).importBatch( batchDto, getUser( ), _feedToken );
 
-            addInfo( INFO_BATCH_CREATED, getLocale( ) );
-            resetListId( );
+            this.addInfo( INFO_BATCH_CREATED, getLocale( ) );
+            this.resetListId( );
         }
         catch( IdentityStoreException | IOException e )
         {
-            addError( e.getMessage( ) );
+            this.addError( e.getMessage( ) );
             return redirectView( request, VIEW_IMPORT_BATCH );
         }
 
@@ -715,7 +715,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return the jsp URL to display the form to manage batchs
      */
     @Action( ACTION_PROCESS_BATCH_WORKFLOW_ACTION )
-    public String doProcessBatchAction( HttpServletRequest request )
+    public String doProcessBatchAction( final HttpServletRequest request )
     {
         final int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );
         final int nAction = Integer.parseInt( request.getParameter( PARAMETER_ID_ACTION ) );
@@ -723,7 +723,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
         if ( _batch == null || ( _batch.getId( ) != nId ) )
         {
-            Optional<Batch> optBatch = BatchHome.findByPrimaryKey( nId );
+            final Optional<Batch> optBatch = BatchHome.findByPrimaryKey( nId );
             _batch = optBatch.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
 
             _wfBatchBean = _wfBatchBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
@@ -748,15 +748,15 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return the jsp URL to display the form to manage batchs
      */
     @Action( ACTION_PROCESS_IDENTITY_WORKFLOW_ACTION )
-    public String doProcessIdentityAction( HttpServletRequest request )
+    public String doProcessIdentityAction( final HttpServletRequest request )
     {
-        int nResourceId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_RESOURCE_ID ) );
-        int nActionId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_ACTION_ID ) );
+        final int nResourceId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_RESOURCE_ID ) );
+        final int nActionId = Integer.parseInt( request.getParameter( WorkflowBeanService.PARAMETER_ACTION_ID ) );
 
         // check and refresh resource if necessary
         if ( _candidateidentity == null || ( _candidateidentity.getId( ) != nResourceId ) )
         {
-            Optional<CandidateIdentity> optIdentity = CandidateIdentityHome.findByPrimaryKey( nResourceId );
+            final Optional<CandidateIdentity> optIdentity = CandidateIdentityHome.findByPrimaryKey( nResourceId );
             _candidateidentity = optIdentity.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
 
             _wfCandidateIdentityBean = _wfIdentitiesBeanService.createWorkflowBean( _candidateidentity, _candidateidentity.getId( ),
@@ -771,7 +771,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             // The task does not need a form
             _wfIdentitiesBeanService.processAction( _wfCandidateIdentityBean, nActionId, request, getLocale( ) );
             final int batchId = _wfCandidateIdentityBean.getExternalParentId( );
-            Optional<Batch> optBatch = BatchHome.findByPrimaryKey( batchId );
+            final Optional<Batch> optBatch = BatchHome.findByPrimaryKey( batchId );
             _batch = optBatch.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
             _wfBatchBean = _wfBatchBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
 
@@ -824,16 +824,15 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             if ( _current_batch_state != null && _current_batch_state.getResourceCount( ) > 0 )
             {
                 _listIdBatchs = BatchHome.getIdBatchsList( _current_batch_state, _filterAppCode );
-                final int nbItemsPerPages = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 10 );
                 final int totalRecords = _listIdBatchs.size( );
-                _batchTotalPages = (int) Math.ceil( (double) totalRecords / nbItemsPerPages );
+                _batchTotalPages = (int) Math.ceil( (double) totalRecords / NB_ITEMS_PER_PAGES );
                 if ( _batchTotalPages == 0 )
                 {
                     _batchTotalPages = 1;
                 }
 
-                final int start = ( _batchCurrentPage - 1 ) * nbItemsPerPages;
-                final int end = Math.min( start + nbItemsPerPages, totalRecords );
+                final int start = ( _batchCurrentPage - 1 ) * NB_ITEMS_PER_PAGES;
+                final int end = Math.min( start + NB_ITEMS_PER_PAGES, totalRecords );
                 _listIdBatchs = _listIdBatchs.subList( start, end );
             }
         } );
