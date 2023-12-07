@@ -16,8 +16,14 @@
     <@identityMerge />
 -->
 <#macro identityMerge identityToMerge identityToKeep keyList>
-    <div id="lutece-merge" class="p-0 m-0 position-absolute start-50 translate-middle-x z-2" style="width:100px;">
+	<div id="lutece-merge" class="p-0 m-0 position-absolute start-50 translate-middle-x z-2" style="width:100px;">
 		<ul class="list-group list-group-flush">
+			<li class="position-relative d-flex justify-content-center align-items-center" style="height:155px;">
+				<div class="position-absolute top-50 start-0 end-0" style="z-index:-1"></div>
+				<div class="text-center w-100">
+
+				</div>
+			</li>
 			<#list keyList as current_key >
 				<li class="list-group-item text-center d-flex justify-content-center align-items-center border-0" data-name="${current_key}" style="min-height:55px">
 					<#assign attributesList = identityToMerge.attributes?filter(a -> a.key == current_key)>

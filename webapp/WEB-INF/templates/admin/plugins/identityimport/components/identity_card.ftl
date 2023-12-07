@@ -9,6 +9,9 @@
   @returns A rendered identity card based on provided parameters.
 -->
 <#macro identityCard identity identity_workflow index merge=false class="" width="">
+    <#if index == 0>
+        <#assign firstIdentity = identity>
+    </#if>
     <#assign familyNameAttr = identity.attributes?filter(a -> a.key == "family_name")?first!{}>
     <#assign firstNameAttr = identity.attributes?filter(a -> a.key == "first_name")?first!{}>
     <#assign emailAttr = identity.attributes?filter(a -> a.key == "email")?first!{}>
@@ -83,6 +86,9 @@
                     <li class="list-group-item d-flex justify-content-center align-items-center p-0 border-start-0 border-end-0" data-name="${current_key}" style="min-height:55px">
                         <div class="w-100 d-flex">
                             <#assign attributesList=identity.attributes?filter(a -> a.key == current_key)>
+                            <#if index != 0>
+                                <#assign firstIdentityAttr=firstIdentity.attributes?filter(a -> a.key == current_key)?first!{}>
+                            </#if>
                             <#if attributesList?size gt 0>
                                 <#list attributesList as attr>
                                     <div class="flex-1 flex-grow-1 py-2 px-3 text-break">
@@ -90,7 +96,7 @@
                                             ${current_key}
                                         </div>
                                         <div class="fw-bold">
-                                            <h3 class="mb-0 fw-bold">
+                                            <h3 class="mb-0 fw-bold <#if index!=0 && ( !(firstIdentityAttr.value?has_content) || firstIdentityAttr.value != attr.value )>text-danger</#if>">
                                                 <#if attr.value?? && attr.value?has_content>
                                                     ${attr.value}
                                                 <#else>
