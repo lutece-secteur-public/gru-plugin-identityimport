@@ -64,7 +64,7 @@ public class WorkflowBeanService<T> implements Serializable
     public static final String PARAMETER_SUBMITTED_TASK_FORM = "submitted_task_form";
     public static final String PARAMETER_RESOURCE_ID = "id";
     public static final String PARAMETER_RESOURCE_TYPE_ID = "resource_type_id";
-    public static final String PARAMETER_ACTION_ID = "action_id";
+    public static final String PARAMETER_ACTION_ID = "actionId";
     public static final String PARAMETER_ID_PARAMETER = "parameter_ID";
 
     public static final String CONSTANT_PROCESS_WORKFLOW_ACTION = "processWorkflowAction";

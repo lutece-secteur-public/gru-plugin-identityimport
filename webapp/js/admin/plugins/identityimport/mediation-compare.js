@@ -106,7 +106,7 @@ export default class MediationCompare {
             });
         } else {
             inputNames.forEach((name) => {
-                const inputsToDelete = this.container.querySelectorAll(`input[name="${name}"].d-none`);
+                const inputsToDelete = this.mergeForm.querySelectorAll(`input[name="${name}"]`);
                 inputsToDelete.forEach(input => {
                     this.mergeForm.removeChild(input);
                 });

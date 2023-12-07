@@ -39,17 +39,21 @@ import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHistory;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.QualityDefinition;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.CandidateIdentityAttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.CandidateIdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.ImportingHistoryDto;
+import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CandidateIdentityService
 {
-
     private static CandidateIdentityService instance;
 
     public static CandidateIdentityService instance( )
@@ -147,14 +151,32 @@ public class CandidateIdentityService
         quality.setQuality( 1.0 );
         dto.setQuality( quality );
 
-        bean.getAttributes( ).forEach( attr -> {
+        ServiceContractDto activeServiceContract = null;
+        try
+        {
+            activeServiceContract = ServiceContractService.instance( ).getActiveServiceContract( bean.getClientAppCode( ) );
+        }
+        catch( IdentityStoreException exception )
+        {
+            AppLogService.info( "Could not find active contract service for client code " + bean.getClientAppCode( ) );
+        }
+
+        for ( CandidateIdentityAttribute attr : bean.getAttributes( ) )
+        {
             final AttributeDto attrDto = new AttributeDto( );
             attrDto.setKey( attr.getCode( ) );
             attrDto.setValue( attr.getValue( ) );
             attrDto.setCertifier( attr.getCertProcess( ) );
             attrDto.setCertificationDate( attr.getCertDate( ) );
+            if ( activeServiceContract != null )
+            {
+                activeServiceContract.getAttributeDefinitions( ).stream( ).filter( def -> Objects.equals( def.getKeyName( ), attr.getCode( ) ) ).findFirst( )
+                        .flatMap( def -> def.getAttributeCertifications( ).stream( ).filter( cert -> Objects.equals( cert.getCode( ), attr.getCertProcess( ) ) )
+                                .findFirst( ) )
+                        .ifPresent( cert -> attrDto.setCertificationLevel( Integer.parseInt( cert.getLevel( ) ) ) );
+            }
             dto.getAttributes( ).add( attrDto );
-        } );
+        }
         return dto;
     }
 }

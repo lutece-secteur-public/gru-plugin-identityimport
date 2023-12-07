@@ -36,7 +36,7 @@
                             <#list identity_workflow.actions as action >
                                 <#if action.id == 9 || action.id == 15>
                                     <div class="list-group-item list-group-item-action border-bottom-0">
-                                        <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processIdentityAction&action_id=${action.id}&id=${identity_workflow.resource.id}"
+                                        <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processIdentityAction&actionId=${action.id}&id=${identity_workflow.resource.id}"
                                         title="${action.name}" alt="${action.name}"/>
                                     </div>
                                 </#if>

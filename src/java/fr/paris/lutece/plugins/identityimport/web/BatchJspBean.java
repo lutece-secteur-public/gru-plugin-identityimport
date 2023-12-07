@@ -99,7 +99,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String TEMPLATE_MODIFY_BATCH = "/admin/plugins/identityimport/modify_batch.html";
     private static final String TEMPLATE_PROCESS_BATCH = "/admin/plugins/identityimport/process_batch.html";
     private static final String TEMPLATE_IMPORT_CANDIDATE_IDENTITY = "/admin/plugins/identityimport/import_candidateidentity.html";
-    private static final String TEMPLATE_RESOLVE_DUPLICATES = "/admin/plugins/identityimport/resolve_duplicates.html";
+    private static final String TEMPLATE_COMPLETE_IDENTITY = "/admin/plugins/identityimport/complete_identity.html";
     private static final String JSP_MANAGE_CANDIDATEIDENTITIES = "jsp/admin/plugins/identityimport/ManageBatchs.jsp";
 
     // Parameters
@@ -125,7 +125,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE = "identityimport.listItems.itemsPerPage";
     private static final String PROPERTY_PAGE_TITLE_IMPORT_CANDIDATEIDENTITY = "identityimport.import_candidateidentity.pageTitle";
     private static final String PROPERTY_DUPLICATE_RULES = "identityimport.duplicate.search.rules";
-    private static final String PROPERTY_PAGE_TITLE_RESOLVE_DUPLICATES = "identityimport.resolve_duplicates.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_COMPLETE_IDENTITY = "identityimport.complete_identity.pageTitle";
 
     // Markers
     private static final String MARK_BATCH_LIST = "batch_list";
@@ -143,7 +143,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String MARK_CANDIDATE_IDENTITY_DUPLICATE_LIST = "duplicate_list";
     private static final String MARK_CANDIDATE_IDENTITY = "identity";
     private static final String MARK_CANDIDATE_IDENTITY_WORKFLOW = "identity_workflow";
-    private static final String MARK_IDENTITY_TO_MERGE = "identity_to_merge";
+    private static final String MARK_IDENTITY_TO_KEEP = "identity_to_keep";
     private static final String MARK_ATTRIBUTE_KEY_LIST = "key_list";
     private static final String MARK_RETURN_URL = "return_url";
 
@@ -162,7 +162,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String VIEW_MODIFY_BATCH = "modifyBatch";
     private static final String VIEW_PROCESS_BATCH = "processBatch";
     private static final String VIEW_IMPORT_CANDIDATEIDENTITY = "importCandidateIdentity";
-    private static final String VIEW_RESOLVE_DUPLICATES = "resolveDuplicates";
+    private static final String VIEW_COMPLETE_IDENTITY = "completeIdentity";
 
     // Actions
     private static final String ACTION_IMPORT_BATCH = "importBatch";
@@ -213,7 +213,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private final IdentityQualityService identityQualityService = SpringContextService.getBean( "qualityService.rest" );
     private final IdentityService identityService = SpringContextService.getBean( "identityService.rest" );
     private final List<String> DUPLICATE_RULE_CODES = Arrays.asList( AppPropertiesService.getProperty( PROPERTY_DUPLICATE_RULES, "" ).split( "," ) );
-    private static final int NB_ITEMS_PER_PAGES = AppPropertiesService.getPropertyInt(PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 10);
+    private static final int NB_ITEMS_PER_PAGES = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 10 );
 
     /**
      * Build the Manage View
@@ -349,8 +349,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      *            The Http request
      * @return the html code of the form
      */
-    @View( value = VIEW_RESOLVE_DUPLICATES )
-    public String getResolveDuplicates( final HttpServletRequest request )
+    @View( value = VIEW_COMPLETE_IDENTITY )
+    public String getCompleteIdentity( final HttpServletRequest request )
     {
         final Optional<String> idIdentityOpt = Optional.ofNullable( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
         idIdentityOpt.ifPresent( idIdentity -> {
@@ -375,7 +375,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             {
                 keyList.addAll( response.getIdentities( ).stream( ).flatMap( duplicate -> duplicate.getAttributes( ).stream( ) ).map( AttributeDto::getKey )
                         .distinct( ).collect( Collectors.toList( ) ) );
-                model.put( MARK_IDENTITY_TO_MERGE, response.getIdentities( ).get( 0 ) );
+                model.put( MARK_IDENTITY_TO_KEEP, response.getIdentities( ).get( 0 ) );
             }
         }
         catch( IdentityStoreException e )
@@ -398,7 +398,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         model.put( MARK_CANDIDATE_IDENTITY, CandidateIdentityService.instance( ).getIdentityDto( _wfCandidateIdentityBean.getResource( ) ) );
         model.put( MARK_ATTRIBUTE_KEY_LIST, keyList.stream( ).distinct( ).collect( Collectors.toList( ) ) );
 
-        return getPage( PROPERTY_PAGE_TITLE_RESOLVE_DUPLICATES, TEMPLATE_RESOLVE_DUPLICATES, model );
+        return getPage( PROPERTY_PAGE_TITLE_COMPLETE_IDENTITY, TEMPLATE_COMPLETE_IDENTITY, model );
     }
 
     /**
@@ -634,7 +634,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @throws AccessDeniedException
      */
     @View( VIEW_COMPLETE_BATCH )
-    public String getViewCompletetBatch( final HttpServletRequest request ) throws AccessDeniedException
+    public String getViewCompleteBatch( final HttpServletRequest request ) throws AccessDeniedException
     {
         this.registerFeed( );
         final int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_BATCH ) );

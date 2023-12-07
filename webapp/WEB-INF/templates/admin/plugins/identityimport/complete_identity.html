@@ -1,43 +1,44 @@
 <#include "utils/functions.ftl" />
 <#include "components/identity_card.ftl" />
 <#include "components/identity_merge.ftl" />
+<#include "components/merge_modals.ftl" />
 <@pageContainer id="mediation">
     <#include "components/menu_identity.ftl" />
     <@pageColumn id="mediation-resolve" class="pt-xl-4 px-xl-5 bg-secondary ">
         <div class="container">
-            <@pageHeader title="#i18n{identityimport.resolve_duplicates.pageTitle}">
-                <#if !identity_to_merge.monParisActive>
+            <@pageHeader title="#i18n{identityimport.complete_identity.pageTitle}">
+                <#if !identity_to_keep.monParisActive>
                     <button id="merge-btn" type="button" class="btn btn-primary" data-bs-toggle="modal"
                             data-bs-target="#merge-modal">
-                        #i18n{identityimport.resolve_duplicates.buttonMergeDuplicate}
+                        #i18n{identityimport.complete_identity.buttonMergeDuplicate}
                     </button>
                 </#if>
             </@pageHeader>
             <@messages infos=infos />
             <@messages errors=errors />
             <@messages warnings=warnings />
-            <#if identity_to_merge.monParisActive>
+            <#if identity_to_keep.monParisActive>
                 <div class="alert alert-warning mt-2" role="alert">
-                    <h3>#i18n{identityimport.resolve_duplicates.alertMonParis.title}</h3>
-                    <p class="m-0 text-body">#i18n{identityimport.resolve_duplicates.alertMonParis.description} <a id="notify-btn" role="button" class="text-warning" data-bs-toggle="modal" data-bs-target="#notify-modal">
-                        #i18n{identityimport.resolve_duplicates.buttonNotifyUsers}
+                    <h3>#i18n{identityimport.complete_identity.alertMonParis.title}</h3>
+                    <p class="m-0 text-body">#i18n{identityimport.complete_identity.alertMonParis.description} <a id="notify-btn" role="button" class="text-warning" data-bs-toggle="modal" data-bs-target="#notify-modal">
+                        #i18n{identityimport.complete_identity.buttonNotifyUsers}
                     </a></p>
                 </div>
             </#if>
             <div id="lutece-compare" class="row mt-4 position-relative shadow rounded-5 mx-1">
-                <#list [identity, identity_to_merge] as identity_to_display>
-                    <#if identity_to_display==identity>
-                        <@identityMerge />
+                <#list [identity_to_keep, identity] as tmp>
+                    <#if tmp==identity>
+                        <@identityMerge identityToKeep=identity_to_keep identityToMerge=identity keyList=key_list />
                     </#if>
-                    <#if identity_to_display?is_last>
-                        <@identityCard identity=identity_to_display index=identity_to_display?index identity_workflow=identity_workflow merge=true class="col-6 p-5 rounded-end-5"/>
+                    <#if tmp?is_last>
+                        <@identityCard identity=tmp index=tmp?index identity_workflow=identity_workflow merge=true class="col-6 p-5 rounded-end-5"/>
                     <#else>
-                        <@identityCard identity=identity_to_display index=identity_to_display?index identity_workflow=identity_workflow merge=true class="col-6 p-5"/>
+                        <@identityCard identity=tmp index=tmp?index identity_workflow=identity_workflow merge=true class="col-6 p-5"/>
                     </#if>
                 </#list>
             </div>
         </div>
-    </div>
+        <@mergeModals identity_workflow=identity_workflow identityToKeep=identity_to_keep />
     </@pageColumn>
 </@pageContainer>
 <script type="module">

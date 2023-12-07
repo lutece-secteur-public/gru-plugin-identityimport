@@ -103,7 +103,7 @@ public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
         if ( activeServiceContract == null )
         {
             response.setStatus( ResponseStatusFactory.unauthorized( ).setMessageKey( Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND ) );
-            response.getStatus().setMessage("Unauthorized Client code " + clientAppCode);
+            response.getStatus( ).setMessage( "Unauthorized Client code " + clientAppCode );
             return response;
         }
         if ( !activeServiceContract.isAuthorizedImport( ) )

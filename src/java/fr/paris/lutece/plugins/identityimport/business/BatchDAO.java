@@ -438,7 +438,7 @@ public final class BatchDAO implements IBatchDAO
      */
     public int getBatchInitialActionId( final Plugin plugin ) throws IdentityStoreException
     {
-        try ( final DAOUtil daoUtil = new DAOUtil(SQL_QUERY_SELECT_BATCHES_INITIAL_ACTION_ID, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BATCHES_INITIAL_ACTION_ID, plugin ) )
         {
             daoUtil.executeQuery( );
             if ( daoUtil.next( ) )
