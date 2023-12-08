@@ -57,7 +57,7 @@ public class WorkflowBeanService<T> implements Serializable
     private static final String MARK_TARGET_JSP = "target_jsp";
     private static final String MARK_RESOURCE_ID = "resource_id";
     private static final String MARK_RESOURCE_TYPE_ID = "resource_type_id";
-    private static final String MARK_WORKFLOW_ACTION_ID = "action_id";
+    private static final String MARK_WORKFLOW_ACTION_ID = "actionId";
     private static final String MARK_WORKFLOW_ACTION_JSP = "workflowAction";
     private static final String TEMPLATE_TASKS_FORM_WORKFLOW = "admin/plugins/workflow/default_task_form_wrapper.html";
 

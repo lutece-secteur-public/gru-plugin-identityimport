@@ -75,7 +75,11 @@ public final class BatchDAO implements IBatchDAO
 
     private static final String SQL_QUERY_SELECT_INITIAL_STATE_BATCHES = "SELECT " + BATCH_SELECT_FIELDS
             + " FROM identityimport_batch b JOIN workflow_resource_workflow r ON b.id_batch = r.id_resource AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' JOIN workflow_state s ON s.id_state = r.id_state WHERE s.is_initial_state = 1 ";
+    private static final String SQL_QUERY_SELECT_CLOSABLE_BATCHES = "SELECT " + BATCH_SELECT_FIELDS
+            + " FROM identityimport_batch b JOIN workflow_resource_workflow r ON b.id_batch = r.id_resource AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' "
+            + " WHERE r.id_state = 2 AND NOT EXISTS( SELECT 1 FROM workflow_resource_workflow candidate WHERE candidate.id_external_parent = b.id_batch AND (candidate.id_state = 4 OR candidate.id_state = 7)) ";
     private static final String SQL_QUERY_SELECT_BATCHES_INITIAL_ACTION_ID = "SELECT sb.id_action FROM workflow_action_state_before sb JOIN workflow_state s ON s.id_state = sb.id_state_before AND s.is_initial_state = 1 JOIN workflow_resource_workflow r ON r.id_workflow = s.id_workflow AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE'";
+    private static final String SQL_QUERY_SELECT_BATCHES_IN_TREATMENT_ACTION_ID = "SELECT sb.id_action FROM workflow_action_state_before sb WHERE sb.id_state_before = 2";
 
     /**
      * {@inheritDoc }
@@ -294,6 +298,29 @@ public final class BatchDAO implements IBatchDAO
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Batch> selectClosableBatches(final int batchLimit, final Plugin plugin )
+    {
+        final List<Batch> batchList = new ArrayList<>( );
+        final StringBuilder query = new StringBuilder(SQL_QUERY_SELECT_CLOSABLE_BATCHES);
+        if ( batchLimit > 0 )
+        {
+            query.append( " LIMIT " ).append( batchLimit );
+        }
+        try ( DAOUtil daoUtil = new DAOUtil( query.toString( ), plugin ) )
+        {
+            daoUtil.executeQuery( );
+            while ( daoUtil.next( ) )
+            {
+                batchList.add( getBatch( daoUtil ) );
+            }
+            return batchList;
+        }
+    }
+
     @Override
     public Batch selectBatchByReference( final Plugin plugin, final String reference )
     {
@@ -447,6 +474,21 @@ public final class BatchDAO implements IBatchDAO
             }
         }
         throw new IdentityStoreException( "The initial state for batches doesn't have any linked action." );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getBatchInTreatmentActionId( final Plugin plugin ) throws IdentityStoreException {
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BATCHES_IN_TREATMENT_ACTION_ID, plugin ) )
+        {
+            daoUtil.executeQuery( );
+            if ( daoUtil.next( ) )
+            {
+                return daoUtil.getInt( 1 );
+            }
+        }
+        throw new IdentityStoreException( "The in treatment state for batches doesn't have any linked action." );
     }
 
     private Batch getBatch( final DAOUtil daoUtil )

@@ -41,19 +41,19 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
 /**
- * Searches for batches at init state and starts them.
+ * Searches for batches at "in treatment" state, and closes them when possible
  */
-public class BatchLaunchDaemon extends Daemon
+public class BatchCloseDaemon extends Daemon
 {
 
-    private final static int _batchLimit = AppPropertiesService.getPropertyInt( "identityimport.daemon.launch.batch.limit", 10 );
+    private final static int _batchLimit = AppPropertiesService.getPropertyInt( "identityimport.daemon.close.batch.limit", 10 );
 
     @Override
     public void run( )
     {
         final StopWatch stopWatch = new StopWatch( );
         stopWatch.start( );
-        final StringBuilder logs = BatchService.instance( ).launchBatches( _batchLimit );
+        final StringBuilder logs = BatchService.instance( ).closeBatches( _batchLimit );
         stopWatch.stop( );
         final String execTime = "Execution time " + DurationFormatUtils.formatDurationWords( stopWatch.getTime( ), true, true );
         AppLogService.info( execTime );

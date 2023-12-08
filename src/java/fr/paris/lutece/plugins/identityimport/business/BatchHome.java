@@ -179,6 +179,18 @@ public final class BatchHome
         return _dao.selectInitialStateBatches( batchLimit, _plugin );
     }
 
+    /**
+     * Load the data of all the batches in the initial workflow state and returns them as a list
+     *
+     * @param batchLimit
+     *            the limit
+     * @return batches in the initial workflow state
+     */
+    public static List<Batch> findClosableBatches(final int batchLimit )
+    {
+        return _dao.selectClosableBatches( batchLimit, _plugin );
+    }
+
     public static List<ResourceState> getBatchStates( final String filterAppCode )
     {
         return _dao.selectBatchStates( filterAppCode, _plugin );
@@ -207,5 +219,15 @@ public final class BatchHome
     public static int getBatchInitialActionId( ) throws IdentityStoreException
     {
         return _dao.getBatchInitialActionId( _plugin );
+    }
+
+    /**
+     * Get the id of the action for batches in initial state
+     *
+     * @return the action id
+     */
+    public static int getBatchInTreatmentActionId( ) throws IdentityStoreException
+    {
+        return _dao.getBatchInTreatmentActionId( _plugin );
     }
 }

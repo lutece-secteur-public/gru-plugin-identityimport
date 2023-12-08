@@ -64,7 +64,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class BatchService
 {
@@ -242,7 +241,41 @@ public class BatchService
         }
         catch( final Exception e )
         {
-            msg.append( "Error occured while launching batches automatically :: " ).append( System.lineSeparator( ) ).append( e.getMessage( ) )
+            msg.append( "Error occurred while launching batches automatically :: " ).append( System.lineSeparator( ) ).append( e.getMessage( ) )
+                    .append( System.lineSeparator( ) );
+        }
+        return msg;
+    }
+
+    /**
+     * Find batches that can be closed, and close them
+     * @param batchLimit the limit
+     * @return logs
+     */
+    public StringBuilder closeBatches(int batchLimit) {
+        final StringBuilder msg = new StringBuilder( );
+        try
+        {
+            final List<Batch> closableBatches = BatchHome.findClosableBatches( batchLimit );
+            if ( !closableBatches.isEmpty( ) )
+            {
+                msg.append( closableBatches.size( ) ).append( " in treatment state batches found" ).append( System.lineSeparator( ) );
+                final int actionId = BatchHome.getBatchInTreatmentActionId( );
+                for ( final Batch batch : closableBatches )
+                {
+                    msg.append( "Closing batch : " ).append( batch.toLog( ) ).append( System.lineSeparator( ) );
+                    final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean( batch, batch.getId( ), null );
+                    _wfBatchBeanService.processAutomaticAction( workflowBean, actionId, null, Locale.getDefault( ) );
+                }
+            }
+            else
+            {
+                msg.append( "No in treatment state batches found." ).append( System.lineSeparator( ) );
+            }
+        }
+        catch( final Exception e )
+        {
+            msg.append( "Error occurred while closing batches automatically :: " ).append( System.lineSeparator( ) ).append( e.getMessage( ) )
                     .append( System.lineSeparator( ) );
         }
         return msg;

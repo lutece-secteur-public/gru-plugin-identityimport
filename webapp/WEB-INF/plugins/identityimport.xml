@@ -80,6 +80,12 @@
             <daemon-description>identityimport.batch.daemon.launchDaemon.description</daemon-description>
             <daemon-class>fr.paris.lutece.plugins.identityimport.task.BatchLaunchDaemon</daemon-class>
         </daemon>
+        <daemon>
+            <daemon-id>daemon.close.batch</daemon-id>
+            <daemon-name>identityimport.daemon.batch.closeDaemon.name</daemon-name>
+            <daemon-description>identityimport.batch.daemon.closeDaemon.description</daemon-description>
+            <daemon-class>fr.paris.lutece.plugins.identityimport.task.BatchCloseDaemon</daemon-class>
+        </daemon>
     </daemons>
     
 
