@@ -61,7 +61,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_candidate_identity WHERE id_candidate_identity = ? ";
     private static final String SQL_QUERY_DELETE_LISTS = "DELETE FROM identityimport_candidate_identity WHERE id_candidate_identity IN ( " + ID_LIST + " )";
     private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_candidate_identity SET id_candidate_identity = ?, id_batch = ?, connection_id = ?, customer_id = ?, client_id = ? WHERE id_candidate_identity = ?";
-    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_candidate_identity FROM identityimport_candidate_identity where id_batch = ?";
+    private static final String SQL_QUERY_SELECTALL_ID = "SELECT i.id_candidate_identity FROM identityimport_candidate_identity i JOIN workflow_resource_workflow r on r.id_resource = i.id_candidate_identity AND r.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' WHERE i.id_batch = ? ORDER BY FIELD(r.id_state, 4, 7, 5, 6, 8, 9)";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = SQL_QUERY_SELECT_ALL + " WHERE i.id_candidate_identity IN (  ";
     private static final String EXTERNAL_IDS = "{external_ids}";
     private static final String SQL_QUERY_EXISTS_BY_IDS = "SELECT EXISTS(SELECT 1 FROM identityimport_candidate_identity ci JOIN identityimport_batch b ON ci.id_batch = b.id_batch WHERE b.reference = ? AND ci.client_id IN ("
