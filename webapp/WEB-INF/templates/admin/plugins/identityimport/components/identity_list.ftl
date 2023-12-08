@@ -54,10 +54,10 @@
         <ul class="pagination justify-content-center mt-3 mb-0">
             <li class="page-item <#if identities_current_page == 1>disabled</#if>">
                 <a class="page-link"
-                   href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageIdentities&id_state=${current_batch_state.id}&identities_page=${identities_current_page - 1}&batch_page=${batch_current_page}&id_batch=${current_batch_id}&application_code=${application_code!}"
+                   href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageIdentities&from_pagination=true&id_state=${current_batch_state.id}&identities_page=${identities_current_page - 1}&batch_page=${batch_current_page}&id_batch=${current_batch_id}&application_code=${application_code!}"
                    tabindex="-1" aria-disabled="true"><i class="ti ti-chevron-left"></i></a>
             </li>
-            <#if batch_total_pages gt 6>
+            <#if identities_total_pages gt 6>
                 <li class="page-item">
                     <select id="paginationSelect" class="form-select rounded-0" style="width: auto;">
                         <#list 1..identities_total_pages as page>
@@ -66,16 +66,16 @@
                     </select>
                 </li>
             <#else>
-                <#list 1..batch_total_pages as page>
+                <#list 1..identities_total_pages as page>
                     <li class="page-item <#if identities_current_page == page>border-primary-subtle border-end border-top-0 border-start-0 border-bottom-0</#if>">
                         <a class="page-link <#if identities_current_page == page>text-primary-emphasis bg-primary-subtle border border-primary-subtle border-end</#if> <#if identities_current_page == page - 1>border-start-0</#if>"
-                           href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageIdentities&id_state=${current_batch_state.id}&identities_page=${identities_current_page}&batch_page=${batch_current_page}&id_batch=${current_batch_id}&application_code=${application_code!}">${page}</a>
+                           href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageIdentities&from_pagination=true&id_state=${current_batch_state.id}&identities_page=${identities_current_page}&batch_page=${batch_current_page}&id_batch=${current_batch_id}&application_code=${application_code!}">${page}</a>
                     </li>
                 </#list>
             </#if>
             <li class="page-item <#if identities_current_page == identities_total_pages>disabled</#if>">
                 <a class="page-link"
-                   href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageIdentities&id_state=${current_batch_state.id}&identities_page=${identities_current_page + 1}&batch_page=${batch_current_page}&id_batch=${current_batch_id}&application_code=${application_code!}"><i
+                   href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageIdentities&from_pagination=true&id_state=${current_batch_state.id}&identities_page=${identities_current_page + 1}&batch_page=${batch_current_page}&id_batch=${current_batch_id}&application_code=${application_code!}"><i
                             class="ti ti-chevron-right"></i></a>
             </li>
         </ul>
@@ -93,5 +93,9 @@
             const ulElement = document.getElementById("candidate-identity-list");
             ulElement.scrollTop = selectedItem.offsetTop - (ulElement.clientHeight / 2) + (selectedItem.clientHeight / 2);
         }, 100);
+    }
+    const fromPagination = ${from_pagination!false};
+    if(fromPagination) {
+        $("#pills-identities-tab").click();
     }
 </script>

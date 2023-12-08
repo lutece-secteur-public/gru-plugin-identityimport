@@ -112,6 +112,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String PARAMETER_CSV_FILE = "csvFile";
     private static final String PARAMETER_REFERENCE = "reference";
     private static final String PARAMETER_FILTER_APP_CODE = "application_code";
+    private static final String PARAMETER_FROM_PAGINATION = "from_pagination";
     private final static String PARAMETER_BATCH_PAGE = "batch_page";
     private final static String IDENTITIES_PARAMETER_PAGE = "identities_page";
     private static final String MARK_FEED_TOKEN = "feed_token";
@@ -146,6 +147,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String MARK_IDENTITY_TO_KEEP = "identity_to_keep";
     private static final String MARK_ATTRIBUTE_KEY_LIST = "key_list";
     private static final String MARK_RETURN_URL = "return_url";
+    private static final String MARK_FROM_PAGINATION = "from_pagination";
 
     // Properties
     private static final String MESSAGE_CONFIRM_REMOVE_BATCH = "identityimport.message.confirmRemoveBatch";
@@ -244,6 +246,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         this.globalInit( request );
         this.unregisterFeed( );
 
+        final String fromPagination = request.getParameter(PARAMETER_FROM_PAGINATION) != null ? request.getParameter(PARAMETER_FROM_PAGINATION) : "false";
+
         final Optional<String> idBatchOpt = Optional.ofNullable( request.getParameter( PARAMETER_ID_BATCH ) );
         idBatchOpt.ifPresent( idBatch -> {
             _currentBatchId = Integer.parseInt( idBatch );
@@ -276,6 +280,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         } );
 
         final Map<String, Object> model = this.globalModel( request );
+        model.put(MARK_FROM_PAGINATION, fromPagination);
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_BATCHS, TEMPLATE_MANAGE_IDENTITIES, model );
     }
 
