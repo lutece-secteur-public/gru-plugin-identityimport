@@ -25,7 +25,7 @@
                             ${candidateidentity.resource.status!}
                         </td>
                         <td>
-                            <#if candidateidentity.state?? && candidateidentity.state.id == 7 >
+                            <#if candidateidentity.state?? && candidateidentity.state.id == 7 && batch.state?? && batch.state.id == 2 >
                                 <@aButton class="manualImportButton" href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=importCandidateIdentity&id_identity=${candidateidentity.resource.id}&return_url=jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}" title='#i18n{identityimport.manage_candidateidentity.labelManualImport}' hideTitle=['all'] buttonIcon='hammer' />
                             </#if>
                             <#if candidateidentity.resource.attributes?? && candidateidentity.resource.attributes?size gt 0>
