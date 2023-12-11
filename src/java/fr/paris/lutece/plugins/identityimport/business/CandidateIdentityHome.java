@@ -172,4 +172,9 @@ public final class CandidateIdentityHome
     {
         return _dao.getHistory( identityId, _plugin );
     }
+
+    public static ResourceState getIdentityState( final int id )
+    {
+        return _dao.selectIdentityState( id, _plugin );
+    }
 }

@@ -69,7 +69,8 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     private static final String SQL_QUERY_SELECTALL_BY_IDS_END = ")";
 
     private static final String SQL_QUERY_SELECTSTATES = "SELECT ws.id_state, ws.name, ws.description, COUNT(wr.id_resource) as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' AND wr.id_external_parent = ? WHERE ws.id_workflow = 2 GROUP BY ws.id_state, ws.name, ws.description";
-    private static final String SQL_QUERY_SELECT_HISTORY = "SELECT a.name, a.description, h.creation_date, h.user_access_code FROM workflow_resource_history h JOIN workflow_action a ON a.id_action = h.id_action WHERE h.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' AND h.id_resource = ?";
+    private static final String SQL_QUERY_SELECTSTATE_BY_IDENTITY_ID = "SELECT ws.id_state, ws.name, ws.description, 1 as identity_count FROM workflow_resource_workflow wr LEFT JOIN workflow_state ws ON ws.id_state = wr.id_state LEFT JOIN identityimport_candidate_identity b ON b.id_candidate_identity = wr.id_resource WHERE ws.id_workflow = 2 AND wr.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' AND b.id_candidate_identity = ?";
+    private static final String SQL_QUERY_SELECT_HISTORY = "SELECT h.id_history, a.name, a.description, h.creation_date, h.user_access_code FROM workflow_resource_history h JOIN workflow_action a ON a.id_action = h.id_action WHERE h.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' AND h.id_resource = ?";
 
     /**
      * {@inheritDoc }
@@ -309,6 +310,27 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     }
 
     @Override
+    public ResourceState selectIdentityState( final int batchId, final Plugin plugin )
+    {
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTSTATE_BY_IDENTITY_ID, plugin ) )
+        {
+            daoUtil.setInt( 1, batchId );
+            daoUtil.executeQuery( );
+
+            if ( daoUtil.next( ) )
+            {
+                final ResourceState state = new ResourceState( );
+                state.setId( daoUtil.getInt( 1 ) );
+                state.setName( daoUtil.getString( 2 ) );
+                state.setDescription( daoUtil.getString( 3 ) );
+                state.setResourceCount( daoUtil.getInt( 4 ) );
+                return state;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public List<ResourceHistory> getHistory( final int identityId, final Plugin plugin )
     {
         final List<ResourceHistory> list = new ArrayList<>( );
@@ -320,12 +342,13 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
             while ( daoUtil.next( ) )
             {
                 final ResourceHistory history = new ResourceHistory( );
+                history.setId( daoUtil.getInt(1) );
                 final Action action = new Action( );
-                action.setName( daoUtil.getString( 1 ) );
-                action.setDescription( daoUtil.getString( 2 ) );
+                action.setName( daoUtil.getString( 2 ) );
+                action.setDescription( daoUtil.getString( 3 ) );
                 history.setAction( action );
-                history.setCreationDate( daoUtil.getTimestamp( 3 ) );
-                history.setUserAccessCode( daoUtil.getString( 4 ) );
+                history.setCreationDate( daoUtil.getTimestamp( 4 ) );
+                history.setUserAccessCode( daoUtil.getString( 5 ) );
                 list.add( history );
             }
         }

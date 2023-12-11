@@ -135,4 +135,6 @@ public interface ICandidateIdentityDAO
     List<ResourceState> selectIdentityStates( final int batchId, final Plugin plugin );
 
     List<ResourceHistory> getHistory( final int identityId, final Plugin plugin );
+
+    ResourceState selectIdentityState( int id, Plugin plugin );
 }

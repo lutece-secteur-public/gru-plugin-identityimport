@@ -48,6 +48,8 @@ import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchResourceStateDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatisticsDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusMode;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusResponse;
@@ -118,6 +120,7 @@ public class BatchService
                 throw new IdentityStoreException( "A batch already exists with this reference." );
             }
             final Batch bean = this.getBean( batch );
+            bean.setDate( new Date( System.currentTimeMillis( ) ) );
             BatchHome.create( bean );
 
             // Init workflow resource
@@ -362,9 +365,26 @@ public class BatchService
         final BatchStatusDto batchStatus = new BatchStatusDto( );
 
         batchStatus.setReference( batch.getReference( ) );
-        batchStatus.setLaunchDate( batch.getDate( ) );
+        batchStatus.setClientCode( batch.getAppCode( ) );
+        batchStatus.setUser( batch.getUser( ) );
+        batchStatus.setComment( batch.getComment( ) );
+        batchStatus.setCreationDate( batch.getDate( ) );
         batchStatus.setStatus( batchState.getName( ) );
         batchStatus.setStatusDescription( batchState.getDescription( ) );
+
+        final BatchStatisticsDto statisticsDto = new BatchStatisticsDto( );
+        batchStatus.setStatistics( statisticsDto );
+        final List<ResourceState> candidateIdentityStates = CandidateIdentityHome.getCandidateIdentityStates( batch.getId( ) );
+        candidateIdentityStates.stream( ).filter( r -> r.getResourceCount( ) > 0 ).forEach( resourceState -> {
+            final BatchResourceStateDto resourceStateDto = new BatchResourceStateDto( );
+            statisticsDto.getResourceStates( ).add( resourceStateDto );
+            resourceStateDto.setName( resourceState.getName( ) );
+            resourceStateDto.setDescription( resourceState.getDescription( ) );
+            resourceStateDto.setInitialState( resourceStateDto.isInitialState( ) );
+            resourceStateDto.setResourceCount( resourceState.getResourceCount( ) );
+        } );
+
+        statisticsDto.setTotalResourceCount( candidateIdentityStates.stream( ).mapToInt( ResourceState::getResourceCount ).sum( ) );
 
         if ( mode != BatchStatusMode.IDENTITIES_ONLY )
         {
@@ -384,9 +404,9 @@ public class BatchService
             final List<CandidateIdentity> identities = CandidateIdentityHome
                     .getCandidateIdentitiesListByIds( CandidateIdentityHome.getIdCandidateIdentitiesList( batch.getId( ) ) );
             identities.forEach( candidate -> {
-                candidate.setAttributes( CandidateIdentityAttributeHome.getCandidateIdentityAttributesList( candidate.getId( ) ) );
-                batchStatus.getIdentities( ).add( CandidateIdentityService.instance( ).getDto( candidate,
-                        CandidateIdentityHistoryHome.selectAll( candidate.getId( ) ), CandidateIdentityHome.getHistory( candidate.getId( ) ) ) );
+                final List<CandidateIdentityHistory> identityHistoryList = CandidateIdentityHistoryHome.selectAll( candidate.getId( ) );
+                final List<ResourceHistory> history = CandidateIdentityHome.getHistory( candidate.getId( ) );
+                batchStatus.getIdentities( ).add( CandidateIdentityService.instance( ).getDto( candidate, identityHistoryList, history ) );
             } );
         }
 

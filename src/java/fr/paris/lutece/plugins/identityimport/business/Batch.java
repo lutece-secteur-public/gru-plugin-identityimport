@@ -51,8 +51,6 @@ public class Batch implements Serializable
     // Variables declarations
     private int _nId;
     private String _strReference;
-
-    @NotNull( message = "#i18n{portal.validation.message.notEmpty}" )
     private Date _dateDate;
 
     @NotEmpty( message = "#i18n{identityimport.validation.batch.User.notEmpty}" )

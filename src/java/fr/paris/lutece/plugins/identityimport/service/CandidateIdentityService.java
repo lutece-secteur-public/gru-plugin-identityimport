@@ -36,19 +36,18 @@ package fr.paris.lutece.plugins.identityimport.service;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentity;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribute;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHistory;
+import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
+import fr.paris.lutece.plugins.identityimport.business.ResourceState;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.QualityDefinition;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.CandidateIdentityAttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.CandidateIdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.ImportingHistoryDto;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -74,18 +73,13 @@ public class CandidateIdentityService
         }
         final CandidateIdentityDto dto = new CandidateIdentityDto( );
         dto.setCustomerId( bean.getCustomerId( ) );
-        dto.setConnectionId( bean.getConnectionId( ) );
         dto.setExternalCustomerId( bean.getExternalCustomerId( ) );
         dto.setClientAppCode( bean.getClientAppCode( ) );
-        dto.setStatus( bean.getStatus( ) );
-        bean.getAttributes( ).forEach( attr -> {
-            final CandidateIdentityAttributeDto attrDto = new CandidateIdentityAttributeDto( );
-            attrDto.setKey( attr.getCode( ) );
-            attrDto.setValue( attr.getValue( ) );
-            attrDto.setCertProcess( attr.getCertProcess( ) );
-            attrDto.setCertDate( attr.getCertDate( ) );
-            dto.getAttributes( ).add( attrDto );
-        } );
+        final ResourceState identityState = CandidateIdentityHome.getIdentityState( bean.getId( ) );
+        dto.setStatus( identityState.getName( ) );
+        dto.setStatusDescription( identityState.getDescription( ) );
+        dto.setApiStatus( bean.getStatus( ) );
+
         if ( identityHistoryList != null )
         {
             identityHistoryList.forEach( hist -> {
@@ -105,33 +99,6 @@ public class CandidateIdentityService
             } );
         }
         return dto;
-    }
-
-    public CandidateIdentity getBean( final CandidateIdentityDto dto )
-    {
-        if ( dto == null )
-        {
-            return null;
-        }
-        final CandidateIdentity bean = new CandidateIdentity( );
-        bean.setCustomerId( dto.getCustomerId( ) );
-        bean.setConnectionId( dto.getConnectionId( ) );
-        bean.setExternalCustomerId( dto.getExternalCustomerId( ) );
-        bean.setClientAppCode( dto.getClientAppCode( ) );
-        bean.setStatus( dto.getStatus( ) );
-        if ( !dto.getAttributes( ).isEmpty( ) )
-        {
-            bean.setAttributes( new ArrayList<>( dto.getAttributes( ).size( ) ) );
-            dto.getAttributes( ).forEach( attrDto -> {
-                final CandidateIdentityAttribute attr = new CandidateIdentityAttribute( );
-                attr.setCode( attrDto.getKey( ) );
-                attr.setValue( attrDto.getValue( ) );
-                attr.setCertProcess( attrDto.getCertProcess( ) );
-                attr.setCertDate( attrDto.getCertDate( ) );
-                bean.getAttributes( ).add( attr );
-            } );
-        }
-        return bean;
     }
 
     public IdentityDto getIdentityDto( final CandidateIdentity bean )

@@ -8,9 +8,6 @@
         <@input type="hidden" id="id" name="id"/>
         <@input type="hidden" value="${token}" name="token" />
 
-		<@formGroup labelFor='date' labelKey='#i18n{identityimport.modify_batch.labelDate}' mandatory=true >
-			<@input type='text' id='date' name='date'  value='${batch.date!\'\'}' tabIndex='1' disabled=(!newImport) />
-		</@formGroup>
 		<@formGroup labelFor='user' labelKey='#i18n{identityimport.modify_batch.labelUser}' mandatory=true>
 			<@input type='text' id='user' name='user'  maxlength=255 value='${batch.user!\'\'}' tabIndex='2' disabled=(!newImport) />
 		</@formGroup>
