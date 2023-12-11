@@ -102,11 +102,6 @@ public class BatchValidationService
             throw new IdentityStoreException( "The provided batch reference is null" );
         }
 
-        if ( batch.getDate( ) == null )
-        {
-            throw new IdentityStoreException( "The provided batch date is null" );
-        }
-
         if ( batch.getIdentities( ).isEmpty( ) )
         {
             throw new IdentityStoreException( "No identities found in imported batch" );

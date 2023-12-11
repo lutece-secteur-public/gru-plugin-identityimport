@@ -342,7 +342,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
             while ( daoUtil.next( ) )
             {
                 final ResourceHistory history = new ResourceHistory( );
-                history.setId( daoUtil.getInt(1) );
+                history.setId( daoUtil.getInt( 1 ) );
                 final Action action = new Action( );
                 action.setName( daoUtil.getString( 2 ) );
                 action.setDescription( daoUtil.getString( 3 ) );

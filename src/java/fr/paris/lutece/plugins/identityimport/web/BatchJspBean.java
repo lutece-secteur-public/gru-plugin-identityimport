@@ -619,7 +619,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     public String getViewImportBatch( final HttpServletRequest request ) throws AccessDeniedException
     {
         this.registerFeed( );
-        _batch = ( _batch != null ) ? _batch : new Batch( );
+        _batch = new Batch( );
 
         final Map<String, Object> model = getModel( );
         model.put( MARK_NEW_IMPORT, true );
