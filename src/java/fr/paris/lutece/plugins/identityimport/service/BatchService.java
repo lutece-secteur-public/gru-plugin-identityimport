@@ -58,17 +58,22 @@ import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreExceptio
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.progressmanager.ProgressManagerService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.sql.TransactionManager;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 public class BatchService
 {
     private static final String BATCH_WFBEANSERVICE = "identityimport.batch.wfbeanservice";
     private static final String CANDIDATEIDENTITY_WFBEANSERVICE = "identityimport.candidateidentity.wfbeanservice";
+
+    private static final int ARCHIVE_ACTION_ID = AppPropertiesService.getPropertyInt( "identityimport.archive.action.id", 0 );
     private final WorkflowBeanService<CandidateIdentity> _wfIdentityBeanService = SpringContextService.getBean( CANDIDATEIDENTITY_WFBEANSERVICE );
     private final WorkflowBeanService<Batch> _wfBatchBeanService = SpringContextService.getBean( BATCH_WFBEANSERVICE );
     private final ProgressManagerService progressManagerService = ProgressManagerService.getInstance( );
@@ -181,33 +186,63 @@ public class BatchService
      * @param batchLimit
      * @return
      */
-    public StringBuilder purgeBatches( final int batchLimit )
+    public StringBuilder purgeBatches( final int batchLimit ) throws IdentityStoreException
     {
         final StringBuilder msg = new StringBuilder( );
-        TransactionManager.beginTransaction( null );
+        final List<Batch> expiredBatches = BatchHome.findExpiredBatches( batchLimit );
+        msg.append( expiredBatches.size( ) ).append( " expired batches found" ).append( System.lineSeparator( ) );
 
-        try
+        if ( ARCHIVE_ACTION_ID > 0 )
         {
-
-            final List<Batch> expiredBatches = BatchHome.findExpiredBatches( batchLimit );
-            msg.append( expiredBatches.size( ) ).append( " expired batches found" ).append( System.lineSeparator( ) );
             for ( final Batch expiredBatch : expiredBatches )
             {
                 msg.append( "Removing expired batch : " ).append( expiredBatch.toLog( ) ).append( System.lineSeparator( ) );
-                final List<Integer> idCandidateIdentitiesList = CandidateIdentityHome.getIdCandidateIdentitiesList( expiredBatch.getId( ) );
+                final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean( expiredBatch, expiredBatch.getId( ), null );
+                _wfBatchBeanService.processAutomaticAction( workflowBean, ARCHIVE_ACTION_ID, null, Locale.getDefault( ) );
+            }
+        }
+        else
+        {
+            AppLogService.error( "Property identityimport.archive.action.id must be defined in order to perform archiving task." );
+        }
+
+        // return message for daemons
+        return msg;
+    }
+
+    /**
+     * Purge given batch. Deletion of {@link CandidateIdentity}, {@link CandidateIdentityAttribute}, {@link CandidateIdentityHistory}
+     *
+     * @param batchId
+     *            the id of the batch
+     * @return
+     */
+    public void purgeBatch( final int batchId ) throws IdentityStoreException
+    {
+        final Optional<Batch> expiredBatch = BatchHome.findByPrimaryKey( batchId );
+        if ( expiredBatch.isPresent( ) )
+        {
+            final Batch batch = expiredBatch.get( );
+            TransactionManager.beginTransaction( null );
+
+            try
+            {
+                final List<Integer> idCandidateIdentitiesList = CandidateIdentityHome.getIdCandidateIdentitiesList( batch.getId( ) );
                 CandidateIdentityHome.delete( idCandidateIdentitiesList );
                 CandidateIdentityAttributeHome.delete( idCandidateIdentitiesList );
                 CandidateIdentityHistoryHome.delete( idCandidateIdentitiesList );
                 TransactionManager.commitTransaction( null );
             }
+            catch( final Exception e )
+            {
+                TransactionManager.rollBack( null );
+                throw new IdentityStoreException( "An error occurred during batch purge.", e );
+            }
         }
-        catch( final Exception e )
+        else
         {
-            TransactionManager.rollBack( null );
+            throw new IdentityStoreException( "Could not find batch with ID " + batchId );
         }
-
-        // return message for daemons
-        return msg;
     }
 
     /**
@@ -249,10 +284,13 @@ public class BatchService
 
     /**
      * Find batches that can be closed, and close them
-     * @param batchLimit the limit
+     * 
+     * @param batchLimit
+     *            the limit
      * @return logs
      */
-    public StringBuilder closeBatches(int batchLimit) {
+    public StringBuilder closeBatches( int batchLimit )
+    {
         final StringBuilder msg = new StringBuilder( );
         try
         {

@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.identityimport.task;
 
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
+import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.portal.service.daemon.Daemon;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -49,7 +50,16 @@ public class BatchPurgeDaemon extends Daemon
     {
         final StopWatch stopWatch = new StopWatch( );
         stopWatch.start( );
-        final StringBuilder logs = BatchService.instance( ).purgeBatches( _batchLimit );
+        final StringBuilder logs = new StringBuilder( );
+        try
+        {
+            logs.append( BatchService.instance( ).purgeBatches( _batchLimit ) );
+        }
+        catch( final IdentityStoreException e )
+        {
+            logs.append( "An error occurred during automatic archiving task: " ).append( e.getMessage( ) );
+            AppLogService.error( "An error occurred during automatic archiving task: " + e.getMessage( ), e );
+        }
         stopWatch.stop( );
         final String execTime = "Execution time " + DurationFormatUtils.formatDurationWords( stopWatch.getTime( ), true, true );
         AppLogService.info( execTime );

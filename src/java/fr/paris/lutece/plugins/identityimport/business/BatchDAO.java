@@ -50,13 +50,14 @@ import java.util.Optional;
  */
 public final class BatchDAO implements IBatchDAO
 {
-    private static final String BATCH_SELECT_FIELDS = "id_batch, reference, date, user, app_code, comment";
+    private static final String BATCH_SELECT_FIELDS = "batch.id_batch, batch.reference, batch.date, batch.user, batch.app_code, batch.comment";
 
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch WHERE id_batch = ?";
-    private static final String SQL_QUERY_SELECT_EXPIRED_BATCHES = "SELECT " + BATCH_SELECT_FIELDS
-            + " JOIN identityimport_client client ON client.app_code = batch.app_code where DATE_ADD(batch.date, INTERVAL client.data_retention_period_in_months MONTH ) < CURRENT_DATE";
-    private static final String SQL_QUERY_SELECT_BY_REFERENCE = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch WHERE reference = ?";
+    private static final String SQL_QUERY_SELECT = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch WHERE id_batch = ?";
+    private static final String SQL_QUERY_SELECT_EXPIRED_BATCHES = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch"
+            + " JOIN identityimport_client client ON client.app_code = batch.app_code JOIN workflow_resource_workflow r ON r.id_resource = batch.id_batch AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE'"
+            + " WHERE DATE_ADD(batch.date, INTERVAL client.data_retention_period_in_months MONTH ) < CURRENT_DATE AND r.id_state = 3";
+    private static final String SQL_QUERY_SELECT_BY_REFERENCE = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch WHERE reference = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_batch ( reference, date, user, app_code, comment ) VALUES ( ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_batch WHERE id_batch = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_batch SET reference = ?, date = ?, user = ?, app_code = ?, comment = ? WHERE id_batch = ?";
@@ -64,20 +65,20 @@ public final class BatchDAO implements IBatchDAO
     private static final String SQL_QUERY_SELECTSTATES = "SELECT ws.id_state, ws.name, ws.description, COUNT(wr.id_resource) as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' WHERE ws.id_workflow = 1 GROUP BY ws.id_state, ws.name, ws.description";
     private static final String SQL_QUERY_SELECTSTATES_BY_APP_CODE = "SELECT ws.id_state, ws.name, ws.description, COUNT(b.app_code) as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' LEFT JOIN identityimport_batch b ON b.id_batch = wr.id_resource AND b.app_code = '${app_code}' WHERE ws.id_workflow = 1 GROUP BY ws.id_state, ws.name, ws.description";
     private static final String SQL_QUERY_SELECTSTATE_BY_BATCH_ID = "SELECT ws.id_state, ws.name, ws.description, 1 as batch_count FROM workflow_resource_workflow wr LEFT JOIN workflow_state ws ON ws.id_state = wr.id_state LEFT JOIN identityimport_batch b ON b.id_batch = wr.id_resource WHERE ws.id_workflow = 1 AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' AND b.id_batch = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch";
+    private static final String SQL_QUERY_SELECTALL = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT b.id_batch FROM identityimport_batch b ";
     private static final String SQL_QUERY_SELECTALL_ID_BY_STATE = "JOIN workflow_resource_workflow wr ON wr.id_resource = b.id_batch AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' WHERE wr.id_state = ${id_state} ";
     private static final String SQL_QUERY_SELECTALL_ID_BY_APP_CODE = "b.app_code = ${app_code}";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch WHERE id_batch IN (  ";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch WHERE id_batch IN (  ";
     private static final String SQL_QUERY_COUNT_IDENTITIES = "SELECT count(identity.id_resource) FROM workflow_resource_workflow identity WHERE identity.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' and identity.id_external_parent = ?";
 
     private static final String SQL_QUERY_SELECT_BATCH_HISTORY = "SELECT a.name, a.description, h.creation_date, h.user_access_code FROM workflow_resource_history h JOIN workflow_action a ON a.id_action = h.id_action WHERE h.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' AND h.id_resource = ?";
 
     private static final String SQL_QUERY_SELECT_INITIAL_STATE_BATCHES = "SELECT " + BATCH_SELECT_FIELDS
-            + " FROM identityimport_batch b JOIN workflow_resource_workflow r ON b.id_batch = r.id_resource AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' JOIN workflow_state s ON s.id_state = r.id_state WHERE s.is_initial_state = 1 ";
+            + " FROM identityimport_batch batch JOIN workflow_resource_workflow r ON batch.id_batch = r.id_resource AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' JOIN workflow_state s ON s.id_state = r.id_state WHERE s.is_initial_state = 1 ";
     private static final String SQL_QUERY_SELECT_CLOSABLE_BATCHES = "SELECT " + BATCH_SELECT_FIELDS
-            + " FROM identityimport_batch b JOIN workflow_resource_workflow r ON b.id_batch = r.id_resource AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' "
-            + " WHERE r.id_state = 2 AND NOT EXISTS( SELECT 1 FROM workflow_resource_workflow candidate WHERE candidate.id_external_parent = b.id_batch AND (candidate.id_state = 4 OR candidate.id_state = 7)) ";
+            + " FROM identityimport_batch batch JOIN workflow_resource_workflow r ON batch.id_batch = r.id_resource AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' "
+            + " WHERE r.id_state = 2 AND NOT EXISTS( SELECT 1 FROM workflow_resource_workflow candidate WHERE candidate.id_external_parent = batch.id_batch AND (candidate.id_state = 4 OR candidate.id_state = 7)) ";
     private static final String SQL_QUERY_SELECT_BATCHES_INITIAL_ACTION_ID = "SELECT sb.id_action FROM workflow_action_state_before sb JOIN workflow_state s ON s.id_state = sb.id_state_before AND s.is_initial_state = 1 JOIN workflow_resource_workflow r ON r.id_workflow = s.id_workflow AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE'";
     private static final String SQL_QUERY_SELECT_BATCHES_IN_TREATMENT_ACTION_ID = "SELECT sb.id_action FROM workflow_action_state_before sb WHERE sb.id_state_before = 2";
 
@@ -302,10 +303,10 @@ public final class BatchDAO implements IBatchDAO
      * {@inheritDoc}
      */
     @Override
-    public List<Batch> selectClosableBatches(final int batchLimit, final Plugin plugin )
+    public List<Batch> selectClosableBatches( final int batchLimit, final Plugin plugin )
     {
         final List<Batch> batchList = new ArrayList<>( );
-        final StringBuilder query = new StringBuilder(SQL_QUERY_SELECT_CLOSABLE_BATCHES);
+        final StringBuilder query = new StringBuilder( SQL_QUERY_SELECT_CLOSABLE_BATCHES );
         if ( batchLimit > 0 )
         {
             query.append( " LIMIT " ).append( batchLimit );
@@ -479,7 +480,8 @@ public final class BatchDAO implements IBatchDAO
     /**
      * {@inheritDoc}
      */
-    public int getBatchInTreatmentActionId( final Plugin plugin ) throws IdentityStoreException {
+    public int getBatchInTreatmentActionId( final Plugin plugin ) throws IdentityStoreException
+    {
         try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BATCHES_IN_TREATMENT_ACTION_ID, plugin ) )
         {
             daoUtil.executeQuery( );

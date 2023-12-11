@@ -246,7 +246,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         this.globalInit( request );
         this.unregisterFeed( );
 
-        final String fromPagination = request.getParameter(PARAMETER_FROM_PAGINATION) != null ? request.getParameter(PARAMETER_FROM_PAGINATION) : "false";
+        final String fromPagination = request.getParameter( PARAMETER_FROM_PAGINATION ) != null ? request.getParameter( PARAMETER_FROM_PAGINATION ) : "false";
 
         final Optional<String> idBatchOpt = Optional.ofNullable( request.getParameter( PARAMETER_ID_BATCH ) );
         idBatchOpt.ifPresent( idBatch -> {
@@ -280,7 +280,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         } );
 
         final Map<String, Object> model = this.globalModel( request );
-        model.put(MARK_FROM_PAGINATION, fromPagination);
+        model.put( MARK_FROM_PAGINATION, fromPagination );
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_BATCHS, TEMPLATE_MANAGE_IDENTITIES, model );
     }
 

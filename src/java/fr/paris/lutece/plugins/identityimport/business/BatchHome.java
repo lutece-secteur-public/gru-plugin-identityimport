@@ -162,6 +162,12 @@ public final class BatchHome
         return _dao.load( id, _plugin );
     }
 
+    /**
+     * Load the data of all the expired batch objects and returns them as a list. <br>
+     * A batch is considered expired if it is finalized and it's creation date exceeds data retention time of the client.
+     * 
+     * @return The list which contains the data of all the expired batch objects
+     */
     public static List<Batch> findExpiredBatches( final int batchLimit )
     {
         return _dao.selectExpiredBatchsList( batchLimit, _plugin );
@@ -186,7 +192,7 @@ public final class BatchHome
      *            the limit
      * @return batches in the initial workflow state
      */
-    public static List<Batch> findClosableBatches(final int batchLimit )
+    public static List<Batch> findClosableBatches( final int batchLimit )
     {
         return _dao.selectClosableBatches( batchLimit, _plugin );
     }
