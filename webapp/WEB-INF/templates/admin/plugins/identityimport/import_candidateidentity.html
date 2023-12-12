@@ -6,14 +6,16 @@
         <@pageHeader title="#i18n{identityimport.select_identities.pageTitle}"/>
         <div id="lutece-compare" class="row flex-nowrap overflow-auto rounded-5 mt-3 pb-4 position-relative  mx-1">
             <@identityCard identity=identity identity_workflow=identity_workflow index=0 width="21.9rem" />
-            <#list duplicate_list as identity>
-                <#assign current_index=identity?index + 1>
-                <#if identity?is_last>
-                    <@identityCard identity=identity identity_workflow=identity_workflow index=current_index width="21.9rem" class="rounded-end-5" />
-                <#else>
-                    <@identityCard identity=identity identity_workflow=identity_workflow index=current_index width="21.9rem" />
-                </#if>
-            </#list>
+            <#if duplicate_list?? && duplicate_list?has_content>
+                <#list duplicate_list as identity>
+                    <#assign current_index=identity?index + 1>
+                    <#if identity?is_last>
+                        <@identityCard identity=identity identity_workflow=identity_workflow index=current_index width="21.9rem" class="rounded-end-5" />
+                    <#else>
+                        <@identityCard identity=identity identity_workflow=identity_workflow index=current_index width="21.9rem" />
+                    </#if>
+                </#list>
+            </#if>
         </div>
     </@pageColumn>
 </@pageContainer>

@@ -76,6 +76,7 @@ public class BatchService
     private static final String CANDIDATEIDENTITY_WFBEANSERVICE = "identityimport.candidateidentity.wfbeanservice";
 
     private static final int ARCHIVE_ACTION_ID = AppPropertiesService.getPropertyInt( "identityimport.archive.action.id", 0 );
+    private static final int VALIDATE_BATCH_ACTION_ID = AppPropertiesService.getPropertyInt( "identityimport.validate.action.id", 0 );
     private final WorkflowBeanService<CandidateIdentity> _wfIdentityBeanService = SpringContextService.getBean( CANDIDATEIDENTITY_WFBEANSERVICE );
     private final WorkflowBeanService<Batch> _wfBatchBeanService = SpringContextService.getBean( BATCH_WFBEANSERVICE );
     private final ProgressManagerService progressManagerService = ProgressManagerService.getInstance( );
@@ -125,7 +126,7 @@ public class BatchService
 
             // Init workflow resource
             final int batchId = bean.getId( );
-            _wfBatchBeanService.createWorkflowBean( bean, batchId, user );
+            final WorkflowBean<Batch> batchWorkflowBean = _wfBatchBeanService.createWorkflowBean(bean, batchId, user);
 
             if ( StringUtils.isNotEmpty( feedToken ) )
             {
@@ -169,6 +170,7 @@ public class BatchService
                 progressManagerService.addReport( feedToken, "Created" + batch.getIdentities( ).size( ) + " candidate identities" );
             }
             TransactionManager.commitTransaction( null );
+            _wfBatchBeanService.processAction(batchWorkflowBean, VALIDATE_BATCH_ACTION_ID, null, Locale.getDefault());
             return bean.getId( );
         }
         catch( final Exception e )

@@ -62,7 +62,7 @@ public final class BatchDAO implements IBatchDAO
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_batch WHERE id_batch = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_batch SET reference = ?, date = ?, user = ?, app_code = ?, comment = ? WHERE id_batch = ?";
     private static final String SQL_QUERY_PURGE = "";
-    private static final String SQL_QUERY_SELECTSTATES = "SELECT ws.id_state, ws.name, ws.description, COUNT(wr.id_resource) as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' WHERE ws.id_workflow = 1 GROUP BY ws.id_state, ws.name, ws.description";
+    private static final String SQL_QUERY_SELECTSTATES = "SELECT ws.id_state, ws.name, ws.description, COUNT(wr.id_resource), ws.display_order as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' WHERE ws.id_workflow = 1 GROUP BY ws.id_state, ws.name, ws.description";
     private static final String SQL_QUERY_SELECTSTATES_BY_APP_CODE = "SELECT ws.id_state, ws.name, ws.description, COUNT(b.app_code) as batch_count FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' LEFT JOIN identityimport_batch b ON b.id_batch = wr.id_resource AND b.app_code = '${app_code}' WHERE ws.id_workflow = 1 GROUP BY ws.id_state, ws.name, ws.description";
     private static final String SQL_QUERY_SELECTSTATE_BY_BATCH_ID = "SELECT ws.id_state, ws.name, ws.description, 1 as batch_count FROM workflow_resource_workflow wr LEFT JOIN workflow_state ws ON ws.id_state = wr.id_state LEFT JOIN identityimport_batch b ON b.id_batch = wr.id_resource WHERE ws.id_workflow = 1 AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' AND b.id_batch = ?";
     private static final String SQL_QUERY_SELECTALL = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch";
@@ -205,6 +205,7 @@ public final class BatchDAO implements IBatchDAO
                 state.setName( daoUtil.getString( 2 ) );
                 state.setDescription( daoUtil.getString( 3 ) );
                 state.setResourceCount( daoUtil.getInt( 4 ) );
+                state.setOrder( daoUtil.getInt( 5 ) );
                 states.add( state );
             }
 
