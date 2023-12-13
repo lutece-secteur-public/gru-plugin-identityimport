@@ -83,7 +83,7 @@
             </div>
             <ul class="list-group list-group-flush rounded-bottom-5">
                 <#list key_list as current_key >
-                    <li class="list-group-item d-flex justify-content-center align-items-center p-0 border-start-0 border-end-0" data-name="${current_key}" style="min-height:55px">
+                    <li class="list-group-item d-flex justify-content-center align-items-center p-0 border-start-0 border-end-0" data-name="${current_key}" data-key="${current_key}" style="min-height:55px">
                         <div class="w-100 d-flex">
                             <#assign attributesList=identity.attributes?filter(a -> a.key == current_key)>
                             <#if index != 0>
