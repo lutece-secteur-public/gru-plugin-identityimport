@@ -1,6 +1,6 @@
 <#macro mergeModals identity_workflow identityToKeep>
 	<div class="modal fade" id="merge-modal" tabindex="-1" aria-labelledby="mergeModalLabel" aria-hidden="true">
-		<div class="modal-dialog rounded-5">
+		<div class="modal-dialog modal-lg rounded-5">
 			<div class="modal-content rounded-5">
 				<form id="mediation-merge-form" class="form-inline container" action="jsp/admin/plugins/identityimport/ManageBatchs.jsp">
 					<#assign action=identity_workflow.actions?filter(a -> a.id == 6)?first!{}>
@@ -13,8 +13,14 @@
 						<button type="button" class="btn btn-rounded border position-absolute end-0 me-3 top-0 mt-3" data-bs-dismiss="modal" aria-label="Close">x</button>
 					</div>
 					<div class="modal-body text-center border-0 pt-0">
-						#i18n{identityimport.complete_identity.confirmMerge}
-						<ul id="recap-ul"></ul>
+						<h3 class="text-center w-100">#i18n{identityimport.complete_identity.confirmMerge}</h3>
+						<ul class="text-start">
+							<li><b>#i18n{identityimport.complete_identity.mergeEntities}</b></li>
+							<li class="d-none">
+								<b>#i18n{identityimport.complete_identity.copyAttributes}</b>
+								<ul id="recap-attributes-merge-ul"></ul>
+							</li>
+						</ul>
 					</div>
 					<div class="modal-footer justify-content-center pb-4 pt-0 border-0">
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">#i18n{identityimport.complete_identity.buttonCancel}</button>
