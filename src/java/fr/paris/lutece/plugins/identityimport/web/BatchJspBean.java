@@ -326,7 +326,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         }
         catch( IdentityStoreException e )
         {
-            this.addInfo( e.getLocalizedMessage( ));
+            this.addInfo( e.getLocalizedMessage( ) );
         }
 
         final Optional<String> returnUrlOpt = Optional.ofNullable( request.getParameter( PARAMETER_RETURN_URL ) );
@@ -819,7 +819,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         _listIdCandidateIdentities = new ArrayList<>( );
         _filterAppCode = request.getParameter( PARAMETER_FILTER_APP_CODE );
         _batchStates = BatchHome.getBatchStates( _filterAppCode );
-        _batchStates.sort(Comparator.comparingInt(ResourceState::getOrder));
+        _batchStates.sort( Comparator.comparingInt( ResourceState::getOrder ) );
 
         final Optional<String> idStateOpt = Optional.ofNullable( request.getParameter( PARAMETER_ID_BATCH_STATE ) );
         idStateOpt.ifPresent( idState -> {

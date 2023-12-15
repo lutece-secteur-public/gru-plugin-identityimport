@@ -126,7 +126,7 @@ public class BatchService
 
             // Init workflow resource
             final int batchId = bean.getId( );
-            final WorkflowBean<Batch> batchWorkflowBean = _wfBatchBeanService.createWorkflowBean(bean, batchId, user);
+            final WorkflowBean<Batch> batchWorkflowBean = _wfBatchBeanService.createWorkflowBean( bean, batchId, user );
 
             if ( StringUtils.isNotEmpty( feedToken ) )
             {
@@ -170,7 +170,7 @@ public class BatchService
                 progressManagerService.addReport( feedToken, "Created" + batch.getIdentities( ).size( ) + " candidate identities" );
             }
             TransactionManager.commitTransaction( null );
-            _wfBatchBeanService.processAction(batchWorkflowBean, VALIDATE_BATCH_ACTION_ID, null, Locale.getDefault());
+            _wfBatchBeanService.processActionNoUser( batchWorkflowBean, VALIDATE_BATCH_ACTION_ID, null, Locale.getDefault( ) );
             return bean.getId( );
         }
         catch( final Exception e )

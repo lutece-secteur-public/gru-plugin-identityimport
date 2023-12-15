@@ -170,6 +170,23 @@ public class WorkflowBeanService<T> implements Serializable
     }
 
     /**
+     * process action
+     *
+     * @param wfBean
+     * @param nAction
+     * @param request
+     * @param locale
+     *
+     */
+    public void processActionNoUser( WorkflowBean<T> wfBean, int nAction, HttpServletRequest request, Locale locale )
+    {
+        WorkflowService.getInstance( ).doProcessAction( wfBean.getResourceId( ), _strResourceType, nAction, wfBean.getExternalParentId( ), request, locale,
+                true, wfBean.getUser( ) );
+
+        refresh( wfBean );
+    }
+
+    /**
      * get task form HTML
      * 
      * @param wfBean
