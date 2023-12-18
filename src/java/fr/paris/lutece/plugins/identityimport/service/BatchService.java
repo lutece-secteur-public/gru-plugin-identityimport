@@ -144,7 +144,6 @@ public class BatchService
                 final CandidateIdentity candidateIdentity = new CandidateIdentity( );
                 candidateIdentity.setIdBatch( batchId );
                 candidateIdentity.setExternalCustomerId( identity.getExternalCustomerId( ) );
-                candidateIdentity.setCustomerId( identity.getCustomerId( ) );
                 candidateIdentity.setConnectionId( identity.getConnectionId( ) );
                 candidateIdentity.setClientAppCode( appCode );
                 CandidateIdentityHome.create( candidateIdentity );
