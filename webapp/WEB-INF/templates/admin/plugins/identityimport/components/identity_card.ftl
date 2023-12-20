@@ -8,7 +8,7 @@
   @param width Optional width for the card.
   @returns A rendered identity card based on provided parameters.
 -->
-<#macro identityCard identity identity_workflow index merge=false class="" width="">
+<#macro identityCard identity identity_workflow index serviceContract merge=false class="" width="">
     <#if index == 0>
         <#assign firstIdentity = identity>
     </#if>
@@ -91,9 +91,10 @@
                             </#if>
                             <#if attributesList?size gt 0>
                                 <#list attributesList as attr>
+                                    <#assign attributeDefinition = (serviceContract.attributeDefinitions?filter(a -> a.keyName == attr.key)?first)!{} />
                                     <div class="flex-1 flex-grow-1 py-2 px-3 text-break">
                                         <div class="opacity-50">
-                                            ${current_key}
+                                            ${current_key} <#if !attributeDefinition.attributeRight.writable> <i class="ti ti-x" style="color: red"></i> </#if>
                                         </div>
                                         <div class="fw-bold">
                                             <h3 class="mb-0 fw-bold <#if index!=0 && ( !(firstIdentityAttr.value?has_content) || firstIdentityAttr.value != attr.value )>text-danger</#if>">

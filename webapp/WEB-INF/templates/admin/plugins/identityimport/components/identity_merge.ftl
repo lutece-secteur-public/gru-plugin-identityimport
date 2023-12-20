@@ -15,7 +15,7 @@
   Usage:
     <@identityMerge />
 -->
-<#macro identityMerge identityToMerge identityToKeep keyList>
+<#macro identityMerge identityToMerge identityToKeep keyList serviceContract>
     <div id="lutece-merge" class="p-0 m-0 position-absolute start-50 translate-middle-x z-2" style="width:100px;">
         <ul class="list-group list-group-flush">
             <li class="position-relative d-flex justify-content-center align-items-center" style="height:155px;">
@@ -28,11 +28,12 @@
                 <li class="list-group-item text-center d-flex justify-content-center align-items-center border-0" data-name="${current_key}" style="min-height:55px">
                     <#list identityToMerge.attributes?filter(a -> a.key == current_key) as attrToMerge>
                         <#assign attrToKeep = (identityToKeep.attributes?filter(a -> a.key == current_key)?first)!{} >
+                        <#assign attributeDefinition = (serviceContract.attributeDefinitions?filter(a -> a.keyName == current_key)?first)!{} />
                         <#if ( !identityToKeep.monParisActive && !identityToMerge.monParisActive && ( attrToMerge.certificationLevel gte (attrToKeep.certificationLevel)!0 ) && ( !(attrToKeep?has_content) || (attrToKeep.value != attrToMerge.value) ) )
-                             || !(attrToKeep?has_content) >
+                                || !(attrToKeep?has_content) >
                             <div class="position-absolute top-50 start-0 end-0 bg-dark border-top border-primary-subtle mediation-line-merge" style="z-index:-1"></div>
                             <div class="text-center w-100">
-                                <@button class='btn btn-rounded border-primary-subtle btn-light m-auto mediation-btn-merge' color='-' buttonIcon='arrow-left' params=' data-name="${attrToMerge.name}" data-key="${attrToMerge.key}" data-value="${attrToMerge.value}" data-certif="${attrToMerge.certifier}" data-certifdate="${attrToMerge.certificationDate?date}" data-timestamp-certif="${attrToMerge.certificationDate?long}"' />
+                                <@button disabled=!attributeDefinition.attributeRight.writable class='btn btn-rounded border-primary-subtle btn-light m-auto mediation-btn-merge' color='-' buttonIcon='arrow-left' params=' data-name="${attributeDefinition.name}" data-key="${attrToMerge.key}" data-value="${attrToMerge.value}" data-certif="${attrToMerge.certifier}" data-certifdate="${attrToMerge.certificationDate?date}" data-timestamp-certif="${attrToMerge.certificationDate?long}"' />
                             </div>
                         </#if>
                     </#list>

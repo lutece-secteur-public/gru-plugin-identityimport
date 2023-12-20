@@ -44,10 +44,12 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.QualityDefinit
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.CandidateIdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.ImportingHistoryDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.referentiel.AttributeCertificationProcessusDto;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -118,10 +120,10 @@ public class CandidateIdentityService
         quality.setQuality( 1.0 );
         dto.setQuality( quality );
 
-        ServiceContractDto activeServiceContract = null;
+        final List<AttributeCertificationProcessusDto> processes = new ArrayList<>();
         try
         {
-            activeServiceContract = ServiceContractService.instance( ).getActiveServiceContract( bean.getClientAppCode( ) );
+            processes.addAll(ReferentialService.instance().getProcesses());
         }
         catch( IdentityStoreException exception )
         {
@@ -135,13 +137,7 @@ public class CandidateIdentityService
             attrDto.setValue( attr.getValue( ) );
             attrDto.setCertifier( attr.getCertProcess( ) );
             attrDto.setCertificationDate( attr.getCertDate( ) );
-            if ( activeServiceContract != null )
-            {
-                activeServiceContract.getAttributeDefinitions( ).stream( ).filter( def -> Objects.equals( def.getKeyName( ), attr.getCode( ) ) ).findFirst( )
-                        .flatMap( def -> def.getAttributeCertifications( ).stream( ).filter( cert -> Objects.equals( cert.getCode( ), attr.getCertProcess( ) ) )
-                                .findFirst( ) )
-                        .ifPresent( cert -> attrDto.setCertificationLevel( Integer.parseInt( cert.getLevel( ) ) ) );
-            }
+            processes.stream().filter(process -> Objects.equals(process.getCode(), attr.getCertProcess())).findFirst().flatMap(process -> process.getAttributeCertificationLevels().stream().filter(level -> Objects.equals(level.getAttributeKey(), attr.getCode())).findFirst()).ifPresent(level -> attrDto.setCertificationLevel(Integer.parseInt(level.getLevel().getLevel())));
             dto.getAttributes( ).add( attrDto );
         }
         return dto;

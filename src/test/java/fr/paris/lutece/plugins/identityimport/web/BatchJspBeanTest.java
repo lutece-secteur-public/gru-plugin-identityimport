@@ -44,7 +44,6 @@ import fr.paris.lutece.test.LuteceTestCase;
 import fr.paris.lutece.util.date.DateUtil;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockServletConfig;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -64,17 +63,13 @@ public class BatchJspBeanTest extends LuteceTestCase
     private static final String COMMENT1 = "Comment1";
     private static final String COMMENT2 = "Comment2";
 
-    public void testJspBeans( ) throws AccessDeniedException, IOException
+    public void testJspBeans( ) throws IOException
     {
         MockHttpServletRequest request = new MockHttpServletRequest( );
 
         // display admin Batch management JSP
         BatchJspBean jspbean = new BatchJspBean( );
         String html = jspbean.getManageBatchs( request );
-        assertNotNull( html );
-
-        // display admin Batch creation JSP
-        html = jspbean.getCreateBatch( request );
         assertNotNull( html );
 
         // action create Batch
@@ -120,8 +115,6 @@ public class BatchJspBeanTest extends LuteceTestCase
         request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
         jspbean = new BatchJspBean( );
 
-        assertNotNull( jspbean.getModifyBatch( request ) );
-
         // action modify Batch
         request = new MockHttpServletRequest( );
         response = new MockHttpServletResponse( );
@@ -160,8 +153,6 @@ public class BatchJspBeanTest extends LuteceTestCase
         // request.setRequestURI("jsp/admin/plugins/example/ManageBatchs.jsp");
         request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
         jspbean = new BatchJspBean( );
-        request.addParameter( "action", "confirmRemoveBatch" );
-        assertNotNull( jspbean.getModifyBatch( request ) );
 
         // do remove Batch
         request = new MockHttpServletRequest( );

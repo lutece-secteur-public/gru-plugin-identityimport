@@ -33,6 +33,9 @@
 	<bean id="restTransport.serviceContract.httpAccess" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.ServiceContractTransportRest">
 		<constructor-arg ref="httpAccessTransport-ids"/>
 	</bean>
+	<bean id="restTransport.referential.httpAccess" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.ReferentialTransportRest">
+		<constructor-arg ref="httpAccessTransport-ids" />
+	</bean>
 
 	<!-- IdentityService impl -->
 	<bean id="identityService.rest" class="fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService">
@@ -42,6 +45,11 @@
 	<!-- ServiceContractService impl -->
 	<bean id="identity.serviceContractService" class="fr.paris.lutece.plugins.identitystore.v3.web.service.ServiceContractService">
 		<constructor-arg ref="restTransport.serviceContract.httpAccess"/>
+	</bean>
+
+	<!-- ReferentialService  impl -->
+	<bean id="identity.referentialService" class="fr.paris.lutece.plugins.identitystore.v3.web.service.ReferentialService">
+		<constructor-arg ref="restTransport.referential.httpAccess"/>
 	</bean>
 
 	<!-- IHttpTransportProvider declarations -->
@@ -62,6 +70,9 @@
 	<!-- Cache -->
 	<bean id="identity.serviceContractCacheService"  class="fr.paris.lutece.plugins.identityimport.cache.ServiceContractCache">
 		<constructor-arg ref="identity.serviceContractService"/>
+	</bean>
+	<bean id="identity.serviceReferentialCache"  class="fr.paris.lutece.plugins.identityimport.cache.ReferentialCache">
+		<constructor-arg ref="identity.referentialService"/>
 	</bean>
 
 	<!-- REST -->

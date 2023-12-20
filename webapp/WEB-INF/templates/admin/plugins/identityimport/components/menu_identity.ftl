@@ -63,4 +63,8 @@
             </div>
         </div>
     </div>
+    <hr class="d-none d-xxl-block">
+    <div class="alert alert-warning mt-2" role="alert">
+        <p class="m-0 text-body">#i18n{identityimport.select_identities.service.contract.rights.message}</p>
+    </div>
 </@pageColumn>

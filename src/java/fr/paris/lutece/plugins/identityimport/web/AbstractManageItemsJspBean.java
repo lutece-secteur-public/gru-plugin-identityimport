@@ -81,17 +81,17 @@ public abstract class AbstractManageItemsJspBean<S, T> extends MVCAdminJspBean
      */
     protected Map<String, Object> getPaginatedListModel( HttpServletRequest request, String strBookmark, List<S> list, String strManageJsp )
     {
-        int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 50 );
+        final int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 50 );
         _strCurrentPageIndex = AbstractPaginator.getPageIndex( request, AbstractPaginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex );
         _nItemsPerPage = AbstractPaginator.getItemsPerPage( request, AbstractPaginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage, nDefaultItemsPerPage );
 
-        UrlItem url = new UrlItem( strManageJsp );
-        String strUrl = url.getUrl( );
+        final UrlItem url = new UrlItem( strManageJsp );
+        final String strUrl = url.getUrl( );
 
         // PAGINATOR
-        LocalizedPaginator<S> paginator = new LocalizedPaginator<>( list, _nItemsPerPage, strUrl, PARAMETER_PAGE_INDEX, _strCurrentPageIndex, getLocale( ) );
+        final LocalizedPaginator<S> paginator = new LocalizedPaginator<>( list, _nItemsPerPage, strUrl, PARAMETER_PAGE_INDEX, _strCurrentPageIndex, getLocale( ) );
 
-        Map<String, Object> model = getModel( );
+        final Map<String, Object> model = getModel( );
 
         model.put( MARK_NB_ITEMS_PER_PAGE, String.valueOf( _nItemsPerPage ) );
         model.put( MARK_PAGINATOR, paginator );

@@ -30,22 +30,6 @@
             <feature-icon-url></feature-icon-url>
         </admin-feature>
         <admin-feature>
-            <feature-id>IDENTITYIMPORT_CANDIDATE_IDENTITY_MANAGEMENT</feature-id>
-            <feature-title>identityimport.adminFeature.ManageCandidateIdentities.name</feature-title>
-            <feature-description>identityimport.adminFeature.ManageCandidateIdentities.description</feature-description>
-            <feature-level>0</feature-level>
-            <feature-url>jsp/admin/plugins/identityimport/ManageCandidateIdentities.jsp</feature-url>
-            <feature-icon-url></feature-icon-url>
-        </admin-feature>
-        <admin-feature>
-            <feature-id>IDENTITYIMPORT_CANDIDATE_IDENTITY_ATTRIBUTE_MANAGEMENT</feature-id>
-            <feature-title>identityimport.adminFeature.ManageCandidateIdentitiesAttributes.name</feature-title>
-            <feature-description>identityimport.adminFeature.ManageCandidateIdentitiesAttributes.description</feature-description>
-            <feature-level>0</feature-level>
-            <feature-url>jsp/admin/plugins/identityimport/ManageCandidateIdentityAttributes.jsp</feature-url>
-            <feature-icon-url></feature-icon-url>
-        </admin-feature>
-        <admin-feature>
             <feature-id>IDENTITYIMPORT_CLIENT_MANAGEMENT</feature-id>
             <feature-title>identityimport.adminFeature.ManageClients.name</feature-title>
             <feature-description>identityimport.adminFeature.ManageClients.description</feature-description>

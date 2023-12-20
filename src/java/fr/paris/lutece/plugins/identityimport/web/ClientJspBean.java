@@ -139,7 +139,7 @@ public class ClientJspBean extends AbstractManageItemsJspBean<Integer, Client>
     @Override
     List<Client> getItemsFromIds( List<Integer> listIds )
     {
-        List<Client> listClient = ClientHome.getClientsListByIds( listIds );
+        final List<Client> listClient = ClientHome.getClientsListByIds( listIds );
 
         // keep original order
         return listClient.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) ).collect( Collectors.toList( ) );
