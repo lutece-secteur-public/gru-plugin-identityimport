@@ -200,7 +200,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private final IdentityService identityService = SpringContextService.getBean( "identityService.rest" );
     private final List<String> DUPLICATE_RULE_CODES = Arrays.asList( AppPropertiesService.getProperty( PROPERTY_DUPLICATE_RULES, "" ).split( "," ) );
     private final int NB_ITEMS_PER_PAGES = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 10 );
-    private final String IMPORT_CLIENT_CODE = AppPropertiesService.getProperty(PROPERTY_IMPORT_CLIENT_CODE);
+    private final String IMPORT_CLIENT_CODE = AppPropertiesService.getProperty( PROPERTY_IMPORT_CLIENT_CODE );
 
     /**
      * Build the Manage View
@@ -307,8 +307,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             keyList.addAll( response.getIdentities( ).stream( ).flatMap( duplicate -> duplicate.getAttributes( ).stream( ) ).map( AttributeDto::getKey )
                     .distinct( ).collect( Collectors.toList( ) ) );
             model.put( MARK_CANDIDATE_IDENTITY_DUPLICATE_LIST, response.getIdentities( ) );
-            final ServiceContractDto clientServiceContract = ServiceContractService.instance( ).getActiveServiceContract( _candidateidentity.getClientAppCode() );
-            model.put(MARK_SERVICE_CONTRACT, clientServiceContract);
+            final ServiceContractDto clientServiceContract = ServiceContractService.instance( )
+                    .getActiveServiceContract( _candidateidentity.getClientAppCode( ) );
+            model.put( MARK_SERVICE_CONTRACT, clientServiceContract );
         }
         catch( IdentityStoreException e )
         {
@@ -367,8 +368,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
                         .distinct( ).collect( Collectors.toList( ) ) );
                 model.put( MARK_IDENTITY_TO_KEEP, response.getIdentities( ).get( 0 ) );
             }
-            final ServiceContractDto clientServiceContract = ServiceContractService.instance( ).getActiveServiceContract( _candidateidentity.getClientAppCode() );
-            model.put(MARK_SERVICE_CONTRACT, clientServiceContract);
+            final ServiceContractDto clientServiceContract = ServiceContractService.instance( )
+                    .getActiveServiceContract( _candidateidentity.getClientAppCode( ) );
+            model.put( MARK_SERVICE_CONTRACT, clientServiceContract );
         }
         catch( IdentityStoreException e )
         {

@@ -50,10 +50,10 @@ public class ReferentialCache extends AbstractCacheableService
     private static final String SERVICE_NAME = "ReferentialCacheService";
     private static final String KEY = "ReferentialCacheService";
     private static final String PROPERTY_IMPORT_CLIENT_CODE = "identityimport.client.code";
-    private static final String IMPORT_CLIENT_CODE = AppPropertiesService.getProperty(PROPERTY_IMPORT_CLIENT_CODE);
+    private static final String IMPORT_CLIENT_CODE = AppPropertiesService.getProperty( PROPERTY_IMPORT_CLIENT_CODE );
     private final ReferentialService _referentialService;
 
-    public ReferentialCache(ReferentialService srService )
+    public ReferentialCache( ReferentialService srService )
     {
         _referentialService = srService;
         this.initCache( );
@@ -61,32 +61,34 @@ public class ReferentialCache extends AbstractCacheableService
 
     public void put( final String processus, final List<AttributeCertificationProcessusDto> referential )
     {
-        if ( this.getKeys( ).contains( processus  ) )
+        if ( this.getKeys( ).contains( processus ) )
         {
-            this.removeKey( processus  );
+            this.removeKey( processus );
         }
-        this.putInCache( processus , referential );
-        AppLogService.debug( "Processus added to cache: " + processus  );
+        this.putInCache( processus, referential );
+        AppLogService.debug( "Processus added to cache: " + processus );
     }
 
     public void remove( final String processus )
     {
-        if ( this.getKeys( ).contains( processus  ) )
+        if ( this.getKeys( ).contains( processus ) )
         {
-            this.removeKey( processus  );
+            this.removeKey( processus );
         }
-        AppLogService.debug( "Processus removed from cache: " + processus  );
+        AppLogService.debug( "Processus removed from cache: " + processus );
     }
 
-    public List<AttributeCertificationProcessusDto> get() throws IdentityStoreException
+    public List<AttributeCertificationProcessusDto> get( ) throws IdentityStoreException
     {
-        final List<AttributeCertificationProcessusDto> processusDtos = _referentialService.getProcessList( IMPORT_CLIENT_CODE, this.buildAuthor()).getProcessus( );
-        this.put( KEY , processusDtos );
+        final List<AttributeCertificationProcessusDto> processusDtos = _referentialService.getProcessList( IMPORT_CLIENT_CODE, this.buildAuthor( ) )
+                .getProcessus( );
+        this.put( KEY, processusDtos );
         return processusDtos;
     }
 
-    private RequestAuthor buildAuthor() {
-        return new RequestAuthor("IdentityDesk_ServiceReferentialCache", AuthorType.application.name());
+    private RequestAuthor buildAuthor( )
+    {
+        return new RequestAuthor( "IdentityDesk_ServiceReferentialCache", AuthorType.application.name( ) );
     }
 
     @Override

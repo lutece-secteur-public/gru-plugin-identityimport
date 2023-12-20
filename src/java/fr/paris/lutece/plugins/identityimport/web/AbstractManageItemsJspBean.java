@@ -89,7 +89,8 @@ public abstract class AbstractManageItemsJspBean<S, T> extends MVCAdminJspBean
         final String strUrl = url.getUrl( );
 
         // PAGINATOR
-        final LocalizedPaginator<S> paginator = new LocalizedPaginator<>( list, _nItemsPerPage, strUrl, PARAMETER_PAGE_INDEX, _strCurrentPageIndex, getLocale( ) );
+        final LocalizedPaginator<S> paginator = new LocalizedPaginator<>( list, _nItemsPerPage, strUrl, PARAMETER_PAGE_INDEX, _strCurrentPageIndex,
+                getLocale( ) );
 
         final Map<String, Object> model = getModel( );
 

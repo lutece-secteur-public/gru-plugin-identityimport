@@ -59,9 +59,10 @@ public class ReferentialService
 
     /**
      * Get referential processus list
+     * 
      * @return ServiceContractDto instance
      */
-    public List<AttributeCertificationProcessusDto> getProcesses(  ) throws IdentityStoreException
+    public List<AttributeCertificationProcessusDto> getProcesses( ) throws IdentityStoreException
     {
         return _cache.get( );
     }

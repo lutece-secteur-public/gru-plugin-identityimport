@@ -120,10 +120,10 @@ public class CandidateIdentityService
         quality.setQuality( 1.0 );
         dto.setQuality( quality );
 
-        final List<AttributeCertificationProcessusDto> processes = new ArrayList<>();
+        final List<AttributeCertificationProcessusDto> processes = new ArrayList<>( );
         try
         {
-            processes.addAll(ReferentialService.instance().getProcesses());
+            processes.addAll( ReferentialService.instance( ).getProcesses( ) );
         }
         catch( IdentityStoreException exception )
         {
@@ -137,7 +137,10 @@ public class CandidateIdentityService
             attrDto.setValue( attr.getValue( ) );
             attrDto.setCertifier( attr.getCertProcess( ) );
             attrDto.setCertificationDate( attr.getCertDate( ) );
-            processes.stream().filter(process -> Objects.equals(process.getCode(), attr.getCertProcess())).findFirst().flatMap(process -> process.getAttributeCertificationLevels().stream().filter(level -> Objects.equals(level.getAttributeKey(), attr.getCode())).findFirst()).ifPresent(level -> attrDto.setCertificationLevel(Integer.parseInt(level.getLevel().getLevel())));
+            processes.stream( ).filter( process -> Objects.equals( process.getCode( ), attr.getCertProcess( ) ) ).findFirst( )
+                    .flatMap( process -> process.getAttributeCertificationLevels( ).stream( )
+                            .filter( level -> Objects.equals( level.getAttributeKey( ), attr.getCode( ) ) ).findFirst( ) )
+                    .ifPresent( level -> attrDto.setCertificationLevel( Integer.parseInt( level.getLevel( ).getLevel( ) ) ) );
             dto.getAttributes( ).add( attrDto );
         }
         return dto;
