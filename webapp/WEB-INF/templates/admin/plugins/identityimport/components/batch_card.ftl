@@ -13,7 +13,7 @@
                 <div class="lutece-compare-item card p-0 rounded-5 shadow-xl my-3">
                     <div class="py-4 text-center">
                         <h3 class="px-2 text-truncate">
-                            Batch
+                            #i18n{identityimport.modify_batch.pageTitle}
                         </h3>
                     </div>
                     <ul class="list-group list-group-flush rounded-bottom-5">
