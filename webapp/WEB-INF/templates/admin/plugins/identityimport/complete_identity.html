@@ -2,15 +2,16 @@
 <#include "components/identity_card.ftl" />
 <#include "components/identity_merge.ftl" />
 <#include "components/merge_modals.ftl" />
+<div id="message-select-identity" style="display: none" data-value="#i18n{identityimport.complete_identity.button.selectIdentity}"></div>
+<div id="message-select-identity-with-attributes" style="display: none" data-value="#i18n{identityimport.complete_identity.button.selectIdentity.with.attributes}"></div>
 <@pageContainer id="mediation">
     <#include "components/menu_identity.ftl" />
     <@pageColumn id="mediation-resolve" class="pt-xl-4 px-xl-5 bg-secondary ">
         <div class="container">
             <@pageHeader title="#i18n{identityimport.complete_identity.pageTitle}">
                 <#if !identity_to_keep.monParisActive>
-                    <button id="merge-btn" type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#merge-modal">
-                        #i18n{identityimport.complete_identity.buttonMergeDuplicate}
+                    <button id="merge-btn" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#merge-modal">
+                        #i18n{identityimport.complete_identity.button.selectIdentity}
                     </button>
                 </#if>
             </@pageHeader>

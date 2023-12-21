@@ -15,7 +15,7 @@
 					<div class="modal-body text-center border-0 pt-0">
 						<h3 class="text-center w-100">#i18n{identityimport.complete_identity.confirmMerge}</h3>
 						<ul class="text-start">
-							<li><b>#i18n{identityimport.complete_identity.mergeEntities}</b></li>
+							<li><b>#i18n{identityimport.complete_identity.select.message}</b></li>
 							<li class="d-none">
 								<b>#i18n{identityimport.complete_identity.copyAttributes}</b>
 								<ul id="recap-attributes-merge-ul"></ul>
@@ -24,7 +24,7 @@
 					</div>
 					<div class="modal-footer justify-content-center pb-4 pt-0 border-0">
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">#i18n{identityimport.complete_identity.buttonCancel}</button>
-						<button type="submit" form="mediation-merge-form" class="btn btn-primary" name="action_processIdentityAction">#i18n{identityimport.complete_identity.buttonMergeDuplicate}</button>
+						<button type="submit" form="mediation-merge-form" class="btn btn-primary" name="action_processIdentityAction">#i18n{identityimport.complete_identity.button.confirm}</button>
 					</div>
 				</form>
 			</div>

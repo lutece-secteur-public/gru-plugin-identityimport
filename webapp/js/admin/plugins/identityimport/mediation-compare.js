@@ -73,7 +73,7 @@ export default class MediationCompare {
                     btn.classList.add('bg-warning-subtle', 'text-warning-emphasis', 'border-warning');
                     btn.classList.remove('border-primary-subtle', 'btn-light');
                     icon.classList.remove('ti-arrow-right');
-                    icon.classList.add('ti-x');
+                    icon.classList.add('ti-x', 'merge-attribute');
                     mediationLine.classList.add('border-warning-subtle');
                     mediationLine.classList.remove('border-primary-subtle');
                     valueRight.classList.add('text-decoration-line-through', 'opacity-50');
@@ -88,7 +88,7 @@ export default class MediationCompare {
                 } else {
                     btn.classList.remove('bg-warning-subtle', 'text-warning-emphasis');
                     btn.classList.add('border-primary-subtle', 'btn-light');
-                    icon.classList.remove('ti-x');
+                    icon.classList.remove('ti-x', 'merge-attribute');
                     icon.classList.add('ti-arrow-right');
                     mediationLine.classList.remove('border-warning-subtle');
                     mediationLine.classList.add('border-primary-subtle');
@@ -97,6 +97,13 @@ export default class MediationCompare {
                     attrContainerRight.removeChild(newValue)
                     attrLineLeft.classList.remove('bg-warning-subtle');
                     this.merge(btn, false);
+                }
+
+                let mergeButton = document.getElementById('merge-btn');
+                if(document.querySelectorAll('.merge-attribute').length > 0) {
+                    mergeButton.innerHTML = document.getElementById('message-select-identity-with-attributes').getAttribute('data-value');
+                } else {
+                    mergeButton.innerHTML = document.getElementById('message-select-identity').getAttribute('data-value');
                 }
             });
         });
