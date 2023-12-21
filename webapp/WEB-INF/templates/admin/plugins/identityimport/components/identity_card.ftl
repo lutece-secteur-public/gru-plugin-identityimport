@@ -8,7 +8,7 @@
   @param width Optional width for the card.
   @returns A rendered identity card based on provided parameters.
 -->
-<#macro identityCard identity identity_workflow index serviceContract merge=false class="" width="">
+<#macro identityCard identity identity_workflow index serviceContract merge=false candidate=false class="" width="">
     <#if index == 0>
         <#assign firstIdentity = identity>
     </#if>
@@ -55,15 +55,19 @@
                         </#if>
                     </div>
                     <div>
-                        <#if identity.monParisActive>
-                            <@tag color="success" class="ms-2">MON PARIS</@tag>
-                        <#else>
-                            <@tag color="danger" class="ms-2 text-decoration-line-through">MON PARIS</@tag>
+                        <#if !candidate>
+                            <#if identity.monParisActive>
+                                <@tag color="success" class="ms-2">MON PARIS</@tag>
+                            <#else>
+                                <@tag color="danger" class="ms-2 text-decoration-line-through">MON PARIS</@tag>
+                            </#if>
                         </#if>
                     </div>
                     <div>
-                        <#if identity.customerId??>
-                            <@tag color="info" class="ms-2" params="data-toggle='tooltip' data-placement='top' title='${identity.customerId}'">CUID</@tag>
+                        <#if !candidate>
+                            <#if identity.customerId??>
+                                <@tag color="info" class="ms-2" params="data-toggle='tooltip' data-placement='top' title='${identity.customerId}'">CUID</@tag>
+                            </#if>
                         </#if>
                     </div>
                 </div>

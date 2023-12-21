@@ -115,9 +115,9 @@ public class CandidateIdentityService
         dto.setExternalCustomerId( bean.getExternalCustomerId( ) );
         dto.setMonParisActive( false );
         final QualityDefinition quality = new QualityDefinition( );
-        quality.setCoverage( 1 );
-        quality.setScoring( 1.0 );
-        quality.setQuality( 1.0 );
+        quality.setCoverage( 0 );
+        quality.setScoring( 0.0 );
+        quality.setQuality( 0.0 );
         dto.setQuality( quality );
 
         final List<AttributeCertificationProcessusDto> processes = new ArrayList<>( );
