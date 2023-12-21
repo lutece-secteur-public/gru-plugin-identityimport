@@ -71,19 +71,24 @@
                         </#if>
                     </div>
                 </div>
-                <#if !merge>
-                    <div class="mt-3">
-                        <#if index!=0>
+                <div class="mt-3">
+                    <#if candidate>
+                        <button type="button" class="btn btn-warning" data-name="identity-cuid-${index}" data-cuid="${identity.customerId!''}">
+                            #i18n{identityimport.import_identity.importedIdentity}
+                        </button>
+                    <#else>
+                        <#if merge>
+                            <button type="button" class="btn btn-success" data-name="identity-cuid-${index}" data-cuid="${identity.customerId!''}">
+                                #i18n{identityimport.import_identity.selectedIdentity}
+                            </button>
+                        <#else>
                             <button type="button" class="btn btn-success" data-name="identity-cuid-${index}" data-cuid="${identity.customerId!''}">
                                 ${identity.duplicateDefinition.duplicateSuspicion.duplicateRuleCode!''}
                             </button>
-                        <#else>
-                            <button type="button" class="btn btn-warning" data-name="identity-cuid-${index}" data-cuid="${identity.customerId!''}">
-                                #i18n{identityimport.import_identity.importedIdentity}
-                            </button>
                         </#if>
-                    </div>
-                </#if>
+                    </#if>
+
+                </div>
             </div>
             <ul class="list-group list-group-flush rounded-bottom-5">
                 <#list key_list as current_key >
