@@ -8,15 +8,12 @@
   @param width Optional width for the card.
   @returns A rendered identity card based on provided parameters.
 -->
-<#macro identityCard identity identity_workflow index serviceContract merge=false candidate=false class="" width="">
-    <#if index == 0>
-        <#assign firstIdentity = identity>
-    </#if>
+<#macro identityCard identity identity_workflow firstIdentity index serviceContract merge=false candidate=false class="" width="">
     <#assign familyNameAttr = identity.attributes?filter(a -> a.key == "family_name")?first!{}>
     <#assign firstNameAttr = identity.attributes?filter(a -> a.key == "first_name")?first!{}>
     <#assign emailAttr = identity.attributes?filter(a -> a.key == "email")?first!{}>
     <#assign birthdateAttr = identity.attributes?filter(a -> a.key == "birthdate")?first!{}>
-    <div class="lutece-compare-item-container border-end p-3 position-relative <#if index=0>bg-primary-subtle border border-primary-subtle rounded-start-5<#else> border-top border-bottom</#if><#if !merge & index=0> border-2 border-end-dashed </#if><#if !merge && index!=0> border-dark-subtle<#elseif merge & index!=0> border-warning-subtle</#if> ${class}" style="<#if width!=''>width:${width}</#if>">
+    <div class="lutece-compare-item-container border-end p-3 position-relative <#if index == 0>bg-primary-subtle border border-primary-subtle rounded-start-5<#else> border-top border-bottom</#if><#if !merge && index == 0> border-2 border-end-dashed </#if><#if !merge && index != 0> border-dark-subtle<#elseif merge && index != 0> border-warning-subtle</#if> ${class}" style="<#if width!=''>width:${width}</#if>">
         <div class="lutece-compare-item card p-0 rounded-5 shadow-xl mb-0">
             <div class="py-4 text-center">
                 <h3 class="px-2 text-truncate">
@@ -87,30 +84,29 @@
                             </button>
                         </#if>
                     </#if>
-
                 </div>
             </div>
             <ul class="list-group list-group-flush rounded-bottom-5">
                 <#list key_list as current_key >
+                    <#assign attributeDefinition = (serviceContract.attributeDefinitions?filter(a -> a.keyName == current_key)?first)!{} />
                     <li class="list-group-item d-flex justify-content-center align-items-center p-0 border-start-0 border-end-0" data-name="${current_key}" data-key="${current_key}" style="min-height:55px">
                         <div class="w-100 d-flex">
                             <#assign attributesList=identity.attributes?filter(a -> a.key == current_key)>
-                            <#if index != 0>
+                            <#if (!merge && index != 0) || (merge && index == 0)>
                                 <#assign firstIdentityAttr=firstIdentity.attributes?filter(a -> a.key == current_key)?first!{}>
                             </#if>
                             <#if attributesList?size gt 0>
                                 <#list attributesList as attr>
-                                    <#assign attributeDefinition = (serviceContract.attributeDefinitions?filter(a -> a.keyName == attr.key)?first)!{} />
                                     <div class="flex-1 flex-grow-1 py-2 px-3 text-break">
                                         <div class="opacity-50">
                                             ${current_key} <#if !attributeDefinition.attributeRight.writable> <i class="ti ti-x" style="color: red"></i> </#if>
                                         </div>
-                                        <div class="fw-bold">
-                                            <h3 class="mb-0 fw-bold <#if index!=0 && ( !(firstIdentityAttr.value?has_content) || firstIdentityAttr.value != attr.value )>text-danger</#if>">
+                                        <div class="fw-bold attribute-container">
+                                            <h3 class="attribute-value mb-0 fw-bold <#if !attr.value?has_content>text-warning</#if> <#if ((!merge && index != 0) || (merge && index == 0)) && ( !(firstIdentityAttr.value?has_content) || firstIdentityAttr.value != attr.value )>text-danger</#if>">
                                                 <#if attr.value?? && attr.value?has_content>
                                                     ${attr.value}
                                                 <#else>
-                                                    <span class="text-warning">Vide</span>
+                                                    Vide
                                                 </#if>
                                             </h3>
                                         </div>
@@ -132,11 +128,16 @@
                                 </#list>
                             <#else>
                                 <div class="flex-1 flex-grow-1 py-2 px-3 text-break">
-                                    <div class="small-title">
-                                        ${current_key}
+                                    <div class="opacity-50">
+                                        ${current_key} <#if !attributeDefinition.attributeRight.writable> <i class="ti ti-x" style="color: red"></i> </#if>
                                     </div>
-                                    <h3 class="mb-0 fw-bold"><span class="text-warning">Inexistant</span></h3>
+                                    <div class="fw-bold attribute-container">
+                                        <h3 class="attribute-value mb-0 fw-bold text-warning">
+                                            Inexistant
+                                        </h3>
+                                    </div>
                                 </div>
+                                <div class="flex-1 border-start py-2 px-2 text-break" style="width:110px;min-width:110px;max-width:110px;"></div>
                             </#if>
                         </div>
                     </li>
@@ -144,15 +145,8 @@
             </ul>
             <div class="py-4 text-center">
                 <#if !merge>
-                    <#if index!=0>
-                        <#list identity_workflow.actions as action >
-                            <#if action.id == 6>
-                                <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processIdentityAction&actionId=${action.id}&id=${identity_workflow.resource.id}&customer_id=${identity.customerId!''}" title="${action.name}" alt="${action.name}"/>
-                            </#if>
-                        </#list>
-                        <a class="btn btn-outline-primary" href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_completeIdentity=&id_identity=${identity_workflow.resource.id}&selected_customer_id=${identity.customerId!''}">
-                            <i class="ti ti-arrow-big-left-filled"></i> #i18n{identityimport.select_identities.buttonMergeDuplicate}
-                        </a>
+                    <#if index != 0>
+                        <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_completeIdentity=&id_identity=${identity_workflow.resource.id}&selected_customer_id=${identity.customerId!''}" title="#i18n{identityimport.select_identities.buttonMergeDuplicate}" alt="#i18n{identityimport.select_identities.buttonMergeDuplicate}"/>
                     <#else>
                         <#list identity_workflow.actions as action >
                             <#if action.id == 4 >

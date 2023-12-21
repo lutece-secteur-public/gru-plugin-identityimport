@@ -26,9 +26,9 @@
                 </div>
             </#if>
             <div id="lutece-compare" class="row mt-4 position-relative shadow rounded-5 mx-1">
-                <@identityCard identity=identity_to_keep index=0 identity_workflow=identity_workflow serviceContract=client_service_contract merge=true class="col-6 p-5"/>
+                <@identityCard identity=identity firstIdentity=identity_to_keep candidate=true index=0 identity_workflow=identity_workflow serviceContract=client_service_contract merge=true class="col-6 p-5"/>
                 <@identityMerge identityToKeep=identity_to_keep identityToMerge=identity keyList=key_list serviceContract=client_service_contract />
-                <@identityCard identity=identity candidate=true index=1 identity_workflow=identity_workflow serviceContract=client_service_contract merge=true class="col-6 p-5 rounded-end-5"/>
+                <@identityCard identity=identity_to_keep firstIdentity=identity_to_keep index=1 identity_workflow=identity_workflow serviceContract=client_service_contract merge=true class="col-6 p-5 rounded-end-5"/>
             </div>
         </div>
         <@mergeModals identity_workflow=identity_workflow identityToKeep=identity_to_keep />

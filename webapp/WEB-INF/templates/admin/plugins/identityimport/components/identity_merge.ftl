@@ -31,7 +31,7 @@
                                 || !(attrToKeep?has_content) >
                             <div class="position-absolute top-50 start-0 end-0 bg-dark border-top border-primary-subtle mediation-line-merge" style="z-index:-1"></div>
                             <div class="text-center w-100">
-                                <@button disabled=!attributeDefinition.attributeRight.writable class='btn btn-rounded border-primary-subtle btn-light m-auto mediation-btn-merge' color='-' buttonIcon='arrow-left' params=' data-name="${attributeDefinition.name}" data-key="${attrToMerge.key}" data-value="${attrToMerge.value}" data-certif="${attrToMerge.certifier}" data-certifdate="${attrToMerge.certificationDate?date}" data-timestamp-certif="${attrToMerge.certificationDate?long}"' />
+                                <@button disabled=!attributeDefinition.attributeRight.writable class='btn btn-rounded border-primary-subtle btn-light m-auto mediation-btn-merge' color='-' buttonIcon='arrow-right' params=' data-name="${attributeDefinition.name}" data-key="${attrToMerge.key}" data-value="${attrToMerge.value}" data-certif="${attrToMerge.certifier}" data-certifdate="${attrToMerge.certificationDate?date}" data-timestamp-certif="${attrToMerge.certificationDate?long}"' />
                             </div>
                         </#if>
                     </#list>

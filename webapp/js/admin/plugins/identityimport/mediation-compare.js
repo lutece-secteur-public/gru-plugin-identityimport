@@ -65,25 +65,37 @@ export default class MediationCompare {
                 let mediationLine = btn.closest('.list-group-item').querySelector('.mediation-line-merge');
                 let attrLineLeft = this.container.querySelector('.lutece-compare-item-container.rounded-start-5 li.list-group-item[data-key="' + btn.dataset.key + '"]');
                 let attrLineRight = this.container.querySelector('.lutece-compare-item-container.rounded-end-5 li.list-group-item[data-key="' + btn.dataset.key + '"]');
-                if (icon.classList.contains('ti-arrow-left')) {
+                let valueLeft = attrLineLeft.querySelector('.attribute-value');
+                let valueRight = attrLineRight.querySelector('.attribute-value');
+                let attrContainerRight = attrLineRight.querySelector('.attribute-container');
+
+                if (icon.classList.contains('ti-arrow-right')) {
                     btn.classList.add('bg-warning-subtle', 'text-warning-emphasis', 'border-warning');
                     btn.classList.remove('border-primary-subtle', 'btn-light');
-                    icon.classList.remove('ti-arrow-left');
+                    icon.classList.remove('ti-arrow-right');
                     icon.classList.add('ti-x');
                     mediationLine.classList.add('border-warning-subtle');
                     mediationLine.classList.remove('border-primary-subtle');
-                    attrLineLeft.classList.add('text-decoration-line-through', 'opacity-25');
-                    attrLineRight.classList.add('bg-warning-subtle');
+                    valueRight.classList.add('text-decoration-line-through', 'opacity-50');
+                    let newValue = document.createElement('h3');
+                    newValue.classList.add('text-danger', 'mb-0', 'fw-bold');
+                    newValue.id = btn.dataset.key;
+                    let newValueText = document.createTextNode(valueLeft.innerText);
+                    newValue.appendChild(newValueText);
+                    attrContainerRight.appendChild(newValue)
+                    attrLineLeft.classList.add('bg-warning-subtle');
                     this.merge(btn);
                 } else {
                     btn.classList.remove('bg-warning-subtle', 'text-warning-emphasis');
                     btn.classList.add('border-primary-subtle', 'btn-light');
                     icon.classList.remove('ti-x');
-                    icon.classList.add('ti-arrow-left');
+                    icon.classList.add('ti-arrow-right');
                     mediationLine.classList.remove('border-warning-subtle');
                     mediationLine.classList.add('border-primary-subtle');
-                    attrLineLeft.classList.remove('text-decoration-line-through', 'opacity-25');
-                    attrLineRight.classList.remove('bg-warning-subtle');
+                    valueRight.classList.remove('text-decoration-line-through', 'opacity-50');
+                    let newValue = document.getElementById(btn.dataset.key);
+                    attrContainerRight.removeChild(newValue)
+                    attrLineLeft.classList.remove('bg-warning-subtle');
                     this.merge(btn, false);
                 }
             });
