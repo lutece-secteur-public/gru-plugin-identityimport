@@ -169,7 +169,7 @@ public class BatchService
                 progressManagerService.addReport( feedToken, "Created" + batch.getIdentities( ).size( ) + " candidate identities" );
             }
             TransactionManager.commitTransaction( null );
-            _wfBatchBeanService.processActionNoUser( batchWorkflowBean, VALIDATE_BATCH_ACTION_ID, null, Locale.getDefault( ) );
+            // _wfBatchBeanService.processActionNoUser( batchWorkflowBean, VALIDATE_BATCH_ACTION_ID, null, Locale.getDefault( ) );
             return bean.getId( );
         }
         catch( final Exception e )

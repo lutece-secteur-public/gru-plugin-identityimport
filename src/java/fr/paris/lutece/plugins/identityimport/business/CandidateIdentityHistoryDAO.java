@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 public final class CandidateIdentityHistoryDAO implements ICandidateIdentityHistoryDAO
 {
     // Constants
-    private static final String QUERY_SELECT_ALL = "SELECT ih.id_history, ih.id_wf_resource_history, ih.status, ih.comment, wrh.id_resource as id_candidate_identity FROM identityimport_candidate_identity_history ih JOIN idimport.workflow_resource_history wrh on ih.id_wf_resource_history = wrh.id_history";
+    private static final String QUERY_SELECT_ALL = "SELECT ih.id_history, ih.id_wf_resource_history, ih.status, ih.comment, wrh.id_resource as id_candidate_identity FROM identityimport_candidate_identity_history ih JOIN workflow_resource_history wrh on ih.id_wf_resource_history = wrh.id_history";
     private static final String ID_LIST = "%{id_list}";
     private final static String SQL_QUERY_SELECT_BY_ID = QUERY_SELECT_ALL + " WHERE id_history = ?";
     private final static String SQL_QUERY_SELECT_BY_WF_RESOURCE_ID = QUERY_SELECT_ALL + " WHERE id_wf_resource_history = ?";
