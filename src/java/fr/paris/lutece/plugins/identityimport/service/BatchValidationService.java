@@ -48,6 +48,17 @@ import java.util.stream.Collectors;
 public class BatchValidationService
 {
     private final int importBatchLimit = AppPropertiesService.getPropertyInt( "identityimport.identitystore.api.batch.identity.limit", 100 );
+    private static final String MESSAGE_KEY_BATCH_OVER_IDENTITY_LIMIT = "identityimport.error.batch.over.identity.limit";
+    private static final String MESSAGE_KEY_BATCH_NOT_PROVIDED = "identityimport.error.batch.not.provided";
+    private static final String MESSAGE_KEY_BATCH_WITHOUT_USER = "identityimport.error.batch.without.user";
+    private static final String MESSAGE_KEY_BATCH_WITHOUT_APP_CODE = "identityimport.error.batch.without.app.code";
+    private static final String MESSAGE_KEY_BATCH_WITHOUT_REFERENCE = "identityimport.error.batch.without.reference";
+    private static final String MESSAGE_KEY_BATCH_WITHOUT_IDENTITIES = "identityimport.error.batch.without.identities";
+    private static final String MESSAGE_KEY_BATCH_WITH_IDENTITY_DUPLICATES = "identityimport.error.batch.with.identity.duplicate";
+    private static final String MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_EXTERNAL_CUID = "identityimport.error.batch.with.identity.without.external.cuid";
+    private static final String MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_CERTIFIER = "identityimport.error.batch.with.identity.without.certifier";
+    private static final String MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_CERTIFICATION_DATE = "identityimport.error.batch.with.identity.without.certification.date";
+    private static final String MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_MINIMUM_ATTRIBUTES = "identityimport.error.batch.with.identity.without.minimum.attributes";
 
     private static BatchValidationService _instance;
 
@@ -68,7 +79,8 @@ public class BatchValidationService
     {
         if ( batch.getIdentities( ).size( ) > importBatchLimit )
         {
-            throw new IdentityStoreException( "The imported batch exceeds limit of " + importBatchLimit + " identities." );
+            throw new IdentityStoreException( "The imported batch exceeds limit of " + importBatchLimit + " identities.",
+                    MESSAGE_KEY_BATCH_OVER_IDENTITY_LIMIT );
         }
     }
 
@@ -84,33 +96,34 @@ public class BatchValidationService
     {
         if ( batch == null )
         {
-            throw new IdentityStoreException( "The provided batch is null" );
+            throw new IdentityStoreException( "The provided batch is null", MESSAGE_KEY_BATCH_NOT_PROVIDED );
         }
 
         if ( StringUtils.isEmpty( batch.getUser( ) ) )
         {
-            throw new IdentityStoreException( "The provided batch user is null" );
+            throw new IdentityStoreException( "The provided batch user is null", MESSAGE_KEY_BATCH_WITHOUT_USER );
         }
 
         if ( StringUtils.isEmpty( batch.getAppCode( ) ) )
         {
-            throw new IdentityStoreException( "The provided batch application code is null" );
+            throw new IdentityStoreException( "The provided batch application code is null", MESSAGE_KEY_BATCH_WITHOUT_APP_CODE );
         }
 
         if ( StringUtils.isEmpty( batch.getReference( ) ) )
         {
-            throw new IdentityStoreException( "The provided batch reference is null" );
+            throw new IdentityStoreException( "The provided batch reference is null", MESSAGE_KEY_BATCH_WITHOUT_REFERENCE );
         }
 
         if ( batch.getIdentities( ).isEmpty( ) )
         {
-            throw new IdentityStoreException( "No identities found in imported batch" );
+            throw new IdentityStoreException( "No identities found in imported batch", MESSAGE_KEY_BATCH_WITHOUT_IDENTITIES );
         }
 
         if ( CandidateIdentityHome.checkIfOneExists( batch.getReference( ),
                 batch.getIdentities( ).stream( ).map( IdentityDto::getExternalCustomerId ).collect( Collectors.toList( ) ) ) )
         {
-            throw new IdentityStoreException( "At least one of the provided identities already exists in the current batch" );
+            throw new IdentityStoreException( "At least one of the provided identities already exists in the current batch",
+                    MESSAGE_KEY_BATCH_WITH_IDENTITY_DUPLICATES );
         }
 
         final IdentityDto [ ] identitiesArray = batch.getIdentities( ).toArray( new IdentityDto [ ] { } );
@@ -120,7 +133,8 @@ public class BatchValidationService
 
             if ( StringUtils.isEmpty( identity.getExternalCustomerId( ) ) )
             {
-                throw new IdentityStoreException( "The provided external customer id of identity " + index + " is empty" );
+                throw new IdentityStoreException( "The provided external customer id of identity " + index + " is empty",
+                        MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_EXTERNAL_CUID );
             }
 
             for ( final AttributeDto attribute : identity.getAttributes( ) )
@@ -128,12 +142,13 @@ public class BatchValidationService
                 if ( StringUtils.isEmpty( attribute.getCertifier( ) ) )
                 {
                     throw new IdentityStoreException(
-                            "The provided attribute " + attribute.getKey( ) + " certifier of identity " + identity.getExternalCustomerId( ) + " is null" );
+                            "The provided attribute " + attribute.getKey( ) + " certifier of identity " + identity.getExternalCustomerId( ) + " is null",
+                            MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_CERTIFIER );
                 }
                 if ( attribute.getCertificationDate( ) == null )
                 {
                     throw new IdentityStoreException( "The provided attribute " + attribute.getKey( ) + " certification date of identity "
-                            + identity.getExternalCustomerId( ) + " is null" );
+                            + identity.getExternalCustomerId( ) + " is null", MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_CERTIFICATION_DATE );
                 }
             }
 
@@ -154,7 +169,8 @@ public class BatchValidationService
     {
         identity.getAttributes( ).stream( ).filter( attributeDto -> Objects.equals( attributeDto.getKey( ), attributeKey ) ).findAny( )
                 .orElseThrow( ( ) -> new IdentityStoreException(
-                        "No " + attributeKey + " attribute found in identity with external ID " + identity.getExternalCustomerId( ) ) );
+                        "No " + attributeKey + " attribute found in identity with external ID " + identity.getExternalCustomerId( ),
+                        MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_MINIMUM_ATTRIBUTES ) );
     }
 
 }

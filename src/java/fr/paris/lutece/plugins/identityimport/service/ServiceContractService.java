@@ -39,6 +39,7 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.AttributeDefinitionDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.CertificationProcessusDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 
@@ -49,6 +50,10 @@ public class ServiceContractService
 {
 
     private final ServiceContractCache _cache = SpringContextService.getBean( "identity.serviceContractCacheService" );
+    private static final String MESSAGE_KEY_NO_SERVICE_CONTRACT_FOUND_WITH_CODE = "identityimport.error.no.service.contract.found.with.code";
+    private static final String MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_DOES_NOT_EXIST_IN_CONTRACT = "identityimport.error.attribute.not.exist.in.contract";
+    private static final String MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_IS_NOT_WRITABLE_IN_CONTRACT = "identityimport.error.attribute.not.writable.in.contract";
+    private static final String MESSAGE_KEY_COUPLE_ATTRIBUTE_CERTIFIER_NOT_ALLOWED_IN_CONTRACT = "identityimport.error.couple.attribute.certifier.not.allowed.in.contract";
 
     private static ServiceContractService instance;
 
@@ -68,17 +73,20 @@ public class ServiceContractService
         final ServiceContractDto serviceContract = _cache.get( clientCode );
         if ( serviceContract == null )
         {
-            throw new IdentityStoreException( "No service contract could be found with client code " + clientCode );
+            throw new IdentityStoreException( "No service contract could be found with client code " + clientCode,
+                    MESSAGE_KEY_NO_SERVICE_CONTRACT_FOUND_WITH_CODE );
         }
         for ( final AttributeDto attribute : identity.getAttributes( ) )
         {
             final AttributeDefinitionDto attributeDefinition = serviceContract.getAttributeDefinitions( ).stream( )
-                    .filter( a -> Objects.equals( a.getKeyName( ), attribute.getKey( ) ) ).findFirst( ).orElseThrow(
-                            ( ) -> new IdentityStoreException( "Attribute " + attribute.getKey( ) + " does not exist in the service contract definition" ) );
+                    .filter( a -> Objects.equals( a.getKeyName( ), attribute.getKey( ) ) ).findFirst( )
+                    .orElseThrow( ( ) -> new IdentityStoreException( "Attribute " + attribute.getKey( ) + " does not exist in the service contract definition",
+                            MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_DOES_NOT_EXIST_IN_CONTRACT ) );
 
             if ( !attributeDefinition.getAttributeRight( ).isWritable( ) )
             {
-                throw new IdentityStoreException( "Attribute " + attribute.getKey( ) + " is not writable in the service contract definition" );
+                throw new IdentityStoreException( "Attribute " + attribute.getKey( ) + " is not writable in the service contract definition",
+                        MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_IS_NOT_WRITABLE_IN_CONTRACT );
             }
 
             final Optional<CertificationProcessusDto> certificationProcessus = attributeDefinition.getAttributeCertifications( ).stream( )
@@ -86,7 +94,7 @@ public class ServiceContractService
             if ( !certificationProcessus.isPresent( ) )
             {
                 throw new IdentityStoreException( "Attribute certifier " + attribute.getCertifier( ) + " of attribute " + attribute.getKey( )
-                        + " is not authorized in the service contract definition" );
+                        + " is not authorized in the service contract definition", MESSAGE_KEY_COUPLE_ATTRIBUTE_CERTIFIER_NOT_ALLOWED_IN_CONTRACT );
             }
         }
     }

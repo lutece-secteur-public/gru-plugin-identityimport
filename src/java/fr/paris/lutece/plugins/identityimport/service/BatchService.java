@@ -77,6 +77,10 @@ public class BatchService
 
     private static final int ARCHIVE_ACTION_ID = AppPropertiesService.getPropertyInt( "identityimport.archive.action.id", 0 );
     private static final int VALIDATE_BATCH_ACTION_ID = AppPropertiesService.getPropertyInt( "identityimport.validate.action.id", 0 );
+
+    private static final String MESSAGE_KEY_BATCH_EXISTS_WITH_SAME_REFERENCE = "identityimport.error.batch.exists.with.same.reference";
+    private static final String MESSAGE_KEY_BATCH_ERROR_DURING_CREATION = "identityimport.error.batch.during.creation";
+
     private final WorkflowBeanService<CandidateIdentity> _wfIdentityBeanService = SpringContextService.getBean( CANDIDATEIDENTITY_WFBEANSERVICE );
     private final WorkflowBeanService<Batch> _wfBatchBeanService = SpringContextService.getBean( BATCH_WFBEANSERVICE );
     private final ProgressManagerService progressManagerService = ProgressManagerService.getInstance( );
@@ -118,7 +122,7 @@ public class BatchService
 
             if ( BatchHome.getBatch( batch.getReference( ) ) != null )
             {
-                throw new IdentityStoreException( "A batch already exists with this reference." );
+                throw new IdentityStoreException( "A batch already exists with this reference.", MESSAGE_KEY_BATCH_EXISTS_WITH_SAME_REFERENCE );
             }
             final Batch bean = this.getBean( batch );
             bean.setDate( new Date( System.currentTimeMillis( ) ) );
@@ -179,7 +183,11 @@ public class BatchService
             {
                 progressManagerService.addReport( feedToken, "An error occurred during creation..." );
             }
-            throw new IdentityStoreException( e.getMessage( ), e );
+            if ( e instanceof IdentityStoreException )
+            {
+                throw e;
+            }
+            throw new IdentityStoreException( e.getMessage( ), e, MESSAGE_KEY_BATCH_ERROR_DURING_CREATION );
         }
     }
 

@@ -468,9 +468,16 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             this.addInfo( INFO_BATCH_CREATED, getLocale( ) );
             this.resetListId( );
         }
-        catch( IdentityStoreException | IOException e )
+        catch( final IdentityStoreException | IOException e )
         {
-            this.addError( e.getMessage( ) );
+            if ( e instanceof IdentityStoreException && StringUtils.isNotBlank( ( (IdentityStoreException) e ).getLocaleMessageKey( ) ) )
+            {
+                this.addError( ( (IdentityStoreException) e ).getLocaleMessageKey( ), getLocale( ) );
+            }
+            else
+            {
+                this.addError( e.getMessage( ) );
+            }
             return redirectView( request, VIEW_IMPORT_BATCH );
         }
 
