@@ -48,15 +48,15 @@ import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchResourceStateDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatisticsDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusMode;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.ImportingHistoryDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
+import fr.paris.lutece.plugins.identitystore.web.exception.ResourceNotFoundException;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.portal.service.progressmanager.ProgressManagerService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
@@ -69,6 +69,7 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 
 public class BatchService
 {
@@ -97,7 +98,59 @@ public class BatchService
         return instance;
     }
 
-    public int importBatch( final BatchDto batch, final User user, final String feedToken ) throws IdentityStoreException
+    public String importBatchFromApi(final BatchImportRequest request, final String clientCode) throws IdentityStoreException {
+        final BatchDto batch = request.getBatch();
+        batch.setAppCode(clientCode);
+        do {
+            batch.setReference(UUID.randomUUID().toString());
+        } while (BatchHome.getBatch(batch.getReference()) != null);
+
+        TransactionManager.beginTransaction( null );
+        try
+        {
+            final Batch bean = this.getBean( batch );
+            bean.setDate( new Date( System.currentTimeMillis( ) ) );
+            BatchHome.create( bean );
+
+            // Init workflow resource
+            final int batchId = bean.getId( );
+            final WorkflowBean<Batch> batchWorkflowBean = _wfBatchBeanService.createWorkflowBean( bean, batchId, null );
+
+            // Import identities
+            final String appCode = bean.getAppCode( );
+            for ( final IdentityDto identity : batch.getIdentities( ) )
+            {
+                final CandidateIdentity candidateIdentity = new CandidateIdentity( );
+                candidateIdentity.setIdBatch( batchId );
+                candidateIdentity.setExternalCustomerId( identity.getExternalCustomerId( ) );
+                candidateIdentity.setConnectionId( identity.getConnectionId( ) );
+                candidateIdentity.setClientAppCode( appCode );
+                CandidateIdentityHome.create( candidateIdentity );
+                _wfIdentityBeanService.createWorkflowBean( candidateIdentity, candidateIdentity.getId( ), candidateIdentity.getIdBatch( ), null );
+
+                for ( final AttributeDto importedAttribute : identity.getAttributes( ) )
+                {
+                    final CandidateIdentityAttribute candidateAttribute = new CandidateIdentityAttribute( );
+                    candidateAttribute.setIdIdentity( candidateIdentity.getId( ) );
+                    candidateAttribute.setCode( importedAttribute.getKey( ) );
+                    candidateAttribute.setValue( importedAttribute.getValue( ) );
+                    candidateAttribute.setCertDate( new Date( importedAttribute.getCertificationDate( ).getTime( ) ) );
+                    candidateAttribute.setCertProcess( importedAttribute.getCertifier( ) );
+                    CandidateIdentityAttributeHome.create( candidateAttribute );
+                }
+            }
+            TransactionManager.commitTransaction( null );
+            _wfBatchBeanService.processActionNoUser( batchWorkflowBean, VALIDATE_BATCH_ACTION_ID, null, Locale.getDefault( ) );
+            return batch.getReference();
+        }
+        catch( final Exception e )
+        {
+            TransactionManager.rollBack( null );
+            throw new IdentityStoreException( e.getMessage( ), e, MESSAGE_KEY_BATCH_ERROR_DURING_CREATION );
+        }
+    }
+
+    public int importBatchFromIhm(final BatchDto batch, final User user, final String feedToken) throws IdentityStoreException
     {
         // Ensure that provided batch size does not exceed the limit defined in properties
         validationService.validateImportBatchLimit( batch );
@@ -112,7 +165,7 @@ public class BatchService
                 progressManagerService.initFeed( feedToken, batch.getIdentities( ).size( ) );
                 progressManagerService.addReport( feedToken, "Validating batch ..." );
             }
-            validationService.validateBatch( batch );
+            validationService.validateBatchFromIhm(batch);
 
             // Try to retrieve the batch by its reference, if exists ensure that both side information is consistent, if not, create it.
             if ( StringUtils.isNotEmpty( feedToken ) )
@@ -353,22 +406,17 @@ public class BatchService
         return dto;
     }
 
-    public BatchStatusResponse getBatchStatus( final String strBatchReference, final BatchStatusMode mode ) throws IdentityStoreException
+    public BatchStatusDto getBatchStatus( final String strBatchReference, final BatchStatusMode mode ) throws IdentityStoreException
     {
-        final BatchStatusResponse response = new BatchStatusResponse( );
         final Batch batch = BatchHome.getBatch( strBatchReference );
         if ( batch == null )
         {
-            response.setStatus(
-                    ResponseStatusFactory.notFound( ).setMessageKey( Constants.PROPERTY_REST_ERROR_BATCH_NOT_FOUND ).setMessage( "Batch not found." ) );
-            return response;
+            throw new ResourceNotFoundException("Batch not found", Constants.PROPERTY_REST_ERROR_BATCH_NOT_FOUND);
         }
         final ResourceState batchState = BatchHome.getBatchState( batch.getId( ) );
         if ( batchState == null )
         {
-            response.setStatus( ResponseStatusFactory.notFound( ).setMessageKey( Constants.PROPERTY_REST_ERROR_BATCH_STATE_NOT_FOUND )
-                    .setMessage( "State of batch not found." ) );
-            return response;
+            throw new ResourceNotFoundException("State of batch not found.", Constants.PROPERTY_REST_ERROR_BATCH_STATE_NOT_FOUND);
         }
 
         final BatchStatusDto batchStatus = new BatchStatusDto( );
@@ -419,9 +467,6 @@ public class BatchService
             } );
         }
 
-        response.setBatchStatus( batchStatus );
-        response.setStatus( ResponseStatusFactory.ok( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION )
-                .setMessage( "Status du batch récupéré avec succès" ) );
-        return response;
+        return batchStatus;
     }
 }

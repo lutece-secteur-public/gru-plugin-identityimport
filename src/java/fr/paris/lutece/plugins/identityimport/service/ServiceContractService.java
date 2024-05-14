@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.identityimport.service;
 
+import fr.paris.lutece.plugins.identityimport.business.Client;
+import fr.paris.lutece.plugins.identityimport.business.ClientHome;
 import fr.paris.lutece.plugins.identityimport.cache.ServiceContractCache;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
@@ -40,8 +42,11 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.AttributeDef
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.CertificationProcessusDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
+import fr.paris.lutece.plugins.identitystore.web.exception.ClientAuthorizationException;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
+import fr.paris.lutece.plugins.identitystore.web.exception.ResourceNotFoundException;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -67,36 +72,42 @@ public class ServiceContractService
         return instance;
     }
 
-    public void validateIdentity( final IdentityDto identity, final String clientCode ) throws IdentityStoreException
+    public void validateIdentityAgainstServiceContract(final IdentityDto identity, final String clientCode) throws IdentityStoreException
     {
         // TODO couldn't it be an API ?
         final ServiceContractDto serviceContract = _cache.get( clientCode );
         if ( serviceContract == null )
         {
-            throw new IdentityStoreException( "No service contract could be found with client code " + clientCode,
+            throw new ResourceNotFoundException( "No service contract could be found with client code " + clientCode,
                     MESSAGE_KEY_NO_SERVICE_CONTRACT_FOUND_WITH_CODE );
         }
+        this.validateIdentityAgainstServiceContract(identity, serviceContract);
+    }
+
+    public void validateIdentityAgainstServiceContract(final IdentityDto identity, final ServiceContractDto serviceContract)
+            throws ClientAuthorizationException {
         for ( final AttributeDto attribute : identity.getAttributes( ) )
         {
             final AttributeDefinitionDto attributeDefinition = serviceContract.getAttributeDefinitions( ).stream( )
-                    .filter( a -> Objects.equals( a.getKeyName( ), attribute.getKey( ) ) ).findFirst( )
-                    .orElseThrow( ( ) -> new IdentityStoreException( "Attribute " + attribute.getKey( ) + " does not exist in the service contract definition",
-                            MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_DOES_NOT_EXIST_IN_CONTRACT ) );
+                                                                              .filter( a -> Objects.equals( a.getKeyName( ), attribute.getKey( ) ) ).findFirst( )
+                                                                              .orElseThrow( ( ) -> new ClientAuthorizationException( "Attribute " + attribute.getKey( ) + " does not exist in the service contract definition",
+                                                                                                                               MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_DOES_NOT_EXIST_IN_CONTRACT ) );
 
             if ( !attributeDefinition.getAttributeRight( ).isWritable( ) )
             {
-                throw new IdentityStoreException( "Attribute " + attribute.getKey( ) + " is not writable in the service contract definition",
-                        MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_IS_NOT_WRITABLE_IN_CONTRACT );
+                throw new ClientAuthorizationException( "Attribute " + attribute.getKey( ) + " is not writable in the service contract definition",
+                                                  MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_IS_NOT_WRITABLE_IN_CONTRACT );
             }
 
             final Optional<CertificationProcessusDto> certificationProcessus = attributeDefinition.getAttributeCertifications( ).stream( )
-                    .filter( a -> Objects.equals( a.getCode( ), attribute.getCertifier( ) ) ).findFirst( );
+                                                                                                  .filter( a -> Objects.equals( a.getCode( ), attribute.getCertifier( ) ) ).findFirst( );
             if ( !certificationProcessus.isPresent( ) )
             {
-                throw new IdentityStoreException( "Attribute certifier " + attribute.getCertifier( ) + " of attribute " + attribute.getKey( )
-                        + " is not authorized in the service contract definition", MESSAGE_KEY_COUPLE_ATTRIBUTE_CERTIFIER_NOT_ALLOWED_IN_CONTRACT );
+                throw new ClientAuthorizationException( "Attribute certifier " + attribute.getCertifier( ) + " of attribute " + attribute.getKey( )
+                                                  + " is not authorized in the service contract definition", MESSAGE_KEY_COUPLE_ATTRIBUTE_CERTIFIER_NOT_ALLOWED_IN_CONTRACT );
             }
         }
+
     }
 
     /**
@@ -109,5 +120,38 @@ public class ServiceContractService
     public ServiceContractDto getActiveServiceContract( final String clientCode ) throws IdentityStoreException
     {
         return _cache.get( clientCode );
+    }
+
+    public ServiceContractDto getActiveServiceContract(final String clientCode, final String clientToken) throws ResourceNotFoundException {
+        final String clientAppCode;
+        if (StringUtils.isBlank(clientCode)) {
+            final Optional<Client> client = ClientHome.findByToken(clientToken);
+            if (client.isPresent()) {
+                clientAppCode = client.get().getAppCode();
+            } else {
+                throw new ResourceNotFoundException("No client found with provided token", Constants.PROPERTY_REST_ERROR_NO_CLIENT_FOUND_WITH_TOKEN);
+            }
+        } else {
+            clientAppCode = clientCode;
+        }
+
+        ServiceContractDto activeServiceContract = null;
+        try {
+            activeServiceContract = this.getActiveServiceContract(clientAppCode);
+        } catch (final IdentityStoreException ignored) {
+            // do nothing
+        }
+
+        if (activeServiceContract == null) {
+            throw new ResourceNotFoundException("Service contract not found", Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND);
+        }
+        return activeServiceContract;
+    }
+
+    public void validateImportAuthorization(final ServiceContractDto serviceContract) throws ClientAuthorizationException {
+        if ( !serviceContract.isAuthorizedImport( ) )
+        {
+            throw new ClientAuthorizationException("Import unauthorized", Constants.PROPERTY_REST_ERROR_IMPORT_UNAUTHORIZED);
+        }
     }
 }

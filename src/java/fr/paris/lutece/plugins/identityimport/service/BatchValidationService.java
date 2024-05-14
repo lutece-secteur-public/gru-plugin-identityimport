@@ -38,7 +38,9 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
+import fr.paris.lutece.plugins.identitystore.web.exception.DuplicatesConsistencyException;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
+import fr.paris.lutece.plugins.identitystore.web.exception.RequestFormatException;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import org.apache.commons.lang3.StringUtils;
 
@@ -75,11 +77,11 @@ public class BatchValidationService
         return _instance;
     }
 
-    public void validateImportBatchLimit( final BatchDto batch ) throws IdentityStoreException
+    public void validateImportBatchLimit( final BatchDto batch ) throws RequestFormatException
     {
         if ( batch.getIdentities( ).size( ) > importBatchLimit )
         {
-            throw new IdentityStoreException( "The imported batch exceeds limit of " + importBatchLimit + " identities.",
+            throw new RequestFormatException( "The imported batch exceeds limit of " + importBatchLimit + " identities.",
                     MESSAGE_KEY_BATCH_OVER_IDENTITY_LIMIT );
         }
     }
@@ -92,40 +94,61 @@ public class BatchValidationService
      * @throws IdentityStoreException
      *             in case of error
      */
-    public void validateBatch( final BatchDto batch ) throws IdentityStoreException
+    public void validateBatchFromIhm(final BatchDto batch) throws IdentityStoreException
     {
+        validateBatchNotNull(batch);
+        validateUser(batch);
+        validateAppCode(batch);
+        validateReference(batch);
+        validateIdentitiesUniqueness(batch);
+        validateIdentities(batch);
+        for(final IdentityDto identity : batch.getIdentities( ) ) {
+            ServiceContractService.instance( ).validateIdentityAgainstServiceContract(identity, batch.getAppCode());
+        }
+    }
+
+    public void validateBatchNotNull(final BatchDto batch) throws RequestFormatException {
         if ( batch == null )
         {
-            throw new IdentityStoreException( "The provided batch is null", MESSAGE_KEY_BATCH_NOT_PROVIDED );
+            throw new RequestFormatException( "The provided batch is null", MESSAGE_KEY_BATCH_NOT_PROVIDED );
         }
+    }
 
+    public void validateUser(final BatchDto batch) throws RequestFormatException {
         if ( StringUtils.isEmpty( batch.getUser( ) ) )
         {
-            throw new IdentityStoreException( "The provided batch user is null", MESSAGE_KEY_BATCH_WITHOUT_USER );
+            throw new RequestFormatException( "The provided batch user is null", MESSAGE_KEY_BATCH_WITHOUT_USER );
         }
+    }
 
+    public void validateAppCode(final BatchDto batch) throws RequestFormatException {
         if ( StringUtils.isEmpty( batch.getAppCode( ) ) )
         {
-            throw new IdentityStoreException( "The provided batch application code is null", MESSAGE_KEY_BATCH_WITHOUT_APP_CODE );
+            throw new RequestFormatException( "The provided batch application code is null", MESSAGE_KEY_BATCH_WITHOUT_APP_CODE );
         }
+    }
 
+    public void validateReference(final BatchDto batch) throws RequestFormatException {
         if ( StringUtils.isEmpty( batch.getReference( ) ) )
         {
-            throw new IdentityStoreException( "The provided batch reference is null", MESSAGE_KEY_BATCH_WITHOUT_REFERENCE );
+            throw new RequestFormatException( "The provided batch reference is null", MESSAGE_KEY_BATCH_WITHOUT_REFERENCE );
         }
+    }
 
+    public void validateIdentitiesUniqueness( final BatchDto batch ) throws DuplicatesConsistencyException {
+        if ( CandidateIdentityHome.checkIfOneExists( batch.getReference( ),
+                                                     batch.getIdentities( ).stream( ).map( IdentityDto::getExternalCustomerId ).collect( Collectors.toList( ) ) ) )
+        {
+            throw new DuplicatesConsistencyException("At least one of the provided identities already exists in the current batch",
+                                                     MESSAGE_KEY_BATCH_WITH_IDENTITY_DUPLICATES );
+        }
+    }
+
+    public void validateIdentities(final BatchDto batch) throws RequestFormatException {
         if ( batch.getIdentities( ).isEmpty( ) )
         {
-            throw new IdentityStoreException( "No identities found in imported batch", MESSAGE_KEY_BATCH_WITHOUT_IDENTITIES );
+            throw new RequestFormatException( "No identities found in imported batch", MESSAGE_KEY_BATCH_WITHOUT_IDENTITIES );
         }
-
-        if ( CandidateIdentityHome.checkIfOneExists( batch.getReference( ),
-                batch.getIdentities( ).stream( ).map( IdentityDto::getExternalCustomerId ).collect( Collectors.toList( ) ) ) )
-        {
-            throw new IdentityStoreException( "At least one of the provided identities already exists in the current batch",
-                    MESSAGE_KEY_BATCH_WITH_IDENTITY_DUPLICATES );
-        }
-
         final IdentityDto [ ] identitiesArray = batch.getIdentities( ).toArray( new IdentityDto [ ] { } );
         for ( int index = 0; index < identitiesArray.length; index++ )
         {
@@ -133,42 +156,40 @@ public class BatchValidationService
 
             if ( StringUtils.isEmpty( identity.getExternalCustomerId( ) ) )
             {
-                throw new IdentityStoreException( "The provided external customer id of identity " + index + " is empty",
-                        MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_EXTERNAL_CUID );
+                throw new RequestFormatException( "The provided external customer id of identity " + index + " is empty",
+                                                  MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_EXTERNAL_CUID );
             }
 
             for ( final AttributeDto attribute : identity.getAttributes( ) )
             {
                 if ( StringUtils.isEmpty( attribute.getCertifier( ) ) )
                 {
-                    throw new IdentityStoreException(
+                    throw new RequestFormatException(
                             "The provided attribute " + attribute.getKey( ) + " certifier of identity " + identity.getExternalCustomerId( ) + " is null",
                             MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_CERTIFIER );
                 }
                 if ( attribute.getCertificationDate( ) == null )
                 {
-                    throw new IdentityStoreException( "The provided attribute " + attribute.getKey( ) + " certification date of identity "
-                            + identity.getExternalCustomerId( ) + " is null", MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_CERTIFICATION_DATE );
+                    throw new RequestFormatException( "The provided attribute " + attribute.getKey( ) + " certification date of identity "
+                                                      + identity.getExternalCustomerId( ) + " is null", MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_CERTIFICATION_DATE );
                 }
             }
 
             this.validateMinimumAttributes( identity );
-            ServiceContractService.instance( ).validateIdentity( identity, batch.getAppCode( ) );
         }
-
     }
 
-    private void validateMinimumAttributes( final IdentityDto identity ) throws IdentityStoreException
+    private void validateMinimumAttributes( final IdentityDto identity ) throws RequestFormatException
     {
         this.checkAttributeExists( identity, Constants.PARAM_FAMILY_NAME );
         this.checkAttributeExists( identity, Constants.PARAM_FIRST_NAME );
         this.checkAttributeExists( identity, Constants.PARAM_BIRTH_DATE );
     }
 
-    private void checkAttributeExists( final IdentityDto identity, final String attributeKey ) throws IdentityStoreException
+    private void checkAttributeExists( final IdentityDto identity, final String attributeKey ) throws RequestFormatException
     {
         identity.getAttributes( ).stream( ).filter( attributeDto -> Objects.equals( attributeDto.getKey( ), attributeKey ) ).findAny( )
-                .orElseThrow( ( ) -> new IdentityStoreException(
+                .orElseThrow( ( ) -> new RequestFormatException(
                         "No " + attributeKey + " attribute found in identity with external ID " + identity.getExternalCustomerId( ),
                         MESSAGE_KEY_BATCH_WITH_IDENTITY_WITHOUT_MINIMUM_ATTRIBUTES ) );
     }

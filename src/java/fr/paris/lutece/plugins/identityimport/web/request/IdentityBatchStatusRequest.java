@@ -33,26 +33,30 @@
  */
 package fr.paris.lutece.plugins.identityimport.web.request;
 
-import fr.paris.lutece.plugins.identityimport.business.Client;
-import fr.paris.lutece.plugins.identityimport.business.ClientHome;
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
 import fr.paris.lutece.plugins.identityimport.service.ServiceContractService;
+import fr.paris.lutece.plugins.identityimport.web.validator.BatchRequestValidator;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.AbstractIdentityStoreRequest;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.BatchRequestValidator;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
+import fr.paris.lutece.plugins.identitystore.web.exception.ClientAuthorizationException;
+import fr.paris.lutece.plugins.identitystore.web.exception.DuplicatesConsistencyException;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Optional;
+import fr.paris.lutece.plugins.identitystore.web.exception.RequestContentFormattingException;
+import fr.paris.lutece.plugins.identitystore.web.exception.RequestFormatException;
+import fr.paris.lutece.plugins.identitystore.web.exception.ResourceConsistencyException;
+import fr.paris.lutece.plugins.identitystore.web.exception.ResourceNotFoundException;
 
 public class IdentityBatchStatusRequest extends AbstractIdentityStoreRequest
 {
-    protected BatchStatusRequest _request;
-    protected String _strHeaderClientToken;
+    private final BatchStatusRequest _request;
+    private final String _strHeaderClientToken;
+
+    private ServiceContractDto serviceContract;
 
     public IdentityBatchStatusRequest( final BatchStatusRequest request, final String strHeaderClientToken, final String strClientCode,
             final String strAuthorName, final String strAuthorType ) throws IdentityStoreException
@@ -63,60 +67,45 @@ public class IdentityBatchStatusRequest extends AbstractIdentityStoreRequest
     }
 
     @Override
-    protected void validateSpecificRequest( ) throws IdentityStoreException
-    {
-        BatchRequestValidator.instance( ).checkBatchStatusRequest( _request );
+    protected void fetchResources() throws ResourceNotFoundException {
+        serviceContract = ServiceContractService.instance().getActiveServiceContract(_strClientCode, _strHeaderClientToken);
+    }
+
+    @Override
+    protected void validateRequestFormat() throws RequestFormatException {
+        BatchRequestValidator.instance().checkBatchStatusRequest(_request);
+        BatchRequestValidator.instance().checkClientCodeAndToken(_strClientCode, _strHeaderClientToken);
+    }
+
+    @Override
+    protected void validateClientAuthorization() throws ClientAuthorizationException {
+        ServiceContractService.instance().validateImportAuthorization(serviceContract);
+    }
+
+    @Override
+    protected void validateResourcesConsistency() throws ResourceConsistencyException {
+        // do nothing
+    }
+
+    @Override
+    protected void formatRequestContent() throws RequestContentFormattingException {
+        // do nothing
+    }
+
+    @Override
+    protected void checkDuplicatesConsistency() throws DuplicatesConsistencyException {
+        // do nothing
     }
 
     @Override
     protected BatchStatusResponse doSpecificRequest( ) throws IdentityStoreException
     {
         final BatchStatusResponse response = new BatchStatusResponse( );
-        if ( StringUtils.isAllBlank( _strClientCode, _strHeaderClientToken ) )
-        {
-            response.setStatus( ResponseStatusFactory.badRequest( ).setMessage( "You must provide a client_code or a client_token." )
-                    .setMessageKey( Constants.PROPERTY_REST_ERROR_MUST_PROVIDE_CLIENT_CODE_OR_TOKEN ) );
-            return response;
-        }
-        final String clientAppCode;
-        if ( StringUtils.isBlank( _strClientCode ) )
-        {
-            final Optional<Client> client = ClientHome.findByToken( _strHeaderClientToken );
-            if ( client.isPresent( ) )
-            {
-                clientAppCode = client.get( ).getAppCode( );
-            }
-            else
-            {
-                response.setStatus( ResponseStatusFactory.notFound( ).setMessage( "No client found with provided token" )
-                        .setMessageKey( Constants.PROPERTY_REST_ERROR_NO_CLIENT_FOUND_WITH_TOKEN ) );
-                return response;
-            }
-        }
-        else
-        {
-            clientAppCode = _strClientCode;
-        }
-        final ServiceContractDto activeServiceContract = ServiceContractService.instance( ).getActiveServiceContract( clientAppCode );
-        if ( activeServiceContract == null )
-        {
-            response.setStatus( ResponseStatusFactory.notFound( ).setMessageKey( Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND ) );
-            return response;
-        }
-        if ( !activeServiceContract.isAuthorizedImport( ) )
-        {
-            response.setStatus( ResponseStatusFactory.unauthorized( ).setMessageKey( Constants.PROPERTY_REST_ERROR_IMPORT_UNAUTHORIZED ) );
-            return response;
-        }
-        try
-        {
-            return BatchService.instance( ).getBatchStatus( _request.getBatchReference( ), _request.getMode( ) );
-        }
-        catch( final IdentityStoreException e )
-        {
-            response.setStatus(
-                    ResponseStatusFactory.failure( ).setMessage( e.getMessage( ) ).setMessageKey( Constants.PROPERTY_REST_ERROR_DURING_TREATMENT ) );
-        }
+
+        final BatchStatusDto batchStatus = BatchService.instance().getBatchStatus(_request.getBatchReference(), _request.getMode());
+        response.setBatchStatus( batchStatus );
+        response.setStatus( ResponseStatusFactory.ok( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION )
+                                                 .setMessage( "Status du batch récupéré avec succès" ) );
 
         return response;
     }

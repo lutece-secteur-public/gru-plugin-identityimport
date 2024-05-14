@@ -35,8 +35,8 @@ package fr.paris.lutece.plugins.identityimport.web.rs;
 
 import fr.paris.lutece.plugins.identityimport.web.request.IdentityBatchImportRequest;
 import fr.paris.lutece.plugins.identityimport.web.request.IdentityBatchStatusRequest;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.ResponseDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportRequest;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
@@ -61,27 +61,25 @@ public class BatchRestService
     /**
      * Create Batch
      * 
-     * @param request
+     * @param importRequest
      * @return
      */
     @POST
     @Path( StringUtils.EMPTY )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response importBatch( final BatchImportRequest request, @HeaderParam( Constants.PARAM_CLIENT_CODE ) String strHeaderClientCode,
+    public Response importBatch( final BatchImportRequest importRequest, @HeaderParam( Constants.PARAM_CLIENT_CODE ) String strHeaderClientCode,
             @HeaderParam( Constants.PARAM_AUTHOR_NAME ) String authorName, @HeaderParam( Constants.PARAM_AUTHOR_TYPE ) String authorType,
             @HeaderParam( Constants.PARAM_CLIENT_TOKEN ) String strHeaderClientToken ) throws IdentityStoreException
     {
-        final IdentityBatchImportRequest identityBatchImportRequest = new IdentityBatchImportRequest( request, strHeaderClientToken, strHeaderClientCode,
-                authorName, authorType );
-        final BatchImportResponse response = (BatchImportResponse) identityBatchImportRequest.doRequest( );
-        return Response.status( response.getStatus( ).getHttpCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
+        final IdentityBatchImportRequest request = new IdentityBatchImportRequest( importRequest, strHeaderClientToken, strHeaderClientCode, authorName, authorType );
+        return buildJsonResponse(request.doRequest());
     }
 
     /**
      * Get the status of the batch
      *
-     * @param request
+     * @param statusRequest
      *            the request containing the reference of the batch and the desired mode
      * @return a {@link BatchStatusResponse}
      */
@@ -89,14 +87,17 @@ public class BatchRestService
     @Path( Constants.BATCH_STATUS_PATH )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response getBacthStatus( final BatchStatusRequest request, @HeaderParam( Constants.PARAM_CLIENT_CODE ) String strHeaderClientCode,
+    public Response getBacthStatus( final BatchStatusRequest statusRequest, @HeaderParam( Constants.PARAM_CLIENT_CODE ) String strHeaderClientCode,
             @HeaderParam( Constants.PARAM_AUTHOR_NAME ) String authorName, @HeaderParam( Constants.PARAM_AUTHOR_TYPE ) String authorType,
             @HeaderParam( Constants.PARAM_CLIENT_TOKEN ) String strHeaderClientToken ) throws IdentityStoreException
     {
-        final IdentityBatchStatusRequest identityBatchStatusRequest = new IdentityBatchStatusRequest( request, strHeaderClientToken, strHeaderClientCode,
-                authorName, authorType );
-        final BatchStatusResponse response = (BatchStatusResponse) identityBatchStatusRequest.doRequest( );
-        return Response.status( response.getStatus( ).getHttpCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
+        final IdentityBatchStatusRequest request = new IdentityBatchStatusRequest( statusRequest, strHeaderClientToken, strHeaderClientCode, authorName, authorType );
+        return buildJsonResponse(request.doRequest());
+    }
+
+    private Response buildJsonResponse( final ResponseDto entity)
+    {
+        return Response.status( entity.getStatus( ).getHttpCode( ) ).entity( entity ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
     }
 
 }

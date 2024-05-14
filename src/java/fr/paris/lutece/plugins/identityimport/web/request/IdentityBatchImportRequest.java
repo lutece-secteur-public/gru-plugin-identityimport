@@ -33,28 +33,31 @@
  */
 package fr.paris.lutece.plugins.identityimport.web.request;
 
-import fr.paris.lutece.plugins.identityimport.business.Client;
-import fr.paris.lutece.plugins.identityimport.business.ClientHome;
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
+import fr.paris.lutece.plugins.identityimport.service.BatchValidationService;
 import fr.paris.lutece.plugins.identityimport.service.ServiceContractService;
+import fr.paris.lutece.plugins.identityimport.web.validator.BatchRequestValidator;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.AbstractIdentityStoreRequest;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.BatchRequestValidator;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportResponse;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
+import fr.paris.lutece.plugins.identitystore.web.exception.ClientAuthorizationException;
+import fr.paris.lutece.plugins.identitystore.web.exception.DuplicatesConsistencyException;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Optional;
-import java.util.UUID;
+import fr.paris.lutece.plugins.identitystore.web.exception.RequestContentFormattingException;
+import fr.paris.lutece.plugins.identitystore.web.exception.RequestFormatException;
+import fr.paris.lutece.plugins.identitystore.web.exception.ResourceConsistencyException;
+import fr.paris.lutece.plugins.identitystore.web.exception.ResourceNotFoundException;
 
 public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
 {
-    protected BatchImportRequest _request;
-    protected String _strHeaderClientToken;
+    private final BatchImportRequest _request;
+    private final String _strHeaderClientToken;
+
+    private ServiceContractDto serviceContract;
 
     public IdentityBatchImportRequest( final BatchImportRequest request, final String strHeaderClientToken, final String strClientCode,
             final String strAuthorName, final String strAuthorType ) throws IdentityStoreException
@@ -65,66 +68,51 @@ public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
     }
 
     @Override
-    protected void validateSpecificRequest( ) throws IdentityStoreException
-    {
-        BatchRequestValidator.instance( ).checkImportRequest( _request );
+    protected void fetchResources() throws ResourceNotFoundException {
+        serviceContract = ServiceContractService.instance().getActiveServiceContract(_strClientCode, _strHeaderClientToken);
+    }
+
+    @Override
+    protected void validateRequestFormat() throws RequestFormatException {
+        BatchRequestValidator.instance().checkImportRequest(_request);
+        BatchRequestValidator.instance().checkClientCodeAndToken(_strClientCode, _strHeaderClientToken);
+
+        BatchValidationService.instance().validateImportBatchLimit(_request.getBatch());
+        BatchValidationService.instance().validateUser(_request.getBatch());
+        BatchValidationService.instance().validateIdentities(_request.getBatch());
+    }
+
+    @Override
+    protected void validateClientAuthorization() throws ClientAuthorizationException {
+        ServiceContractService.instance().validateImportAuthorization(serviceContract);
+        for (final IdentityDto identity : _request.getBatch().getIdentities()) {
+            ServiceContractService.instance().validateIdentityAgainstServiceContract(identity, serviceContract);
+        }
+    }
+
+    @Override
+    protected void validateResourcesConsistency() throws ResourceConsistencyException {
+        // do nothing
+    }
+
+    @Override
+    protected void formatRequestContent() throws RequestContentFormattingException {
+        // do nothing
+    }
+
+    @Override
+    protected void checkDuplicatesConsistency() throws DuplicatesConsistencyException {
+        BatchValidationService.instance().validateIdentitiesUniqueness(_request.getBatch());
     }
 
     @Override
     protected BatchImportResponse doSpecificRequest( ) throws IdentityStoreException
     {
         final BatchImportResponse response = new BatchImportResponse( );
-        if ( StringUtils.isAllBlank( _strClientCode, _strHeaderClientToken ) )
-        {
-            response.setStatus( ResponseStatusFactory.badRequest( ).setMessage( "You must provide a client_code or a client_token." )
-                    .setMessageKey( Constants.PROPERTY_REST_ERROR_MUST_PROVIDE_CLIENT_CODE_OR_TOKEN ) );
-            return response;
-        }
-        final String clientAppCode;
-        if ( StringUtils.isBlank( _strClientCode ) )
-        {
-            final Optional<Client> client = ClientHome.findByToken( _strHeaderClientToken );
-            if ( client.isPresent( ) )
-            {
-                clientAppCode = client.get( ).getAppCode( );
-            }
-            else
-            {
-                response.setStatus( ResponseStatusFactory.notFound( ).setMessage( "No client found with provided token" )
-                        .setMessageKey( Constants.PROPERTY_REST_ERROR_NO_CLIENT_FOUND_WITH_TOKEN ) );
-                return response;
-            }
-        }
-        else
-        {
-            clientAppCode = _strClientCode;
-        }
-        final ServiceContractDto activeServiceContract = ServiceContractService.instance( ).getActiveServiceContract( clientAppCode );
-        if ( activeServiceContract == null )
-        {
-            response.setStatus( ResponseStatusFactory.unauthorized( ).setMessageKey( Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND ) );
-            response.getStatus( ).setMessage( "Unauthorized Client code " + clientAppCode );
-            return response;
-        }
-        if ( !activeServiceContract.isAuthorizedImport( ) )
-        {
-            response.setStatus( ResponseStatusFactory.failure( ).setMessageKey( Constants.PROPERTY_REST_ERROR_IMPORT_UNAUTHORIZED ) );
-            return response;
-        }
-        final BatchDto batch = _request.getBatch( );
-        batch.setAppCode( clientAppCode );
-        batch.setReference( UUID.randomUUID( ).toString( ) );
-        response.setReference( batch.getReference( ) );
-        try
-        {
-            BatchService.instance( ).importBatch( batch, null, null );
-            response.setStatus( ResponseStatusFactory.success( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION ) );
-        }
-        catch( final IdentityStoreException e )
-        {
-            response.setStatus(
-                    ResponseStatusFactory.failure( ).setMessage( e.getMessage( ) ).setMessageKey( Constants.PROPERTY_REST_ERROR_DURING_TREATMENT ) );
-        }
+
+        final String batchReference = BatchService.instance().importBatchFromApi(_request, serviceContract.getClientCode());
+        response.setReference(batchReference);
+        response.setStatus( ResponseStatusFactory.success( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION ) );
 
         return response;
     }

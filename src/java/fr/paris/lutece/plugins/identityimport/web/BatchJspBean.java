@@ -463,7 +463,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
                 return redirectView( request, VIEW_CREATE_BATCH );
             }
 
-            batchId = BatchService.instance( ).importBatch( batchDto, getUser( ), _feedToken );
+            batchId = BatchService.instance( ).importBatchFromIhm(batchDto, getUser(), _feedToken);
 
             this.addInfo( INFO_BATCH_CREATED, getLocale( ) );
             this.resetListId( );
