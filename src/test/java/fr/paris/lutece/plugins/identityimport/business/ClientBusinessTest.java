@@ -46,8 +46,8 @@ public class ClientBusinessTest extends LuteceTestCase
     private static final String NAME2 = "Name2";
     private static final String APPCODE1 = "AppCode1";
     private static final String APPCODE2 = "AppCode2";
-    private static final String TOKEN1 = "Token1";
-    private static final String TOKEN2 = "Token2";
+    private static final String CLIENTCODE1 = "ClientCode1";
+    private static final String CLIENTCODE2 = "ClientCode2";
 
     /**
      * test Client
@@ -58,7 +58,7 @@ public class ClientBusinessTest extends LuteceTestCase
         Client client = new Client( );
         client.setName( NAME1 );
         client.setAppCode( APPCODE1 );
-        client.setToken( TOKEN1 );
+        client.setClientCode( CLIENTCODE1 );
         client.setDataRetentionPeriodInMonths( 24 );
 
         // Create test
@@ -67,19 +67,19 @@ public class ClientBusinessTest extends LuteceTestCase
         Client clientStored = optClientStored.orElse( new Client( ) );
         assertEquals( clientStored.getName( ), client.getName( ) );
         assertEquals( clientStored.getAppCode( ), client.getAppCode( ) );
-        assertEquals( clientStored.getToken( ), client.getToken( ) );
+        assertEquals( clientStored.getClientCode( ), client.getClientCode( ) );
 
         // Update test
         client.setName( NAME2 );
         client.setAppCode( APPCODE2 );
-        client.setToken( TOKEN2 );
+        client.setClientCode( CLIENTCODE2 );
         ClientHome.update( client );
         optClientStored = ClientHome.findByPrimaryKey( client.getId( ) );
         clientStored = optClientStored.orElse( new Client( ) );
 
         assertEquals( clientStored.getName( ), client.getName( ) );
         assertEquals( clientStored.getAppCode( ), client.getAppCode( ) );
-        assertEquals( clientStored.getToken( ), client.getToken( ) );
+        assertEquals( clientStored.getClientCode( ), client.getClientCode( ) );
 
         // List test
         ClientHome.getClientsList( );

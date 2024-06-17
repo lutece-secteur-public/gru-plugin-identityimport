@@ -109,15 +109,15 @@ public final class ClientHome
     }
 
     /**
-     * Returns an instance of a client whose token is specified in parameter
+     * Returns an instance of a client whose client code is specified in parameter
      *
-     * @param token
-     *            The client token
+     * @param clientCode
+     *            The client code
      * @return an instance of Client
      */
-    public static Optional<Client> findByToken( final String token )
+    public static Optional<Client> findByClientCode( final String clientCode )
     {
-        return _dao.selectClientByToken( _plugin, token );
+        return _dao.selectClientByClientCode( _plugin, clientCode );
     }
 
     /**
@@ -160,6 +160,17 @@ public final class ClientHome
     public static List<Client> getClientsListByIds( List<Integer> listIds )
     {
         return _dao.selectClientsListByIds( _plugin, listIds );
+    }
+
+    /**
+     * Load the data of all the client objects and returns them as a list
+     *
+     * @param appCode
+     *            the app code
+     * @return The list which contains the data of all the client objects
+     */
+    public static List<Client> getClientsListByAppCode( final String appCode ) {
+        return _dao.selectClientsListByAppCode(_plugin, appCode);
     }
 
 }
