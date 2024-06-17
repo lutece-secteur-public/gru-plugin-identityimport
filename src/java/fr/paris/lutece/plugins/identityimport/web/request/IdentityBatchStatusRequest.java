@@ -54,27 +54,27 @@ import fr.paris.lutece.plugins.identitystore.web.exception.ResourceNotFoundExcep
 public class IdentityBatchStatusRequest extends AbstractIdentityStoreRequest
 {
     private final BatchStatusRequest _request;
-    private final String _strHeaderClientToken;
+    protected String _strHeaderAppCode;
 
     private ServiceContractDto serviceContract;
 
-    public IdentityBatchStatusRequest( final BatchStatusRequest request, final String strHeaderClientToken, final String strClientCode,
+    public IdentityBatchStatusRequest( final BatchStatusRequest request, final String strHeaderAppCode, final String strClientCode,
             final String strAuthorName, final String strAuthorType ) throws IdentityStoreException
     {
         super( strClientCode, strAuthorName, strAuthorType );
         this._request = request;
-        this._strHeaderClientToken = strHeaderClientToken;
+        this._strHeaderAppCode = strHeaderAppCode;
     }
 
     @Override
     protected void fetchResources() throws ResourceNotFoundException {
-        serviceContract = ServiceContractService.instance().getActiveServiceContract(_strClientCode, _strHeaderClientToken);
+        serviceContract = ServiceContractService.instance().getActiveServiceContract(_strClientCode);
     }
 
     @Override
     protected void validateRequestFormat() throws RequestFormatException {
         BatchRequestValidator.instance().checkBatchStatusRequest(_request);
-        BatchRequestValidator.instance().checkClientCodeAndToken(_strClientCode, _strHeaderClientToken);
+        BatchRequestValidator.instance().checkAppAndClientCode(_strHeaderAppCode, _strClientCode);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class IdentityBatchStatusRequest extends AbstractIdentityStoreRequest
         final BatchStatusDto batchStatus = BatchService.instance().getBatchStatus(_request.getBatchReference(), _request.getMode());
         response.setBatchStatus( batchStatus );
         response.setStatus( ResponseStatusFactory.ok( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION )
-                                                 .setMessage( "Status du batch récupéré avec succès" ) );
+                .setMessage( "Status du batch récupéré avec succès" ) );
 
         return response;
     }

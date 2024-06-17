@@ -14,8 +14,8 @@
 		<@formGroup labelFor='app_code' labelKey='#i18n{identityimport.modify_client.labelAppCode}' mandatory=true>
 			<@input type='text' id='app_code' name='app_code'  maxlength=50 value='${client.appCode!\'\'}' tabIndex='1' />
 		</@formGroup>
-		<@formGroup labelFor='token' labelKey='#i18n{identityimport.modify_client.labelToken}' mandatory=true>
-			<@input type='text' id='token' name='token'  value='${client.token!\'\'}' tabIndex='2' />
+		<@formGroup labelFor='client_code' labelKey='#i18n{identityimport.modify_client.labelCientCode}' mandatory=true>
+			<@input type='text' id='client_code' name='clientCode'  value='${client.clientCode!\'\'}' tabIndex='2' />
 		</@formGroup>
 		<@formGroup labelFor='dataRetentionPeriodInMonths' labelKey='#i18n{identityimport.modify_client.labelDataRetention}' mandatory=true>
 			<@input type='number' id='dataRetentionPeriodInMonths' name='dataRetentionPeriodInMonths'  value='${client.dataRetentionPeriodInMonths!\'\'}' tabIndex='3' />

@@ -1,7 +1,10 @@
 package fr.paris.lutece.plugins.identityimport.web.validator;
 
+import fr.paris.lutece.plugins.identityimport.service.ImportClientService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImportRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusRequest;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
+import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.plugins.identitystore.web.exception.RequestFormatException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -46,9 +49,15 @@ public class BatchRequestValidator {
         }
     }
 
-    public void checkClientCodeAndToken(final String clientCode, final String clientToken) throws RequestFormatException {
-        if (StringUtils.isAllBlank(clientCode, clientToken)) {
-            throw new RequestFormatException("You must provide a client_code or a client_token.", PROPERTY_ERROR_MUST_PROVIDE_CLIENT_CODE_OR_TOKEN);
+    public void checkAppAndClientCode(final String strHeaderAppCode, final String _strClientCode) throws RequestFormatException {
+        try {
+            //TODO refactor si besoin selon le principe du refactoring refactoré
+            ImportClientService.instance().getClient(strHeaderAppCode, _strClientCode);
+        }
+        catch ( final IdentityStoreException e )
+        {
+            final String message = String.format("You must provide valid headers %s and %s.", Constants.PARAM_CLIENT_CODE, Constants.PARAM_APPLICATION_CODE);
+            throw new RequestFormatException(message, PROPERTY_ERROR_MUST_PROVIDE_CLIENT_CODE_OR_TOKEN);
         }
     }
 }

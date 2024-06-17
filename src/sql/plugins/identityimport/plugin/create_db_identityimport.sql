@@ -57,7 +57,7 @@ CREATE TABLE identityimport_client (
 id_client int AUTO_INCREMENT,
 name varchar(255) default '' NOT NULL UNIQUE,
 app_code varchar(50) default '' NOT NULL,
-token long varchar,
+client_code varchar(50) default '' NOT NULL,
 data_retention_period_in_months INT DEFAULT 0 NOT NULL,
 PRIMARY KEY (id_client)
 );

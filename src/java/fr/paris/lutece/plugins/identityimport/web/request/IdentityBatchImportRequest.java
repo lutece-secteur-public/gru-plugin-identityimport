@@ -55,27 +55,27 @@ import fr.paris.lutece.plugins.identitystore.web.exception.ResourceNotFoundExcep
 public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
 {
     private final BatchImportRequest _request;
-    private final String _strHeaderClientToken;
+    private final String _strHeaderAppCode;
 
     private ServiceContractDto serviceContract;
 
-    public IdentityBatchImportRequest( final BatchImportRequest request, final String strHeaderClientToken, final String strClientCode,
+    public IdentityBatchImportRequest( final BatchImportRequest request, final String strHeaderAppCode, final String strClientCode,
             final String strAuthorName, final String strAuthorType ) throws IdentityStoreException
     {
         super( strClientCode, strAuthorName, strAuthorType );
         this._request = request;
-        this._strHeaderClientToken = strHeaderClientToken;
+        this._strHeaderAppCode = strHeaderAppCode;
     }
 
     @Override
     protected void fetchResources() throws ResourceNotFoundException {
-        serviceContract = ServiceContractService.instance().getActiveServiceContract(_strClientCode, _strHeaderClientToken);
+        serviceContract = ServiceContractService.instance().getActiveServiceContract(_strClientCode);
     }
 
     @Override
     protected void validateRequestFormat() throws RequestFormatException {
         BatchRequestValidator.instance().checkImportRequest(_request);
-        BatchRequestValidator.instance().checkClientCodeAndToken(_strClientCode, _strHeaderClientToken);
+        BatchRequestValidator.instance().checkAppAndClientCode(_strHeaderAppCode, _strClientCode);
 
         BatchValidationService.instance().validateImportBatchLimit(_request.getBatch());
         BatchValidationService.instance().validateUser(_request.getBatch());

@@ -196,8 +196,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private Integer _currentIdentityId;
 
     // Services
-    private final IdentityQualityService identityQualityService = SpringContextService.getBean( "qualityService.rest" );
-    private final IdentityService identityService = SpringContextService.getBean( "identityService.rest" );
+    private final IdentityQualityService identityQualityService = SpringContextService.getBean( "identityimport.qualityService.rest" );
+    private final IdentityService identityService = SpringContextService.getBean( "identityimport.identityService.rest" );
     private final List<String> DUPLICATE_RULE_CODES = Arrays.asList( AppPropertiesService.getProperty( PROPERTY_DUPLICATE_RULES, "" ).split( "," ) );
     private final int NB_ITEMS_PER_PAGES = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 10 );
     private final String IMPORT_CLIENT_CODE = AppPropertiesService.getProperty( PROPERTY_IMPORT_CLIENT_CODE );

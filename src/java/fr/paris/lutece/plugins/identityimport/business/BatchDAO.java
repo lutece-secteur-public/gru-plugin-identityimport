@@ -71,6 +71,7 @@ public final class BatchDAO implements IBatchDAO
     private static final String SQL_QUERY_SELECTALL_ID_BY_APP_CODE = "b.app_code = ${app_code}";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch WHERE id_batch IN (  ";
     private static final String SQL_QUERY_COUNT_IDENTITIES = "SELECT count(identity.id_resource) FROM workflow_resource_workflow identity WHERE identity.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' and identity.id_external_parent = ?";
+    private static final String SQL_ORDER_BY_DATE_DESC = " ORDER BY b.date DESC ";
 
     private static final String SQL_QUERY_SELECT_BATCH_HISTORY = "SELECT a.name, a.description, h.creation_date, h.user_access_code FROM workflow_resource_history h JOIN workflow_action a ON a.id_action = h.id_action WHERE h.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' AND h.id_resource = ?";
 
@@ -363,6 +364,10 @@ public final class BatchDAO implements IBatchDAO
                 query += " WHERE " + SQL_QUERY_SELECTALL_ID_BY_APP_CODE.replace( "${app_code}", "'" + filterAppCode + "'" );
             }
 
+        if( batchStateId != null && batchStateId == 13)
+        {
+            query += SQL_ORDER_BY_DATE_DESC;
+        }
         try ( final DAOUtil daoUtil = new DAOUtil( query, plugin ) )
         {
             daoUtil.executeQuery( );

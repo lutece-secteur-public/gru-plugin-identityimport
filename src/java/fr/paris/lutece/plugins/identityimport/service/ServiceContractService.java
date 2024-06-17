@@ -54,7 +54,7 @@ import java.util.Optional;
 public class ServiceContractService
 {
 
-    private final ServiceContractCache _cache = SpringContextService.getBean( "identity.serviceContractCacheService" );
+    private final ServiceContractCache _cache = SpringContextService.getBean( "identityimport.identity.serviceContractCacheService" );
     private static final String MESSAGE_KEY_NO_SERVICE_CONTRACT_FOUND_WITH_CODE = "identityimport.error.no.service.contract.found.with.code";
     private static final String MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_DOES_NOT_EXIST_IN_CONTRACT = "identityimport.error.attribute.not.exist.in.contract";
     private static final String MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_IS_NOT_WRITABLE_IN_CONTRACT = "identityimport.error.attribute.not.writable.in.contract";
@@ -117,27 +117,11 @@ public class ServiceContractService
      *            the client code
      * @return ServiceContractDto instance
      */
-    public ServiceContractDto getActiveServiceContract( final String clientCode ) throws IdentityStoreException
-    {
-        return _cache.get( clientCode );
-    }
-
-    public ServiceContractDto getActiveServiceContract(final String clientCode, final String clientToken) throws ResourceNotFoundException {
-        final String clientAppCode;
-        if (StringUtils.isBlank(clientCode)) {
-            final Optional<Client> client = ClientHome.findByToken(clientToken);
-            if (client.isPresent()) {
-                clientAppCode = client.get().getAppCode();
-            } else {
-                throw new ResourceNotFoundException("No client found with provided token", Constants.PROPERTY_REST_ERROR_NO_CLIENT_FOUND_WITH_TOKEN);
-            }
-        } else {
-            clientAppCode = clientCode;
-        }
+    public ServiceContractDto getActiveServiceContract(final String clientCode) throws ResourceNotFoundException {
 
         ServiceContractDto activeServiceContract = null;
         try {
-            activeServiceContract = this.getActiveServiceContract(clientAppCode);
+            activeServiceContract = _cache.get( clientCode );
         } catch (final IdentityStoreException ignored) {
             // do nothing
         }

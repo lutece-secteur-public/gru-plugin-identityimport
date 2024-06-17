@@ -57,7 +57,7 @@ public class Client implements Serializable
     @Size( max = 50, message = "#i18n{identityimport.validation.client.AppCode.size}" )
     private String _strAppCode;
 
-    private String _strToken;
+    private String _strClientCode;
 
     /**
      * Returns the Id
@@ -122,28 +122,15 @@ public class Client implements Serializable
         _strAppCode = strAppCode;
     }
 
-    /**
-     * Returns the Token
-     * 
-     * @return The Token
-     */
-    public String getToken( )
-    {
-        return _strToken;
+    public String getClientCode() {
+        return _strClientCode;
     }
 
-    /**
-     * Sets the Token
-     * 
-     * @param strToken
-     *            The Token
-     */
-    public void setToken( String strToken )
-    {
-        _strToken = strToken;
+    public void setClientCode(final String _strClientCode) {
+        this._strClientCode = _strClientCode;
     }
 
-    public int getDataRetentionPeriodInMonths( )
+    public int getDataRetentionPeriodInMonths()
     {
         return _nDataRetentionPeriodInMonths;
     }
