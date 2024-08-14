@@ -48,15 +48,16 @@ import java.util.Optional;
 public final class ClientDAO implements IClientDAO
 {
     // Constants
-    private static final String SELECT_COLUMNS = "id_client, name, app_code, token, data_retention_period_in_months";
+    private static final String SELECT_COLUMNS = "id_client, name, app_code, client_code, data_retention_period_in_months";
     private static final String SQL_QUERY_SELECT = "SELECT " + SELECT_COLUMNS + " FROM identityimport_client WHERE id_client = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_client ( name, app_code, token, data_retention_period_in_months ) VALUES ( ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_client ( name, app_code, client_code, data_retention_period_in_months ) VALUES ( ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_client WHERE id_client = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_client SET id_client = ?, name = ?, app_code = ?, token = ?, data_retention_period_in_months = ? WHERE id_client = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_client SET id_client = ?, name = ?, app_code = ?, client_code = ?, data_retention_period_in_months = ? WHERE id_client = ?";
     private static final String SQL_QUERY_SELECTALL = "SELECT " + SELECT_COLUMNS + " FROM identityimport_client";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_client FROM identityimport_client";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT " + SELECT_COLUMNS + " FROM identityimport_client WHERE id_client IN (  ";
-    private static final String SQL_QUERY_SELECT_BY_TOKEN = "SELECT " + SELECT_COLUMNS + " FROM identityimport_client WHERE token = ?";
+    private static final String SQL_QUERY_SELECT_BY_CLIENT_CODE = "SELECT " + SELECT_COLUMNS + " FROM identityimport_client WHERE client_code = ?";
+    private static final String SQL_QUERY_SELECT_BY_APP_CODE = "SELECT " + SELECT_COLUMNS + " FROM identityimport_client WHERE app_code = ?";
 
     /**
      * {@inheritDoc }
@@ -69,7 +70,7 @@ public final class ClientDAO implements IClientDAO
             int nIndex = 1;
             daoUtil.setString( nIndex++, client.getName( ) );
             daoUtil.setString( nIndex++, client.getAppCode( ) );
-            daoUtil.setString( nIndex++, client.getToken( ) );
+            daoUtil.setString( nIndex++, client.getClientCode( ) );
             daoUtil.setInt( nIndex++, client.getDataRetentionPeriodInMonths( ) );
 
             daoUtil.executeUpdate( );
@@ -128,7 +129,7 @@ public final class ClientDAO implements IClientDAO
             daoUtil.setInt( nIndex++, client.getId( ) );
             daoUtil.setString( nIndex++, client.getName( ) );
             daoUtil.setString( nIndex++, client.getAppCode( ) );
-            daoUtil.setString( nIndex++, client.getToken( ) );
+            daoUtil.setString( nIndex++, client.getClientCode( ) );
             daoUtil.setInt( nIndex++, client.getDataRetentionPeriodInMonths( ) );
             daoUtil.setInt( nIndex, client.getId( ) );
 
@@ -244,17 +245,17 @@ public final class ClientDAO implements IClientDAO
         client.setId( daoUtil.getInt( 1 ) );
         client.setName( daoUtil.getString( 2 ) );
         client.setAppCode( daoUtil.getString( 3 ) );
-        client.setToken( daoUtil.getString( 4 ) );
+        client.setClientCode( daoUtil.getString( 4 ) );
         client.setDataRetentionPeriodInMonths( daoUtil.getInt( 5 ) );
         return client;
     }
 
     @Override
-    public Optional<Client> selectClientByToken( final Plugin plugin, final String token )
+    public Optional<Client> selectClientByClientCode( final Plugin plugin, final String clientCode )
     {
-        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_TOKEN, plugin ) )
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_CLIENT_CODE, plugin ) )
         {
-            daoUtil.setString( 1, token );
+            daoUtil.setString( 1, clientCode );
             daoUtil.executeQuery( );
             Client client = null;
 
@@ -264,6 +265,23 @@ public final class ClientDAO implements IClientDAO
             }
 
             return Optional.ofNullable( client );
+        }
+    }
+
+    @Override
+    public List<Client> selectClientsListByAppCode( final Plugin plugin, final String appCode ) {
+        final List<Client> clientList = new ArrayList<>( );
+        try ( final DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_APP_CODE, plugin ) )
+        {
+            daoUtil.setString( 1, appCode );
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                clientList.add( this.getClient( daoUtil ) );
+            }
+
+            return clientList;
         }
     }
 }

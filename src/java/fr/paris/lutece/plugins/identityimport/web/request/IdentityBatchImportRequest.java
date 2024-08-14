@@ -34,8 +34,8 @@
 package fr.paris.lutece.plugins.identityimport.web.request;
 
 import fr.paris.lutece.plugins.identityimport.business.Client;
-import fr.paris.lutece.plugins.identityimport.business.ClientHome;
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
+import fr.paris.lutece.plugins.identityimport.service.ImportClientService;
 import fr.paris.lutece.plugins.identityimport.service.ServiceContractService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.AbstractIdentityStoreRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.BatchRequestValidator;
@@ -46,22 +46,20 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchImport
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
 {
     protected BatchImportRequest _request;
-    protected String _strHeaderClientToken;
+    protected String strHeaderAppCode;
 
-    public IdentityBatchImportRequest( final BatchImportRequest request, final String strHeaderClientToken, final String strClientCode,
+    public IdentityBatchImportRequest( final BatchImportRequest request, final String strHeaderAppCode, final String strClientCode,
             final String strAuthorName, final String strAuthorType ) throws IdentityStoreException
     {
         super( strClientCode, strAuthorName, strAuthorType );
         this._request = request;
-        this._strHeaderClientToken = strHeaderClientToken;
+        this.strHeaderAppCode = strHeaderAppCode;
     }
 
     @Override
@@ -74,36 +72,12 @@ public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
     protected BatchImportResponse doSpecificRequest( ) throws IdentityStoreException
     {
         final BatchImportResponse response = new BatchImportResponse( );
-        if ( StringUtils.isAllBlank( _strClientCode, _strHeaderClientToken ) )
-        {
-            response.setStatus( ResponseStatusFactory.badRequest( ).setMessage( "You must provide a client_code or a client_token." )
-                    .setMessageKey( Constants.PROPERTY_REST_ERROR_MUST_PROVIDE_CLIENT_CODE_OR_TOKEN ) );
-            return response;
-        }
-        final String clientAppCode;
-        if ( StringUtils.isBlank( _strClientCode ) )
-        {
-            final Optional<Client> client = ClientHome.findByToken( _strHeaderClientToken );
-            if ( client.isPresent( ) )
-            {
-                clientAppCode = client.get( ).getAppCode( );
-            }
-            else
-            {
-                response.setStatus( ResponseStatusFactory.notFound( ).setMessage( "No client found with provided token" )
-                        .setMessageKey( Constants.PROPERTY_REST_ERROR_NO_CLIENT_FOUND_WITH_TOKEN ) );
-                return response;
-            }
-        }
-        else
-        {
-            clientAppCode = _strClientCode;
-        }
-        final ServiceContractDto activeServiceContract = ServiceContractService.instance( ).getActiveServiceContract( clientAppCode );
+        final Client client = ImportClientService.instance().getClient(strHeaderAppCode, _strClientCode);
+        final ServiceContractDto activeServiceContract = ServiceContractService.instance( ).getActiveServiceContract( client.getClientCode() );
         if ( activeServiceContract == null )
         {
             response.setStatus( ResponseStatusFactory.unauthorized( ).setMessageKey( Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND ) );
-            response.getStatus( ).setMessage( "Unauthorized Client code " + clientAppCode );
+            response.getStatus( ).setMessage( "Service contract not found." );
             return response;
         }
         if ( !activeServiceContract.isAuthorizedImport( ) )
@@ -112,7 +86,7 @@ public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
             return response;
         }
         final BatchDto batch = _request.getBatch( );
-        batch.setAppCode( clientAppCode );
+        batch.setAppCode( client.getAppCode() );
         batch.setReference( UUID.randomUUID( ).toString( ) );
         response.setReference( batch.getReference( ) );
         try

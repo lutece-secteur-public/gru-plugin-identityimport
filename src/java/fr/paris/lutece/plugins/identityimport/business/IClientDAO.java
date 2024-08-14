@@ -126,13 +126,25 @@ public interface IClientDAO
     List<Client> selectClientsListByIds( Plugin plugin, List<Integer> listIds );
 
     /**
-     * Load the data from the table of the Client corresponding to the given token.
+     * Load the data from the table of the Client corresponding to the given client code.
      * 
      * @param plugin
      *            the plugin
-     * @param token
-     *            the token
+     * @param clientCode
+     *            the client code
      * @return The instance of the client
      */
-    Optional<Client> selectClientByToken( Plugin plugin, String token );
+    Optional<Client> selectClientByClientCode( Plugin plugin, String clientCode );
+
+    /**
+     * Load the data of all the client objects and returns them as a list
+     *
+     * @param plugin
+     *            the Plugin
+     * @param appCode
+     *            the app code
+     * @return The list which contains the data of all the client objects
+     */
+    List<Client> selectClientsListByAppCode( Plugin plugin, String appCode );
+
 }

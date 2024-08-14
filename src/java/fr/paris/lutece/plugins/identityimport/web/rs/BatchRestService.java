@@ -70,9 +70,9 @@ public class BatchRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response importBatch( final BatchImportRequest request, @HeaderParam( Constants.PARAM_CLIENT_CODE ) String strHeaderClientCode,
             @HeaderParam( Constants.PARAM_AUTHOR_NAME ) String authorName, @HeaderParam( Constants.PARAM_AUTHOR_TYPE ) String authorType,
-            @HeaderParam( Constants.PARAM_CLIENT_TOKEN ) String strHeaderClientToken ) throws IdentityStoreException
+            @HeaderParam( Constants.PARAM_APPLICATION_CODE ) String strHeaderAppCode ) throws IdentityStoreException
     {
-        final IdentityBatchImportRequest identityBatchImportRequest = new IdentityBatchImportRequest( request, strHeaderClientToken, strHeaderClientCode,
+        final IdentityBatchImportRequest identityBatchImportRequest = new IdentityBatchImportRequest( request, strHeaderAppCode, strHeaderClientCode,
                 authorName, authorType );
         final BatchImportResponse response = (BatchImportResponse) identityBatchImportRequest.doRequest( );
         return Response.status( response.getStatus( ).getHttpCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
@@ -91,9 +91,9 @@ public class BatchRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getBacthStatus( final BatchStatusRequest request, @HeaderParam( Constants.PARAM_CLIENT_CODE ) String strHeaderClientCode,
             @HeaderParam( Constants.PARAM_AUTHOR_NAME ) String authorName, @HeaderParam( Constants.PARAM_AUTHOR_TYPE ) String authorType,
-            @HeaderParam( Constants.PARAM_CLIENT_TOKEN ) String strHeaderClientToken ) throws IdentityStoreException
+            @HeaderParam( Constants.PARAM_APPLICATION_CODE ) String strHeaderAppCode ) throws IdentityStoreException
     {
-        final IdentityBatchStatusRequest identityBatchStatusRequest = new IdentityBatchStatusRequest( request, strHeaderClientToken, strHeaderClientCode,
+        final IdentityBatchStatusRequest identityBatchStatusRequest = new IdentityBatchStatusRequest( request, strHeaderAppCode, strHeaderClientCode,
                 authorName, authorType );
         final BatchStatusResponse response = (BatchStatusResponse) identityBatchStatusRequest.doRequest( );
         return Response.status( response.getStatus( ).getHttpCode( ) ).entity( response ).type( MediaType.APPLICATION_JSON_TYPE ).build( );

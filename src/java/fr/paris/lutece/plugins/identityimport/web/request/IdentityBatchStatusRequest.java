@@ -34,8 +34,8 @@
 package fr.paris.lutece.plugins.identityimport.web.request;
 
 import fr.paris.lutece.plugins.identityimport.business.Client;
-import fr.paris.lutece.plugins.identityimport.business.ClientHome;
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
+import fr.paris.lutece.plugins.identityimport.service.ImportClientService;
 import fr.paris.lutece.plugins.identityimport.service.ServiceContractService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.AbstractIdentityStoreRequest;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.BatchRequestValidator;
@@ -45,21 +45,18 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatus
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Optional;
 
 public class IdentityBatchStatusRequest extends AbstractIdentityStoreRequest
 {
     protected BatchStatusRequest _request;
-    protected String _strHeaderClientToken;
+    protected String strHeaderAppCode;
 
-    public IdentityBatchStatusRequest( final BatchStatusRequest request, final String strHeaderClientToken, final String strClientCode,
+    public IdentityBatchStatusRequest( final BatchStatusRequest request, final String strHeaderAppCode, final String strClientCode,
             final String strAuthorName, final String strAuthorType ) throws IdentityStoreException
     {
         super( strClientCode, strAuthorName, strAuthorType );
         this._request = request;
-        this._strHeaderClientToken = strHeaderClientToken;
+        this.strHeaderAppCode = strHeaderAppCode;
     }
 
     @Override
@@ -72,32 +69,8 @@ public class IdentityBatchStatusRequest extends AbstractIdentityStoreRequest
     protected BatchStatusResponse doSpecificRequest( ) throws IdentityStoreException
     {
         final BatchStatusResponse response = new BatchStatusResponse( );
-        if ( StringUtils.isAllBlank( _strClientCode, _strHeaderClientToken ) )
-        {
-            response.setStatus( ResponseStatusFactory.badRequest( ).setMessage( "You must provide a client_code or a client_token." )
-                    .setMessageKey( Constants.PROPERTY_REST_ERROR_MUST_PROVIDE_CLIENT_CODE_OR_TOKEN ) );
-            return response;
-        }
-        final String clientAppCode;
-        if ( StringUtils.isBlank( _strClientCode ) )
-        {
-            final Optional<Client> client = ClientHome.findByToken( _strHeaderClientToken );
-            if ( client.isPresent( ) )
-            {
-                clientAppCode = client.get( ).getAppCode( );
-            }
-            else
-            {
-                response.setStatus( ResponseStatusFactory.notFound( ).setMessage( "No client found with provided token" )
-                        .setMessageKey( Constants.PROPERTY_REST_ERROR_NO_CLIENT_FOUND_WITH_TOKEN ) );
-                return response;
-            }
-        }
-        else
-        {
-            clientAppCode = _strClientCode;
-        }
-        final ServiceContractDto activeServiceContract = ServiceContractService.instance( ).getActiveServiceContract( clientAppCode );
+        final Client client = ImportClientService.instance().getClient(strHeaderAppCode, _strClientCode);
+        final ServiceContractDto activeServiceContract = ServiceContractService.instance( ).getActiveServiceContract( client.getClientCode() );
         if ( activeServiceContract == null )
         {
             response.setStatus( ResponseStatusFactory.notFound( ).setMessageKey( Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND ) );
