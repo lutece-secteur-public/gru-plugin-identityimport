@@ -55,13 +55,13 @@ public class AccessImportBatchResourceIdService extends ResourceIdService {
 
     @Override
     public ReferenceList getResourceIdList(final Locale locale) {
-        final Map<String, String> importClientAppCodes =
-                ClientHome.getClientsList().stream().map(Client::getAppCode).distinct().collect(Collectors.toMap(Function.identity(), Function.identity()));
-        return ReferenceList.convert(importClientAppCodes);
+        final Map<String, String> importClientCodes =
+                ClientHome.getClientsList().stream().map(Client::getClientCode).distinct().collect(Collectors.toMap(Function.identity(), Function.identity()));
+        return ReferenceList.convert(importClientCodes);
     }
 
     @Override
-    public String getTitle(final String strAppCode, final Locale locale) {
-        return strAppCode;
+    public String getTitle(final String strClientCode, final Locale locale) {
+        return strClientCode;
     }
 }
