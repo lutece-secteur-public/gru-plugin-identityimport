@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.identityimport.web;
 
+import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.identityimport.business.Batch;
 import fr.paris.lutece.plugins.identityimport.business.BatchHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentity;
@@ -40,6 +41,7 @@ import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribut
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
 import fr.paris.lutece.plugins.identityimport.business.ResourceState;
+import fr.paris.lutece.plugins.identityimport.rbac.AccessImportBatchResource;
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
 import fr.paris.lutece.plugins.identityimport.service.CandidateIdentityService;
 import fr.paris.lutece.plugins.identityimport.service.ServiceContractService;
@@ -61,6 +63,7 @@ import fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.progressmanager.ProgressManagerService;
+import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppException;
@@ -647,11 +650,14 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         final List<Batch> listBatch = BatchHome.getBatchsListByIds( listIds );
 
         // keep original order
-        return listBatch.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) ).map( b -> {
-            final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean( b, b.getId( ), getUser( ) );
-            _wfBatchBeanService.countSubResources( workflowBean );
-            return workflowBean;
-        } ).collect( Collectors.toList( ) );
+        return listBatch.stream( )
+                        .filter(b -> RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, String.valueOf(b.getAppCode()), AccessImportBatchResource.PERMISSION_READ, (User) getUser()))
+                        .sorted(Comparator.comparingInt(notif -> listIds.indexOf(notif.getId())))
+                        .map(b -> {
+                            final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean( b, b.getId( ), getUser( ) );
+                            _wfBatchBeanService.countSubResources( workflowBean );
+                            return workflowBean;
+                        }).collect( Collectors.toList( ) );
     }
 
     protected List<WorkflowBean<CandidateIdentity>> getIdentitiesFromIds( final List<Integer> listIds, final HttpServletRequest request )
