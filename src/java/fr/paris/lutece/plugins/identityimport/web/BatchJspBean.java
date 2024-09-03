@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.identityimport.web;
 
+import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.identityimport.business.Batch;
 import fr.paris.lutece.plugins.identityimport.business.BatchHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentity;
@@ -40,6 +41,7 @@ import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribut
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
 import fr.paris.lutece.plugins.identityimport.business.ResourceState;
+import fr.paris.lutece.plugins.identityimport.rbac.AccessImportBatchResource;
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
 import fr.paris.lutece.plugins.identityimport.service.CandidateIdentityService;
 import fr.paris.lutece.plugins.identityimport.service.ServiceContractService;
@@ -59,8 +61,10 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.IdentitySearch
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
 import fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
+import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.progressmanager.ProgressManagerService;
+import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppException;
@@ -286,7 +290,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return The HTML form to update info
      */
     @View( VIEW_IMPORT_CANDIDATEIDENTITY )
-    public String getImportCandidateIdentity( final HttpServletRequest request )
+    public String getImportCandidateIdentity( final HttpServletRequest request ) throws AccessDeniedException
     {
         final Optional<String> idIdentityOpt = Optional.ofNullable( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
         idIdentityOpt.ifPresent( idIdentity -> {
@@ -298,6 +302,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
                     _candidateidentity.getIdBatch( ), getUser( ) );
             _wfIdentitiesBeanService.addHistory( _wfCandidateIdentityBean, request, getLocale( ) );
         } );
+        if (!RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, _candidateidentity.getClientCode(), AccessImportBatchResource.PERMISSION_MANUAL_TREATMENT, (User) getUser())) {
+            throw new AccessDeniedException("You don't have the right to manually resolve an identity duplicates for this client app code.");
+        }
 
         final Map<String, Object> model = getModel( );
 
@@ -355,8 +362,12 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return the html code of the form
      */
     @View( value = VIEW_COMPLETE_IDENTITY )
-    public String getCompleteIdentity( final HttpServletRequest request )
+    public String getCompleteIdentity( final HttpServletRequest request ) throws AccessDeniedException
     {
+        if(!RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, AccessImportBatchResource.PERMISSION_MANUAL_TREATMENT, (User) getUser())) {
+            throw new AccessDeniedException("You don't have the right to manually resolve an identity duplicates.");
+        }
+
         final Optional<String> idIdentityOpt = Optional.ofNullable( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
         idIdentityOpt.ifPresent( idIdentity -> {
             _currentIdentityId = Integer.parseInt( idIdentity );
@@ -417,6 +428,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     @View( VIEW_IMPORT_BATCH )
     public String getViewImportBatch( final HttpServletRequest request ) throws AccessDeniedException
     {
+        if(!RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, AccessImportBatchResource.PERMISSION_CREATE, (User) getUser())) {
+            throw new AccessDeniedException("You don't have the right to create a new batch.");
+        }
         this.registerFeed( );
         _batch = new Batch( );
 
@@ -440,6 +454,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     @Action( ACTION_IMPORT_BATCH )
     public String doImportBatch( final HttpServletRequest request ) throws AccessDeniedException
     {
+        if(!RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, AccessImportBatchResource.PERMISSION_CREATE, (User) getUser())) {
+            throw new AccessDeniedException("You don't have the right to create a new batch.");
+        }
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_BATCH ) )
         {
             throw new AccessDeniedException( "Invalid security token" );
@@ -665,11 +682,14 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         final List<Batch> listBatch = BatchHome.getBatchsListByIds( listIds );
 
         // keep original order
-        return listBatch.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) ).map( b -> {
-            final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean( b, b.getId( ), getUser( ) );
-            _wfBatchBeanService.countSubResources( workflowBean );
-            return workflowBean;
-        } ).collect( Collectors.toList( ) );
+        return listBatch.stream( )
+                        .filter(b -> RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, String.valueOf(b.getAppCode()), AccessImportBatchResource.PERMISSION_READ, (User) getUser()))
+                        .sorted(Comparator.comparingInt(notif -> listIds.indexOf(notif.getId())))
+                        .map(b -> {
+                            final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean( b, b.getId( ), getUser( ) );
+                            _wfBatchBeanService.countSubResources( workflowBean );
+                            return workflowBean;
+                        }).collect( Collectors.toList( ) );
     }
 
     protected List<WorkflowBean<CandidateIdentity>> getIdentitiesFromIds( final List<Integer> listIds, final HttpServletRequest request )
