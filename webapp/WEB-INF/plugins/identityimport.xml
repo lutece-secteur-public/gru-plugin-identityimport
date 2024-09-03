@@ -71,6 +71,12 @@
             <daemon-class>fr.paris.lutece.plugins.identityimport.task.BatchCloseDaemon</daemon-class>
         </daemon>
     </daemons>
-    
+
+    <!-- RBAC Resources -->
+    <rbac-resource-types>
+        <rbac-resource-type>
+            <rbac-resource-type-class>fr.paris.lutece.plugins.identityimport.rbac.AccessImportBatchResourceIdService</rbac-resource-type-class>
+        </rbac-resource-type>
+    </rbac-resource-types>
 
 </plug-in>
