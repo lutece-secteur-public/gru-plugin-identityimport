@@ -43,7 +43,7 @@ import java.util.List;
 public class ReferentialService
 {
 
-    private final ReferentialCache _cache = SpringContextService.getBean( "identity.serviceReferentialCache" );
+    private final ReferentialCache _cache = SpringContextService.getBean( "identityimport.identity.serviceReferentialCache" );
 
     private static ReferentialService instance;
 

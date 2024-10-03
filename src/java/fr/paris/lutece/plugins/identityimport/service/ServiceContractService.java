@@ -49,7 +49,7 @@ import java.util.Optional;
 public class ServiceContractService
 {
 
-    private final ServiceContractCache _cache = SpringContextService.getBean( "identity.serviceContractCacheService" );
+    private final ServiceContractCache _cache = SpringContextService.getBean( "identityimport.identity.serviceContractCacheService" );
     private static final String MESSAGE_KEY_NO_SERVICE_CONTRACT_FOUND_WITH_CODE = "identityimport.error.no.service.contract.found.with.code";
     private static final String MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_DOES_NOT_EXIST_IN_CONTRACT = "identityimport.error.attribute.not.exist.in.contract";
     private static final String MESSAGE_KEY_A_REQUESTED_ATTRIBUTE_IS_NOT_WRITABLE_IN_CONTRACT = "identityimport.error.attribute.not.writable.in.contract";
