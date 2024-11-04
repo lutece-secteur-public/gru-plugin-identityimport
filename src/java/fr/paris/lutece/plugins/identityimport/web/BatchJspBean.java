@@ -61,6 +61,7 @@ import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.search.IdentitySearch
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.ResponseStatusFactory;
 import fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityService;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
+import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.progressmanager.ProgressManagerService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
@@ -280,7 +281,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return The HTML form to update info
      */
     @View( VIEW_IMPORT_CANDIDATEIDENTITY )
-    public String getImportCandidateIdentity( final HttpServletRequest request )
+    public String getImportCandidateIdentity( final HttpServletRequest request ) throws AccessDeniedException
     {
         final Optional<String> idIdentityOpt = Optional.ofNullable( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
         idIdentityOpt.ifPresent( idIdentity -> {
@@ -292,6 +293,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
                     _candidateidentity.getIdBatch( ), getUser( ) );
             _wfIdentitiesBeanService.addHistory( _wfCandidateIdentityBean, request, getLocale( ) );
         } );
+        if (!RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, _candidateidentity.getClientAppCode(), AccessImportBatchResource.PERMISSION_MANUAL_TREATMENT, (User) getUser())) {
+            throw new AccessDeniedException("You don't have the right to manually resolve an identity duplicates for this client app code.");
+        }
 
         final Map<String, Object> model = getModel( );
 
@@ -345,8 +349,12 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
      * @return the html code of the form
      */
     @View( value = VIEW_COMPLETE_IDENTITY )
-    public String getCompleteIdentity( final HttpServletRequest request )
+    public String getCompleteIdentity( final HttpServletRequest request ) throws AccessDeniedException
     {
+        if(!RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, AccessImportBatchResource.PERMISSION_MANUAL_TREATMENT, (User) getUser())) {
+            throw new AccessDeniedException("You don't have the right to manually resolve an identity duplicates.");
+        }
+
         final Optional<String> idIdentityOpt = Optional.ofNullable( request.getParameter( PARAMETER_ID_CANDIDATEIDENTITY ) );
         idIdentityOpt.ifPresent( idIdentity -> {
             _currentIdentityId = Integer.parseInt( idIdentity );
@@ -417,6 +425,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     @View( VIEW_IMPORT_BATCH )
     public String getViewImportBatch( final HttpServletRequest request ) throws AccessDeniedException
     {
+        if(!RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, AccessImportBatchResource.PERMISSION_CREATE, (User) getUser())) {
+            throw new AccessDeniedException("You don't have the right to create a new batch.");
+        }
         this.registerFeed( );
         _batch = new Batch( );
 
@@ -440,6 +451,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     @Action( ACTION_IMPORT_BATCH )
     public String doImportBatch( final HttpServletRequest request ) throws AccessDeniedException
     {
+        if(!RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, AccessImportBatchResource.PERMISSION_CREATE, (User) getUser())) {
+            throw new AccessDeniedException("You don't have the right to create a new batch.");
+        }
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_BATCH ) )
         {
             throw new AccessDeniedException( "Invalid security token" );
