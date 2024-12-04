@@ -48,6 +48,7 @@ import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.BatchDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
+import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchResourceStateDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatisticsDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.BatchStatusDto;
@@ -113,6 +114,15 @@ public class BatchService
                 progressManagerService.addReport( feedToken, "Validating batch ..." );
             }
             validationService.validateBatch( batch );
+            final ServiceContractDto activeServiceContract = ServiceContractService.instance().getActiveServiceContract(batch.getAppCode());
+            if ( activeServiceContract == null )
+            {
+                throw new IdentityStoreException( "Service contract not found.", Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND );
+            }
+            if ( !activeServiceContract.isAuthorizedImport( ) )
+            {
+                throw new IdentityStoreException("The client code is not authorized to import identities.", Constants.PROPERTY_REST_ERROR_IMPORT_UNAUTHORIZED);
+            }
 
             // Try to retrieve the batch by its reference, if exists ensure that both side information is consistent, if not, create it.
             if ( StringUtils.isNotEmpty( feedToken ) )
