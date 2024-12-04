@@ -132,6 +132,10 @@ public class ServiceContractService
         return activeServiceContract;
     }
 
+    public void validateImportAuthorization(final String clientCode) throws ClientAuthorizationException, ResourceNotFoundException {
+        validateImportAuthorization(getActiveServiceContract(clientCode));
+    }
+
     public void validateImportAuthorization(final ServiceContractDto serviceContract) throws ClientAuthorizationException {
         if ( !serviceContract.isAuthorizedImport( ) )
         {

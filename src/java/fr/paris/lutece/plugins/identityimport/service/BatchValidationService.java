@@ -102,6 +102,7 @@ public class BatchValidationService
         validateReference(batch);
         validateIdentitiesUniqueness(batch);
         validateIdentities(batch);
+        ServiceContractService.instance().validateImportAuthorization(batch.getAppCode());
         for(final IdentityDto identity : batch.getIdentities( ) ) {
             ServiceContractService.instance( ).validateIdentityAgainstServiceContract(identity, batch.getAppCode());
         }
