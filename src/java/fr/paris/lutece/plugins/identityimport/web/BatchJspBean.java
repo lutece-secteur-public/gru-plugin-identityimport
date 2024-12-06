@@ -110,6 +110,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String PARAMETER_FILTER_APP_CODE = "application_code";
     private static final String PARAMETER_FROM_PAGINATION = "from_pagination";
     private final static String PARAMETER_BATCH_PAGE = "batch_page";
+    private final static String PARAMETER_IDENTITIES_STATE_ID = "identities_state_id";
     private final static String IDENTITIES_PARAMETER_PAGE = "identities_page";
     private static final String MARK_FEED_TOKEN = "feed_token";
 
@@ -660,14 +661,12 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
         // keep original order
         return listCandidateIdentity.stream( )
-                .peek( candidateIdentity -> candidateIdentity
-                        .setAttributes( CandidateIdentityAttributeHome.getCandidateIdentityAttributesList( candidateIdentity.getId( ) ) ) )
-                .sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) ).map( b -> {
-                    final WorkflowBean<CandidateIdentity> workflowBean = _wfIdentitiesBeanService.createWorkflowBean( b, b.getId( ), b.getIdBatch( ),
-                            getUser( ) );
-                    _wfIdentitiesBeanService.addHistory( workflowBean, request, getLocale( ) );
-                    return workflowBean;
-                } ).collect( Collectors.toList( ) );
+                .peek( candidateIdentity -> candidateIdentity.setAttributes( CandidateIdentityAttributeHome.getCandidateIdentityAttributesList( candidateIdentity.getId( ) ) ) )
+                .sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) )
+                .map( candidateIdentity -> _wfIdentitiesBeanService.createWorkflowBean( candidateIdentity, candidateIdentity.getId( ), candidateIdentity.getIdBatch( ), getUser( ) ) )
+                .filter( workflowBean -> Optional.ofNullable(request.getParameter(PARAMETER_IDENTITIES_STATE_ID)).map(state -> state.equals(String.valueOf(workflowBean.getState().getId()))).orElse(true))
+                .peek( workflowBean -> _wfIdentitiesBeanService.addHistory( workflowBean, request, getLocale( ) ) )
+                .collect( Collectors.toList( ) );
     }
 
     private void unregisterFeed( )
