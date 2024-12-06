@@ -1,6 +1,8 @@
 <div class="lutece-compare-item-container border-start border-end p-3 position-relative border-top border-bottom border-dark-subtle">
     <div id="candidate-identity-list">
         <#if identity_list?size gt 0>
+            <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}&identities_state_id=7" title="#i18n{identityimport.manage_candidateidentities.filter.identities.to.process}" buttonIcon='filter'/>
+            <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}" title="#i18n{identityimport.manage_candidateidentities.filter.all.identities}" buttonIcon='eye'/>
             <@table>
                 <tr>
                     <th>#i18n{identityimport.manage_candidateidentities.columnExternalCustomerId}</th>
@@ -26,12 +28,12 @@
                         </td>
                         <td>
                             <#if candidateidentity.state?? && candidateidentity.state.id == 7 && batch.state?? && batch.state.id == 2 >
-                                <@aButton class="manualImportButton" href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=importCandidateIdentity&id_identity=${candidateidentity.resource.id}&return_url=jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}" title='#i18n{identityimport.manage_candidateidentity.labelManualImport}' hideTitle=['all'] buttonIcon='hammer' />
+                                <@aButton class="manualImportButton" href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=importCandidateIdentity&id_identity=${candidateidentity.resource.id}&return_url=jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}" title='#i18n{identityimport.manage_candidateidentity.labelManualImport}' hideTitle=['all'] buttonIcon='right-to-bracket' />
                             </#if>
                             <#if candidateidentity.resource.attributes?? && candidateidentity.resource.attributes?size gt 0>
-                                <@customPageColumnBtn idPageColumn="candidateidentity-attribute-list-${candidateidentity.resource.externalCustomerId}" />
+                                <@customPageColumnBtn idPageColumn="candidateidentity-attribute-list-${candidateidentity.resource.externalCustomerId}" buttonIcon='th-list'/>
                             </#if>
-                            <@customPageColumnBtn idPageColumn="candidateidentity-history-${candidateidentity.resource.externalCustomerId}" buttonIcon='th-list'/>
+                            <@customPageColumnBtn idPageColumn="candidateidentity-history-${candidateidentity.resource.externalCustomerId}" buttonIcon='clock-rotate-left'/>
                         </td>
                     </tr>
                 </#list>
