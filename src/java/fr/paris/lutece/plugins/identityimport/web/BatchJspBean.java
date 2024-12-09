@@ -68,6 +68,7 @@ import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppException;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
@@ -319,9 +320,11 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
                     .getActiveServiceContract( _candidateidentity.getClientAppCode( ) );
             model.put( MARK_SERVICE_CONTRACT, clientServiceContract );
         }
-        catch( IdentityStoreException e )
+        catch( final IdentityStoreException e )
         {
-            this.addInfo( e.getLocalizedMessage( ) );
+            AppLogService.error( e.getLocalizedMessage( ), e );
+            this.addError( e.getLocalizedMessage( ) );
+            return redirectView( request, VIEW_MANAGE_IDENTITIES );
         }
 
         final Optional<String> returnUrlOpt = Optional.ofNullable( request.getParameter( PARAMETER_RETURN_URL ) );
