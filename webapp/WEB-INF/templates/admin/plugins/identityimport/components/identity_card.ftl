@@ -99,7 +99,7 @@
                                 <#list attributesList as attr>
                                     <div class="flex-1 flex-grow-1 py-2 px-3 text-break">
                                         <div class="opacity-50">
-                                            ${current_key} <#if !attributeDefinition.attributeRight.writable> <i class="ti ti-x" style="color: red"></i> </#if>
+                                            ${current_key} <#if !attributeDefinition?? || !attributeDefinition.attributeRight.writable> <i class="ti ti-x" style="color: red"></i> </#if>
                                         </div>
                                         <div class="fw-bold attribute-container">
                                             <h3 class="attribute-value mb-0 fw-bold <#if !attr.value?has_content>text-warning</#if> <#if ((!merge && index != 0) || (merge && index == 0)) && ( !(firstIdentityAttr.value?has_content) || firstIdentityAttr.value != attr.value )>text-danger</#if>">
@@ -129,7 +129,7 @@
                             <#else>
                                 <div class="flex-1 flex-grow-1 py-2 px-3 text-break">
                                     <div class="opacity-50">
-                                        ${current_key} <#if !attributeDefinition.attributeRight.writable> <i class="ti ti-x" style="color: red"></i> </#if>
+                                        ${current_key} <#if !attributeDefinition?? || !attributeDefinition.attributeRight.writable> <i class="ti ti-x" style="color: red"></i> </#if>
                                     </div>
                                     <div class="fw-bold attribute-container">
                                         <h3 class="attribute-value mb-0 fw-bold text-warning">
