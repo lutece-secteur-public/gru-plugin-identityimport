@@ -21,3 +21,5 @@ ALTER TABLE identityimport_client ADD COLUMN data_retention_period_in_months INT
 ALTER TABLE identityimport_client MODIFY token VARCHAR(256);
 ALTER TABLE identityimport_client ADD UNIQUE (token);
 ALTER TABLE identityimport_client ADD UNIQUE (app_code);
+ALTER TABLE identityimport_client ADD client_code varchar(50) default '' NOT NULL;
+ALTER TABLE identityimport_client ADD UNIQUE (client_code);
