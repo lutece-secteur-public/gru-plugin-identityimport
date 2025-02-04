@@ -53,7 +53,7 @@ public class BatchValidationService
     private static final String MESSAGE_KEY_BATCH_OVER_IDENTITY_LIMIT = "identityimport.error.batch.over.identity.limit";
     private static final String MESSAGE_KEY_BATCH_NOT_PROVIDED = "identityimport.error.batch.not.provided";
     private static final String MESSAGE_KEY_BATCH_WITHOUT_USER = "identityimport.error.batch.without.user";
-    private static final String MESSAGE_KEY_BATCH_WITHOUT_APP_CODE = "identityimport.error.batch.without.app.code";
+    private static final String MESSAGE_KEY_BATCH_WITHOUT_CLIENT_CODE = "identityimport.error.batch.without.client.code";
     private static final String MESSAGE_KEY_BATCH_WITHOUT_REFERENCE = "identityimport.error.batch.without.reference";
     private static final String MESSAGE_KEY_BATCH_WITHOUT_IDENTITIES = "identityimport.error.batch.without.identities";
     private static final String MESSAGE_KEY_BATCH_WITH_IDENTITY_DUPLICATES = "identityimport.error.batch.with.identity.duplicate";
@@ -98,11 +98,11 @@ public class BatchValidationService
     {
         validateBatchNotNull(batch);
         validateUser(batch);
-        validateAppCode(batch);
+        validateClientCode(batch);
         validateReference(batch);
         validateIdentitiesUniqueness(batch);
         validateIdentities(batch);
-        ServiceContractService.instance().validateImportAuthorization(batch.getAppCode());
+        ServiceContractService.instance().validateImportAuthorization(batch.getClientCode());
         for(final IdentityDto identity : batch.getIdentities( ) ) {
             ServiceContractService.instance( ).validateIdentityAgainstServiceContract(identity, batch.getAppCode());
         }
@@ -122,10 +122,10 @@ public class BatchValidationService
         }
     }
 
-    public void validateAppCode(final BatchDto batch) throws RequestFormatException {
-        if ( StringUtils.isEmpty( batch.getAppCode( ) ) )
+    public void validateClientCode(final BatchDto batch) throws RequestFormatException {
+        if ( StringUtils.isEmpty( batch.getClientCode( ) ) )
         {
-            throw new RequestFormatException( "The provided batch application code is null", MESSAGE_KEY_BATCH_WITHOUT_APP_CODE );
+            throw new RequestFormatException( "The provided batch client code is null", MESSAGE_KEY_BATCH_WITHOUT_CLIENT_CODE );
         }
     }
 

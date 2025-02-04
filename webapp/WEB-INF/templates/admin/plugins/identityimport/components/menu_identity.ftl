@@ -6,8 +6,6 @@
   The element produces a column featuring an accordion section that allows the user to filter
   batches based on different states and to provide search criteria to refine the results.
 
-  @param application_code The code of the application to search for.
-
   @returns A rendered column for identity import and search.
 
   Usage:

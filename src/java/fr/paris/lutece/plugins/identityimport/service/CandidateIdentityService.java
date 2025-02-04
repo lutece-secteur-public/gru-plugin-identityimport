@@ -41,7 +41,6 @@ import fr.paris.lutece.plugins.identityimport.business.ResourceState;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.AttributeDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.QualityDefinition;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.CandidateIdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.importing.ImportingHistoryDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.referentiel.AttributeCertificationProcessusDto;
@@ -76,7 +75,7 @@ public class CandidateIdentityService
         final CandidateIdentityDto dto = new CandidateIdentityDto( );
         dto.setCustomerId( bean.getCustomerId( ) );
         dto.setExternalCustomerId( bean.getExternalCustomerId( ) );
-        dto.setClientAppCode( bean.getClientAppCode( ) );
+        dto.setClientAppCode( bean.getClientCode( ) );
         final ResourceState identityState = CandidateIdentityHome.getIdentityState( bean.getId( ) );
         dto.setStatus( identityState.getName( ) );
         dto.setStatusDescription( identityState.getDescription( ) );
@@ -127,7 +126,7 @@ public class CandidateIdentityService
         }
         catch( IdentityStoreException exception )
         {
-            AppLogService.info( "Could not find active contract service for client code " + bean.getClientAppCode( ) );
+            AppLogService.info( "Could not find active contract service for client code " + bean.getClientCode( ) );
         }
 
         for ( CandidateIdentityAttribute attr : bean.getAttributes( ) )

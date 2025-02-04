@@ -60,6 +60,7 @@ public class Batch implements Serializable
     @NotEmpty( message = "#i18n{identityimport.validation.batch.AppCode.notEmpty}" )
     @Size( max = 50, message = "#i18n{identityimport.validation.batch.AppCode.size}" )
     private String _strAppCode;
+    private String _strClientCode;
 
     private String _strComment;
 
@@ -168,6 +169,14 @@ public class Batch implements Serializable
         _strAppCode = strAppCode;
     }
 
+    public String getClientCode() {
+        return _strClientCode;
+    }
+
+    public void setClientCode(String _strClientCode) {
+        this._strClientCode = _strClientCode;
+    }
+
     /**
      * Returns the Comment
      * 
@@ -192,6 +201,6 @@ public class Batch implements Serializable
     public String toLog( )
     {
         return "[ID : " + getId( ) + "]" + "[REFERENCE : " + getReference( ) + "]" + "[DATE : " + getDate( ) + "]" + "[USER : " + getUser( ) + "]"
-                + "[APP CODE : " + getAppCode( ) + "]";
+                + "[APP CODE : " + getAppCode( ) + "]" + "[CLIENT CODE : " + getClientCode( ) + "]";
     }
 }

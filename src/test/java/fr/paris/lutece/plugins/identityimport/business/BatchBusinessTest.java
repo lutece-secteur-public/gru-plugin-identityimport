@@ -63,6 +63,7 @@ public class BatchBusinessTest extends LuteceTestCase
         batch.setDate( DATE1 );
         batch.setUser( USER1 );
         batch.setAppCode( APPCODE1 );
+        batch.setClientCode( APPCODE1 );
         batch.setComment( COMMENT1 );
 
         // Create test
@@ -78,6 +79,7 @@ public class BatchBusinessTest extends LuteceTestCase
         batch.setDate( DATE2 );
         batch.setUser( USER2 );
         batch.setAppCode( APPCODE2 );
+        batch.setClientCode( APPCODE2 );
         batch.setComment( COMMENT2 );
         BatchHome.update( batch );
         optBatchStored = BatchHome.findByPrimaryKey( batch.getId( ) );

@@ -5,8 +5,6 @@
 
   The element produces a column featuring an accordion section that allows the user to filter 
   batches based on different states and to provide search criteria to refine the results.
-
-  @param application_code The code of the application to search for.
   
   @returns A rendered column for identity import and search.
   
@@ -31,7 +29,7 @@
                     <ul class="list-group list-group-flush">
                         <#list batch_state_list as state>
                             <#assign isCurrent = (current_batch_state?? && state.id == current_batch_state.id) />
-                            <a href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageBatchs&id_state=${state.id}&application_code=${application_code!}"
+                            <a href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageBatchs&id_state=${state.id}&application_code=${application_code!}&client_code=${client_code!}"
                                 class="list-group-item list-group-item-action border-bottom-0 <#if isCurrent>text-primary</#if>"
                                 id="${state.id}">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -65,6 +63,9 @@
                         <input type='hidden' name='id_state' value='<#if current_batch_state??>${current_batch_state.id!""}<#else>0</#if>' />
                         <@formGroup labelKey='#i18n{identityimport.manage_batchs.columnAppCode}' labelFor='application_code' hideLabel=['all'] rows=2>
                             <@input type='text' id='application_code' name='application_code' value='${application_code!""}' placeHolder='#i18n{identityimport.manage_batchs.columnAppCode}' size='' />
+                        </@formGroup>
+                        <@formGroup labelKey='#i18n{identityimport.manage_batchs.columnClientCode}' labelFor='client_code' hideLabel=['all'] rows=2>
+                            <@input type='text' id='client_code' name='client_code' value='${client_code!""}' placeHolder='#i18n{identityimport.manage_batchs.columnClientCode}' size='' />
                         </@formGroup>
                         <@formGroup rows=2>
                             <@button type='submit' style='w-100' buttonIcon='search' title='#i18n{portal.util.labelSearch}' color='primary' size='' />
