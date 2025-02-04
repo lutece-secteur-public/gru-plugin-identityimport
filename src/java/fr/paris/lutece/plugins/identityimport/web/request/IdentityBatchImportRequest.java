@@ -85,13 +85,14 @@ public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
             response.setStatus( ResponseStatusFactory.failure( ).setMessageKey( Constants.PROPERTY_REST_ERROR_IMPORT_UNAUTHORIZED ) );
             return response;
         }
-        final BatchDto batch = _request.getBatch( );
-        batch.setAppCode( client.getAppCode() );
-        batch.setReference( UUID.randomUUID( ).toString( ) );
-        response.setReference( batch.getReference( ) );
+
         try
         {
+            final BatchDto batch = _request.getBatch( );
+            batch.setAppCode( client.getAppCode() );
+            batch.setReference( UUID.randomUUID( ).toString( ) );
             BatchService.instance( ).importBatch( batch, null, null );
+            response.setReference( batch.getReference( ) );
             response.setStatus( ResponseStatusFactory.success( ).setMessageKey( Constants.PROPERTY_REST_INFO_SUCCESSFUL_OPERATION ) );
         }
         catch( final IdentityStoreException e )
