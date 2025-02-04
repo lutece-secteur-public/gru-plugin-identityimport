@@ -125,9 +125,9 @@ public final class BatchHome
      *
      * @return the list which contains the id of all the batch objects
      */
-    public static List<Integer> getIdBatchsList( final ResourceState resourceState, final String filterAppCode )
+    public static List<Integer> getIdBatchsList( final ResourceState resourceState, final String filterAppCode, final String filterClientCode )
     {
-        return _dao.selectIdBatchsList( resourceState.getId( ), filterAppCode, _plugin );
+        return _dao.selectIdBatchsList( resourceState.getId( ), filterAppCode, filterClientCode, _plugin );
     }
 
     /**
@@ -197,9 +197,9 @@ public final class BatchHome
         return _dao.selectClosableBatches( batchLimit, _plugin );
     }
 
-    public static List<ResourceState> getBatchStates( final String filterAppCode )
+    public static List<ResourceState> getBatchStates( final String filterAppCode, final String filterClientCode )
     {
-        return _dao.selectBatchStates( filterAppCode, _plugin );
+        return _dao.selectBatchStates( filterAppCode, filterClientCode, _plugin );
     }
 
     public static ResourceState getBatchState( final int batchId )

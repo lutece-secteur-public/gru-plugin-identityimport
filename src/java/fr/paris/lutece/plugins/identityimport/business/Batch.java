@@ -60,6 +60,7 @@ public class Batch implements Serializable
     @NotEmpty( message = "#i18n{identityimport.validation.batch.AppCode.notEmpty}" )
     @Size( max = 50, message = "#i18n{identityimport.validation.batch.AppCode.size}" )
     private String _strAppCode;
+    private String _strClientCode;
 
     private String _strComment;
 
@@ -166,6 +167,14 @@ public class Batch implements Serializable
     public void setAppCode( String strAppCode )
     {
         _strAppCode = strAppCode;
+    }
+
+    public String getClientCode() {
+        return _strClientCode;
+    }
+
+    public void setClientCode(String _strClientCode) {
+        this._strClientCode = _strClientCode;
     }
 
     /**

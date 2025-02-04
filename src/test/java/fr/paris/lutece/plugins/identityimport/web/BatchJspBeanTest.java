@@ -82,6 +82,7 @@ public class BatchJspBeanTest extends LuteceTestCase
         request.addParameter( "date", DateUtil.getDateString( DATE1, LocaleService.getDefault( ) ) );
         request.addParameter( "user", USER1 );
         request.addParameter( "app_code", APPCODE1 );
+        request.addParameter( "client_code", APPCODE1 );
         request.addParameter( "comment", COMMENT1 );
         request.addParameter( "action", "createBatch" );
         request.addParameter( "token", SecurityTokenService.getInstance( ).getToken( request, "createBatch" ) );
@@ -109,8 +110,9 @@ public class BatchJspBeanTest extends LuteceTestCase
         request.addParameter( "date", DateUtil.getDateString( DATE1, LocaleService.getDefault( ) ) );
         request.addParameter( "user", USER1 );
         request.addParameter( "app_code", APPCODE1 );
+        request.addParameter( "client_code", APPCODE1 );
         request.addParameter( "comment", COMMENT1 );
-        List<Integer> listIds = BatchHome.getIdBatchsList( null, null );
+        List<Integer> listIds = BatchHome.getIdBatchsList( null, null, null );
         assertFalse( listIds.isEmpty( ) );
         request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
         jspbean = new BatchJspBean( );
@@ -125,6 +127,7 @@ public class BatchJspBeanTest extends LuteceTestCase
         request.addParameter( "date", DateUtil.getDateString( DATE2, LocaleService.getDefault( ) ) );
         request.addParameter( "user", USER2 );
         request.addParameter( "app_code", APPCODE2 );
+        request.addParameter( "client_code", APPCODE2 );
         request.addParameter( "comment", COMMENT2 );
         request.setRequestURI( "jsp/admin/plugins/example/ManageBatchs.jsp" );
         // important pour que MVCController sache quelle action effectuer, sinon, il redirigera vers createBatch, qui est l'action par défaut

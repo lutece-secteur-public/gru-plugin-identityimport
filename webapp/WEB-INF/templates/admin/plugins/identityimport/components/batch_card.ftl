@@ -77,6 +77,20 @@
                             <div class="w-100 d-flex">
                                 <div class="flex-1 flex-grow-1 py-2 px-3 text-break">
                                     <div class="opacity-50">
+                                        #i18n{identityimport.modify_batch.labelClientCode}
+                                    </div>
+                                    <div class="fw-bold">
+                                        <h3 class="mb-0 fw-bold">
+                                            ${batch.resource.clientCode}
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-center align-items-center p-0 border-start-0 border-end-0" style="min-height:55px">
+                            <div class="w-100 d-flex">
+                                <div class="flex-1 flex-grow-1 py-2 px-3 text-break">
+                                    <div class="opacity-50">
                                         #i18n{identityimport.modify_batch.labelComment}
                                     </div>
                                     <div class="fw-bold">
@@ -166,7 +180,7 @@
                                 <h3 class="mb-0 fw-bold">
                                     <#if batch.actions??>
                                         <#list batch.actions as action >
-                                            <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processAction&id_action=${action.id}&id_batch=${batch.resource.id}&application_code=${application_code!}"
+                                            <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processAction&id_action=${action.id}&id_batch=${batch.resource.id}&application_code=${application_code!}&client_code=${client_code!}"
                                             title="${action.name}" alt="${action.name}"  size='md' />
                                             </a>
                                         </#list>

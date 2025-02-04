@@ -55,7 +55,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
     private static final String ID_LIST = "%{id_list}";
     private static final String SQL_QUERY_SELECT_ALL = "WITH filtered_date AS (SELECT max(rh.creation_date) AS creation_date, rh.id_resource FROM workflow_resource_history rh GROUP BY rh.id_resource), "
             + "     filtered_history AS (SELECT rh.id_resource, icih.status, icih.comment, rh.creation_date FROM workflow_resource_history rh LEFT JOIN identityimport_candidate_identity_history icih ON icih.id_wf_resource_history = rh.id_history JOIN filtered_date ON filtered_date.id_resource = rh.id_resource AND filtered_date.creation_date = rh.creation_date) "
-            + " SELECT i.id_candidate_identity, i.id_batch, i.connection_id, i.customer_id, i.client_id, ib.app_code, filtered_history.status, filtered_history.comment FROM identityimport_candidate_identity i JOIN identityimport_batch ib ON i.id_batch = ib.id_batch LEFT JOIN filtered_history ON filtered_history.id_resource = i.id_candidate_identity ";
+            + " SELECT i.id_candidate_identity, i.id_batch, i.connection_id, i.customer_id, i.client_id, ib.client_code, filtered_history.status, filtered_history.comment FROM identityimport_candidate_identity i JOIN identityimport_batch ib ON i.id_batch = ib.id_batch LEFT JOIN filtered_history ON filtered_history.id_resource = i.id_candidate_identity ";
     private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE i.id_candidate_identity = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_candidate_identity ( id_batch, connection_id, customer_id, client_id) VALUES ( ?, ?, ?, ?) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_candidate_identity WHERE id_candidate_identity = ? ";
@@ -260,7 +260,7 @@ public final class CandidateIdentityDAO implements ICandidateIdentityDAO
         candidateIdentity.setConnectionId( daoUtil.getString( nIndex++ ) );
         candidateIdentity.setCustomerId( daoUtil.getString( nIndex++ ) );
         candidateIdentity.setExternalCustomerId( daoUtil.getString( nIndex++ ) );
-        candidateIdentity.setClientAppCode( daoUtil.getString( nIndex++ ) );
+        candidateIdentity.setClientCode( daoUtil.getString( nIndex++ ) );
         candidateIdentity.setStatus( StringUtils.defaultString( daoUtil.getString( nIndex ), "" ) );
         return candidateIdentity;
     }

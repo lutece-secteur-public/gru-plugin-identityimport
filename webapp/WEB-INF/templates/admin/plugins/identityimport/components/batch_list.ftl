@@ -22,7 +22,7 @@
                 <#--            <#assign selectedClasses>bg-secondary-subtle shadow selected</#assign>-->
                 <#--          </#if>-->
                     <#assign isCurrent = (current_batch_id?? && batch.resource.id == current_batch_id) />
-                    <a href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}'
+                    <a href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}&client_code=${client_code!}'
                        class="list-group-item list-group-item-action px-4 py-3 ${selectedClasses} <#if isCurrent>text-primary</#if>">
                         <#assign reference = batch.resource.reference!{}>
                         <#assign date = batch.resource.date!{}>
@@ -46,7 +46,7 @@
             <ul class="pagination justify-content-center mt-3 mb-0">
                 <li class="page-item <#if batch_current_page == 1>disabled</#if>">
                     <a class="page-link"
-                       href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageBatchs&id_state=${current_batch_state.id}&batch_page=${batch_current_page - 1}&application_code=${application_code!}"
+                       href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageBatchs&id_state=${current_batch_state.id}&batch_page=${batch_current_page - 1}&application_code=${application_code!}&client_code=${client_code!}"
                        tabindex="-1" aria-disabled="true"><i class="ti ti-chevron-left"></i></a>
                 </li>
                 <#if batch_total_pages gt 6>
@@ -61,13 +61,13 @@
                     <#list 1..batch_total_pages as page>
                         <li class="page-item <#if batch_current_page == page>border-primary-subtle border-end border-top-0 border-start-0 border-bottom-0</#if>">
                             <a class="page-link <#if batch_current_page == page>text-primary-emphasis bg-primary-subtle border border-primary-subtle border-end</#if> <#if batch_current_page == page - 1>border-start-0</#if>"
-                               href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageBatchs&id_state=${current_batch_state.id}&batch_page=${page}&application_code=${application_code!}">${page}</a>
+                               href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageBatchs&id_state=${current_batch_state.id}&batch_page=${page}&application_code=${application_code!}&client_code=${client_code!}">${page}</a>
                         </li>
                     </#list>
                 </#if>
                 <li class="page-item <#if batch_current_page == batch_total_pages>disabled</#if>">
                     <a class="page-link"
-                       href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageBatchs&id_state=${current_batch_state.id}&batch_page=${batch_current_page + 1}&application_code=${application_code!}"><i
+                       href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageBatchs&id_state=${current_batch_state.id}&batch_page=${batch_current_page + 1}&application_code=${application_code!}&client_code=${client_code!}"><i
                                 class="ti ti-chevron-right"></i></a>
                 </li>
             </ul>
@@ -78,7 +78,7 @@
         const paginationSelect = document.getElementById("paginationSelect");
         paginationSelect && paginationSelect.addEventListener("change", function () {
             let selectedPage = this.value;
-            window.location.href = "jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageBatchs&application_code=${application_code!}&id_state=${current_batch_state.id}&page=" + selectedPage;
+            window.location.href = "jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_manageBatchs&application_code=${application_code!}&client_code=${client_code!}&id_state=${current_batch_state.id}&page=" + selectedPage;
         });
         if (selectedItem) {
             setTimeout(function () {

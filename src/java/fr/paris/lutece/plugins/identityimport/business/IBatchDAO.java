@@ -142,7 +142,7 @@ public interface IBatchDAO
      *            the Plugin
      * @return The list which contains the id of all the batch objects
      */
-    List<Integer> selectIdBatchsList( final Integer batchStateId, final String filterAppCode, Plugin plugin );
+    List<Integer> selectIdBatchsList( final Integer batchStateId, final String filterAppCode, final String filterClientCode, final Plugin plugin );
 
     /**
      * Load the data of all the batch objects and returns them as a referenceList
@@ -166,7 +166,7 @@ public interface IBatchDAO
 
     Batch selectBatchByReference( Plugin plugin, String reference );
 
-    List<ResourceState> selectBatchStates( final String filterAppCode, Plugin plugin );
+    List<ResourceState> selectBatchStates( final String filterAppCode, final String filterClientCode, Plugin plugin );
 
     ResourceState selectBatchState( final int batchId, final Plugin plugin );
 

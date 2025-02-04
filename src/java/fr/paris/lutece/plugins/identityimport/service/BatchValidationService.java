@@ -52,6 +52,7 @@ public class BatchValidationService
     private static final String MESSAGE_KEY_BATCH_NOT_PROVIDED = "identityimport.error.batch.not.provided";
     private static final String MESSAGE_KEY_BATCH_WITHOUT_USER = "identityimport.error.batch.without.user";
     private static final String MESSAGE_KEY_BATCH_WITHOUT_APP_CODE = "identityimport.error.batch.without.app.code";
+    private static final String MESSAGE_KEY_BATCH_WITHOUT_CLIENT_CODE = "identityimport.error.batch.without.client.code";
     private static final String MESSAGE_KEY_BATCH_WITHOUT_REFERENCE = "identityimport.error.batch.without.reference";
     private static final String MESSAGE_KEY_BATCH_WITHOUT_IDENTITIES = "identityimport.error.batch.without.identities";
     private static final String MESSAGE_KEY_BATCH_WITH_IDENTITY_DUPLICATES = "identityimport.error.batch.with.identity.duplicate";
@@ -104,9 +105,9 @@ public class BatchValidationService
             throw new IdentityStoreException( "The provided batch user is null", MESSAGE_KEY_BATCH_WITHOUT_USER );
         }
 
-        if ( StringUtils.isEmpty( batch.getAppCode( ) ) )
+        if ( StringUtils.isEmpty( batch.getClientCode( ) ) )
         {
-            throw new IdentityStoreException( "The provided batch application code is null", MESSAGE_KEY_BATCH_WITHOUT_APP_CODE );
+            throw new IdentityStoreException( "The provided batch client code is null", MESSAGE_KEY_BATCH_WITHOUT_CLIENT_CODE );
         }
 
         if ( StringUtils.isEmpty( batch.getReference( ) ) )
@@ -153,7 +154,7 @@ public class BatchValidationService
             }
 
             this.validateMinimumAttributes( identity );
-            ServiceContractService.instance( ).validateIdentity( identity, batch.getAppCode( ) );
+            ServiceContractService.instance( ).validateIdentity( identity, batch.getClientCode( ) );
         }
 
     }

@@ -63,7 +63,7 @@ public class CandidateIdentity implements Serializable
     @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.ExternalCustomerId.size}" )
     private String _strExternalCustomerId;
 
-    private String _strClientAppCode;
+    private String _strClientCode;
 
     @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentity.Status.size}" )
     private String strStatus;
@@ -185,14 +185,14 @@ public class CandidateIdentity implements Serializable
         _strExternalCustomerId = strExternalCustomerId;
     }
 
-    public String getClientAppCode( )
+    public String getClientCode( )
     {
-        return _strClientAppCode;
+        return _strClientCode;
     }
 
-    public void setClientAppCode( String _strClientAppCode )
+    public void setClientCode(String _strClientAppCode )
     {
-        this._strClientAppCode = _strClientAppCode;
+        this._strClientCode = _strClientAppCode;
     }
 
     /**

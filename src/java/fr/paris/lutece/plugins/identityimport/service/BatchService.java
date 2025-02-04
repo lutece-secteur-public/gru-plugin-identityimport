@@ -114,7 +114,7 @@ public class BatchService
                 progressManagerService.addReport( feedToken, "Validating batch ..." );
             }
             validationService.validateBatch( batch );
-            final ServiceContractDto activeServiceContract = ServiceContractService.instance().getActiveServiceContract(batch.getAppCode());
+            final ServiceContractDto activeServiceContract = ServiceContractService.instance().getActiveServiceContract( batch.getClientCode( ) );
             if ( activeServiceContract == null )
             {
                 throw new IdentityStoreException( "Service contract not found.", Constants.PROPERTY_REST_ERROR_SERVICE_CONTRACT_NOT_FOUND );
@@ -148,7 +148,6 @@ public class BatchService
             }
 
             // Import identities
-            final String appCode = bean.getAppCode( );
             if ( StringUtils.isNotEmpty( feedToken ) )
             {
                 progressManagerService.addReport( feedToken, "Creating candidate identities..." );
@@ -159,7 +158,7 @@ public class BatchService
                 candidateIdentity.setIdBatch( batchId );
                 candidateIdentity.setExternalCustomerId( identity.getExternalCustomerId( ) );
                 candidateIdentity.setConnectionId( identity.getConnectionId( ) );
-                candidateIdentity.setClientAppCode( appCode );
+                candidateIdentity.setClientCode( bean.getClientCode() );
                 CandidateIdentityHome.create( candidateIdentity );
                 _wfIdentityBeanService.createWorkflowBean( candidateIdentity, candidateIdentity.getId( ), candidateIdentity.getIdBatch( ), user );
 
@@ -349,6 +348,7 @@ public class BatchService
         bean.setDate( batch.getDate( ) );
         bean.setUser( batch.getUser( ) );
         bean.setAppCode( batch.getAppCode( ) );
+        bean.setClientCode( batch.getClientCode( ) );
         return bean;
     }
 
@@ -360,6 +360,7 @@ public class BatchService
         dto.setDate( batch.getDate( ) );
         dto.setUser( batch.getUser( ) );
         dto.setAppCode( batch.getAppCode( ) );
+        dto.setClientCode( batch.getClientCode( ) );
         return dto;
     }
 

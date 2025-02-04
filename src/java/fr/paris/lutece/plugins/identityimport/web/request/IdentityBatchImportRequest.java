@@ -83,6 +83,7 @@ public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
         if ( !activeServiceContract.isAuthorizedImport( ) )
         {
             response.setStatus( ResponseStatusFactory.failure( ).setMessageKey( Constants.PROPERTY_REST_ERROR_IMPORT_UNAUTHORIZED ) );
+            response.getStatus().setMessage("Import feature is not authorized in the client service contract.");
             return response;
         }
 
@@ -90,6 +91,7 @@ public class IdentityBatchImportRequest extends AbstractIdentityStoreRequest
         {
             final BatchDto batch = _request.getBatch( );
             batch.setAppCode( client.getAppCode() );
+            batch.setClientCode( client.getClientCode() );
             batch.setReference( UUID.randomUUID( ).toString( ) );
             BatchService.instance( ).importBatch( batch, null, null );
             response.setReference( batch.getReference( ) );
