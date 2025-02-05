@@ -57,7 +57,7 @@ import fr.paris.lutece.plugins.identityimport.business.ClientHome;
 /**
  * This class provides the user interface to manage Client features ( manage, create, modify, remove )
  */
-@Controller( controllerJsp = "ManageClients.jsp", controllerPath = "jsp/admin/plugins/identityimport/", right = "IDENTITYIMPORT_BATCH_MANAGEMENT" )
+@Controller( controllerJsp = "ManageClients.jsp", controllerPath = "jsp/admin/plugins/identityimport/", right = "IDENTITYIMPORT_CLIENT_MANAGEMENT" )
 public class ClientJspBean extends AbstractManageItemsJspBean<Integer, Client>
 {
     // Templates
