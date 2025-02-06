@@ -2,17 +2,18 @@
 <#include "components/identity_card.ftl" />
 <@pageContainer id="mediation">
     <#include "components/menu_identity.ftl" />
+    <#assign temp_return_url='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=importCandidateIdentity&id_identity=${id_identity}&return_url=${return_url}'>
     <@pageColumn id="mediation-selection" width="100rem" class=" pt-xl-4 bg-secondary " >
         <@pageHeader title="#i18n{identityimport.select_identities.pageTitle}"/>
         <div id="lutece-compare" class="row flex-nowrap overflow-auto rounded-5 mt-3 pb-4 position-relative  mx-1">
-            <@identityCard identity=identity firstIdentity=identity candidate=true identity_workflow=identity_workflow serviceContract=client_service_contract index=0 width="21.9rem" />
+            <@identityCard identity=identity firstIdentity=identity candidate=true identity_workflow=identity_workflow serviceContract=client_service_contract index=0 width="21.9rem" returnUrl='${temp_return_url}'/>
             <#if duplicate_list?? && duplicate_list?has_content>
                 <#list duplicate_list as duplicate>
                     <#assign current_index=duplicate?index + 1>
                     <#if duplicate?is_last>
-                        <@identityCard identity=duplicate firstIdentity=identity identity_workflow=identity_workflow serviceContract=client_service_contract index=current_index width="21.9rem" class="rounded-end-5" />
+                        <@identityCard identity=duplicate firstIdentity=identity identity_workflow=identity_workflow serviceContract=client_service_contract index=current_index width="21.9rem" class="rounded-end-5" returnUrl='${temp_return_url}' />
                     <#else>
-                        <@identityCard identity=duplicate firstIdentity=identity identity_workflow=identity_workflow serviceContract=client_service_contract index=current_index width="21.9rem" />
+                        <@identityCard identity=duplicate firstIdentity=identity identity_workflow=identity_workflow serviceContract=client_service_contract index=current_index width="21.9rem" returnUrl='${temp_return_url}' />
                     </#if>
                 </#list>
             </#if>

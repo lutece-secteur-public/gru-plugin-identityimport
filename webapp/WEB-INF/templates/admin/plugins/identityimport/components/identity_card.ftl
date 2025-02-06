@@ -8,7 +8,8 @@
   @param width Optional width for the card.
   @returns A rendered identity card based on provided parameters.
 -->
-<#macro identityCard identity identity_workflow firstIdentity index serviceContract merge=false candidate=false class="" width="">
+<#macro identityCard identity identity_workflow firstIdentity index serviceContract returnUrl="" merge=false candidate=false class="" width="">
+    <#setting url_escaping_charset='ISO-8859-1'>
     <#assign familyNameAttr = identity.attributes?filter(a -> a.key == "family_name")?first!{}>
     <#assign firstNameAttr = identity.attributes?filter(a -> a.key == "first_name")?first!{}>
     <#assign emailAttr = identity.attributes?filter(a -> a.key == "email")?first!{}>
@@ -146,11 +147,11 @@
             <div class="py-4 text-center">
                 <#if !merge>
                     <#if index != 0>
-                        <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_completeIdentity=&id_identity=${identity_workflow.resource.id}&selected_customer_id=${identity.customerId!''}" title="#i18n{identityimport.select_identities.buttonMergeDuplicate}" alt="#i18n{identityimport.select_identities.buttonMergeDuplicate}"/>
+                        <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view_completeIdentity=&id_identity=${identity_workflow.resource.id}&selected_customer_id=${identity.customerId!''}&return_url=${returnUrl?url}" title="#i18n{identityimport.select_identities.buttonMergeDuplicate}" alt="#i18n{identityimport.select_identities.buttonMergeDuplicate}"/>
                     <#else>
                         <#list identity_workflow.actions as action >
                             <#if action.id == 4 >
-                                <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processIdentityAction&actionId=${action.id}&id=${identity_workflow.resource.id}" title="${action.name}" alt="${action.name}"/>
+                                <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?action=processIdentityAction&actionId=${action.id}&id=${identity_workflow.resource.id}&return_url=${returnUrl?url}" title="${action.name}" alt="${action.name}"/>
                             </#if>
                         </#list>
                     </#if>

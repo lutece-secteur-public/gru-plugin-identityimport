@@ -8,9 +8,13 @@ Parameters:
 - title (string, optional): The title attribute for the button element.
 - btnColor (string, optional): The color variant of the button. Default is 'primary'.
 -->
-<#macro customPageColumnBtn idPageColumn class='' hideSize='' title='' btnColor='primary' buttonIcon='menu-2'>
+<#macro customPageColumnBtn idPageColumn class='' hideSize='' title='' btnColor='primary' iconPrefix='ti ti-' iconStyle=''>
     <#assign hideSizebtn>
         <#if hideSize!=''>d-${hideSize}-none</#if>
     </#assign>
-    <@button color='primary' class='${hideSizebtn} ${class}' title='${title}' buttonIcon='${buttonIcon}' params='data-bs-toggle="offcanvas" data-bs-target="#${idPageColumn}" aria-controls="${idPageColumn}"' />
+    <@button color='primary' class='${hideSizebtn} ${class}' title='${title}' params='data-bs-toggle="offcanvas" data-bs-target="#${idPageColumn}" aria-controls="${idPageColumn}"' >
+        <#if iconStyle != ''>
+            <@icon prefix='${iconPrefix}' style='${iconStyle}'></@icon>
+        </#if>
+    </@button>
 </#macro>

@@ -106,7 +106,7 @@ public interface ICandidateIdentityDAO
      *            the Plugin
      * @return The list which contains the id of all the candidateIdentity objects
      */
-    List<Integer> selectIdCandidateIdentitiesList( int nBatchId, Plugin plugin );
+    List<Integer> selectIdCandidateIdentitiesList( int nBatchId, Integer stateId, Plugin plugin );
 
     /**
      * Load the data of all the avant objects and returns them as a list

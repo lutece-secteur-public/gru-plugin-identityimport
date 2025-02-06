@@ -290,7 +290,7 @@ public class BatchService
 
             try
             {
-                final List<Integer> idCandidateIdentitiesList = CandidateIdentityHome.getIdCandidateIdentitiesList( batch.getId( ) );
+                final List<Integer> idCandidateIdentitiesList = CandidateIdentityHome.getIdCandidateIdentitiesList( batch.getId( ), null );
                 CandidateIdentityHome.delete( idCandidateIdentitiesList );
                 CandidateIdentityAttributeHome.delete( idCandidateIdentitiesList );
                 CandidateIdentityHistoryHome.delete( idCandidateIdentitiesList );
@@ -459,7 +459,7 @@ public class BatchService
         if ( mode != BatchStatusMode.BATCH_ONLY )
         {
             final List<CandidateIdentity> identities = CandidateIdentityHome
-                    .getCandidateIdentitiesListByIds( CandidateIdentityHome.getIdCandidateIdentitiesList( batch.getId( ) ) );
+                    .getCandidateIdentitiesListByIds( CandidateIdentityHome.getIdCandidateIdentitiesList( batch.getId( ), null ) );
             identities.forEach( candidate -> {
                 final List<CandidateIdentityHistory> identityHistoryList = CandidateIdentityHistoryHome.selectAll( candidate.getId( ) );
                 final List<ResourceHistory> history = CandidateIdentityHome.getHistory( candidate.getId( ) );

@@ -12,22 +12,22 @@
         <@messages infos=infos />
         <@messages errors=errors />
         <@messages warnings=warnings />
-
+        <#assign selectedNavItem = identity_batch_tab!'batch_tab'>
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="pills-batch-tab" data-bs-toggle="pill" data-bs-target="#pills-batch" type="button" role="tab" aria-controls="pills-batch" aria-selected="true">#i18n{identityimport.manage_batchs.pill.batchTitle}</button>
+                <button <#if selectedNavItem == 'batch_tab'> class="nav-link active" <#else> class="nav-link" </#if> id="pills-batch-tab" data-bs-toggle="pill" data-bs-target="#pills-batch" type="button" role="tab" aria-controls="pills-batch" aria-selected="true">#i18n{identityimport.manage_batchs.pill.batchTitle}</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-identities-tab" data-bs-toggle="pill" data-bs-target="#pills-identities" type="button" role="tab" aria-controls="pills-identities" aria-selected="false">#i18n{identityimport.manage_batchs.pill.identitiesTitle}</button>
+                <button <#if selectedNavItem == 'identities_tab'> class="nav-link active" <#else> class="nav-link" </#if> id="pills-identities-tab" data-bs-toggle="pill" data-bs-target="#pills-identities" type="button" role="tab" aria-controls="pills-identities" aria-selected="false">#i18n{identityimport.manage_batchs.pill.identitiesTitle}</button>
             </li>
         </ul>
         <div class="tab-content" id="pills-tabContent">
-            <div class="tab-pane fade show active" id="pills-batch" role="tabpanel" aria-labelledby="pills-batch-tab">
+            <div <#if selectedNavItem == 'batch_tab'> class="tab-pane fade show active" <#else> class="tab-pane fade" </#if>  id="pills-batch" role="tabpanel" aria-labelledby="pills-batch-tab">
                 <div class="row mx-0">
                     <@batchCard batch=batch/>
                 </div>
             </div>
-            <div class="tab-pane fade" id="pills-identities" role="tabpanel" aria-labelledby="pills-identities-tab">
+            <div <#if selectedNavItem == 'identities_tab'> class="tab-pane fade show active" <#else> class="tab-pane fade" </#if> id="pills-identities" role="tabpanel" aria-labelledby="pills-identities-tab">
                 <div class="row mx-0">
                     <#include "components/identity_list.ftl" />
                 </div>
