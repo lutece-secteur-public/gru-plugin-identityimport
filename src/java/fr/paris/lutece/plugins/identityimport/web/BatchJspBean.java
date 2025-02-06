@@ -113,7 +113,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String PARAMETER_FROM_PAGINATION = "from_pagination";
     private final static String PARAMETER_BATCH_PAGE = "batch_page";
     private final static String PARAMETER_IDENTITIES_STATE_ID = "identities_state_id";
-    private final static String IDENTITIES_PARAMETER_PAGE = "identities_page";
+    private final static String PARAMETER_IDENTITY_OR_BATCH_TAB = "identity_batch_tab";
+    private final static String PARAMETER_IDENTITIES_PAGE = "identities_page";
     private static final String MARK_FEED_TOKEN = "feed_token";
 
     // Properties for page titles
@@ -147,6 +148,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String MARK_ATTRIBUTE_KEY_LIST = "key_list";
     private static final String MARK_RETURN_URL = "return_url";
     private static final String MARK_FROM_PAGINATION = "from_pagination";
+    private static final String MARK_IDENTITY_OR_BATCH_TAB = "identity_batch_tab";
+    private static final String MARK_ID_CANDIDATEIDENTITY = "id_identity";
 
     // Validations
     private static final String VALIDATION_ATTRIBUTES_PREFIX = "identityimport.model.entity.batch.attribute.";
@@ -241,8 +244,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         final Optional<String> idBatchOpt = Optional.ofNullable( request.getParameter( PARAMETER_ID_BATCH ) );
         idBatchOpt.ifPresent( idBatch -> {
             _currentBatchId = Integer.parseInt( idBatch );
-            _identitiesCurrentPage = Optional.ofNullable( request.getParameter( IDENTITIES_PARAMETER_PAGE ) ).map( Integer::parseInt ).orElse( 1 );
-            _listIdCandidateIdentities = CandidateIdentityHome.getIdCandidateIdentitiesList( _currentBatchId );
+            _identitiesCurrentPage = Optional.ofNullable( request.getParameter(PARAMETER_IDENTITIES_PAGE) ).map( Integer::parseInt ).orElse( 1 );
+            // .filter( workflowBean -> Optional.ofNullable(request.getParameter(PARAMETER_IDENTITIES_STATE_ID)).map(state -> state.equals(String.valueOf(workflowBean.getState().getId()))).orElse(true))
+            _listIdCandidateIdentities = CandidateIdentityHome.getIdCandidateIdentitiesList( _currentBatchId, Optional.ofNullable( request.getParameter( PARAMETER_IDENTITIES_STATE_ID ) ).map( Integer::parseInt ).orElse( null ) );
             final int totalRecords = _listIdCandidateIdentities.size( );
             _identitiesTotalPages = (int) Math.ceil( (double) totalRecords / NB_ITEMS_PER_PAGES );
             if ( _identitiesTotalPages == 0 )
@@ -329,11 +333,13 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             final String idBatch = request.getParameter( PARAMETER_ID_BATCH );
             final String batchPage = request.getParameter( PARAMETER_BATCH_PAGE );
             final String applicationCode = request.getParameter( PARAMETER_FILTER_APP_CODE );
-            final String returnUrl = String.format( "%s&%s=%s&%s=%s&%s=%s&%s=%s", url, PARAMETER_ID_BATCH_STATE, idState, PARAMETER_ID_BATCH, idBatch,
-                    PARAMETER_BATCH_PAGE, batchPage, PARAMETER_FILTER_APP_CODE, applicationCode );
+            final String clientCode = request.getParameter( PARAMETER_FILTER_CLIENT_CODE );
+            final String tab = request.getParameter( PARAMETER_IDENTITY_OR_BATCH_TAB );
+            final String returnUrl = String.format( "%s&%s=%s&%s=%s&%s=%s&%s=%s&%s=%s&%s=%s", url, PARAMETER_ID_BATCH_STATE, idState, PARAMETER_ID_BATCH, idBatch,
+                    PARAMETER_BATCH_PAGE, batchPage, PARAMETER_FILTER_APP_CODE, applicationCode, PARAMETER_FILTER_CLIENT_CODE, clientCode, PARAMETER_IDENTITY_OR_BATCH_TAB, tab );
             model.put( MARK_RETURN_URL, returnUrl );
         } );
-
+        model.put( MARK_ID_CANDIDATEIDENTITY, _candidateidentity.getId() );
         model.put( MARK_CANDIDATE_IDENTITY_WORKFLOW, _wfCandidateIdentityBean );
         model.put( MARK_CANDIDATE_IDENTITY, CandidateIdentityService.instance( ).getIdentityDto( _wfCandidateIdentityBean.getResource( ) ) );
         model.put( MARK_ATTRIBUTE_KEY_LIST, keyList.stream( ).distinct( ).collect( Collectors.toList( ) ) );
@@ -384,17 +390,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             this.addInfo( e.getLocalizedMessage( ) );
         }
 
-        final Optional<String> returnUrlOpt = Optional.ofNullable( request.getParameter( PARAMETER_RETURN_URL ) );
-        returnUrlOpt.ifPresent( url -> {
-            final String idState = request.getParameter( PARAMETER_ID_BATCH_STATE );
-            final String idBatch = request.getParameter( PARAMETER_ID_BATCH );
-            final String batchPage = request.getParameter( PARAMETER_BATCH_PAGE );
-            final String applicationCode = request.getParameter( PARAMETER_FILTER_APP_CODE );
-            final String returnUrl = String.format( "%s&%s=%s&%s=%s&%s=%s&%s=%s", url, PARAMETER_ID_BATCH_STATE, idState, PARAMETER_ID_BATCH, idBatch,
-                    PARAMETER_BATCH_PAGE, batchPage, PARAMETER_FILTER_APP_CODE, applicationCode );
-            model.put( MARK_RETURN_URL, returnUrl );
-        } );
-
+        model.put( MARK_RETURN_URL, request.getParameter( PARAMETER_RETURN_URL ) );
         model.put( MARK_CANDIDATE_IDENTITY_WORKFLOW, _wfCandidateIdentityBean );
         model.put( MARK_CANDIDATE_IDENTITY, CandidateIdentityService.instance( ).getIdentityDto( _wfCandidateIdentityBean.getResource( ) ) );
         model.put( MARK_ATTRIBUTE_KEY_LIST, keyList.stream( ).distinct( ).collect( Collectors.toList( ) ) );
@@ -580,7 +576,17 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
                 final String errMsg = _wfIdentitiesBeanService.validateTaskForm( _wfCandidateIdentityBean, nActionId, request, getLocale( ) );
                 if ( errMsg == null )
                 {
-                    return redirect( request, VIEW_IMPORT_CANDIDATEIDENTITY, PARAMETER_ID_CANDIDATEIDENTITY, _wfCandidateIdentityBean.getResourceId( ) );
+                    final int batchId = _wfCandidateIdentityBean.getExternalParentId( );
+                    final Optional<Batch> optBatch = BatchHome.findByPrimaryKey( batchId );
+                    _batch = optBatch.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+                    _wfBatchBean = _wfBatchBeanService.createWorkflowBean( _batch, _batch.getId( ), getUser( ) );
+                    final HashMap<String, String> params = new HashMap<>();
+                    params.put( PARAMETER_ID_BATCH_STATE, String.valueOf( _wfBatchBean.getState( ).getId( ) ) );
+                    params.put( PARAMETER_ID_BATCH, String.valueOf( _wfBatchBean.getResource().getId( ) ) );
+                    params.put( PARAMETER_IDENTITY_OR_BATCH_TAB, "identities_tab");
+                    params.put( PARAMETER_BATCH_PAGE, "1" );
+                    params.put( PARAMETER_IDENTITIES_PAGE, "1" );
+                    return redirect( request, VIEW_MANAGE_IDENTITIES, params);
                 }
                 else
                 {
@@ -643,6 +649,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
         model.put( MARK_FILTER_APP_CODE, _filterAppCode );
         model.put( MARK_FILTER_CLIENT_CODE, _filterClientCode );
+        model.put( MARK_IDENTITY_OR_BATCH_TAB, request.getParameter( PARAMETER_IDENTITY_OR_BATCH_TAB ) );
         return model;
     }
 
@@ -674,7 +681,6 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
                 .peek( candidateIdentity -> candidateIdentity.setAttributes( CandidateIdentityAttributeHome.getCandidateIdentityAttributesList( candidateIdentity.getId( ) ) ) )
                 .sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) )
                 .map( candidateIdentity -> _wfIdentitiesBeanService.createWorkflowBean( candidateIdentity, candidateIdentity.getId( ), candidateIdentity.getIdBatch( ), getUser( ) ) )
-                .filter( workflowBean -> Optional.ofNullable(request.getParameter(PARAMETER_IDENTITIES_STATE_ID)).map(state -> state.equals(String.valueOf(workflowBean.getState().getId()))).orElse(true))
                 .peek( workflowBean -> _wfIdentitiesBeanService.addHistory( workflowBean, request, getLocale( ) ) )
                 .collect( Collectors.toList( ) );
     }

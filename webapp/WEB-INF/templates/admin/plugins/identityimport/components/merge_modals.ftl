@@ -8,6 +8,7 @@
 					<input type="hidden" name="id" value="${identity_workflow.resource.id}" />
 					<input type="hidden" name="customer_id" value="${identityToKeep.customerId!''}" />
 					<input type="hidden" name="last_update_date" value="${identityToKeep.lastUpdateDate?string['yyyy-MM-dd HH:mm:ss.SSS']}" />
+					<input type="hidden" name="identity_batch_tab" value="identities_tab">
 					<div class="modal-header border-0">
 						<h1 class="modal-title text-center w-100 p-4 pb-0" id="mergeModalLabel">#i18n{identityimport.complete_identity.confirm}</h1>
 						<button type="button" class="btn btn-rounded border position-absolute end-0 me-3 top-0 mt-3" data-bs-dismiss="modal" aria-label="Close">x</button>

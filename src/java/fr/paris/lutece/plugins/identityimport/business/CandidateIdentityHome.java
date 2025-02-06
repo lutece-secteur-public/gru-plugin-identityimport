@@ -134,9 +134,9 @@ public final class CandidateIdentityHome
      * 
      * @return the list which contains the id of all the candidateIdentity objects
      */
-    public static List<Integer> getIdCandidateIdentitiesList( int nBatchId )
+    public static List<Integer> getIdCandidateIdentitiesList( int nBatchId, Integer stateId )
     {
-        return _dao.selectIdCandidateIdentitiesList( nBatchId, _plugin );
+        return _dao.selectIdCandidateIdentitiesList( nBatchId, stateId, _plugin );
     }
 
     /**
