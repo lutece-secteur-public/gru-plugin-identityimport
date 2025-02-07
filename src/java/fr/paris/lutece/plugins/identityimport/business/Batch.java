@@ -201,6 +201,6 @@ public class Batch implements Serializable
     public String toLog( )
     {
         return "[ID : " + getId( ) + "]" + "[REFERENCE : " + getReference( ) + "]" + "[DATE : " + getDate( ) + "]" + "[USER : " + getUser( ) + "]"
-                + "[APP CODE : " + getAppCode( ) + "]";
+                + "[APP CODE : " + getAppCode( ) + "[CLIENT CODE : " + getClientCode( ) + "]";
     }
 }

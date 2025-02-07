@@ -385,7 +385,7 @@ public class BatchService
         final BatchStatusDto batchStatus = new BatchStatusDto( );
 
         batchStatus.setReference( batch.getReference( ) );
-        batchStatus.setClientCode( batch.getAppCode( ) );
+        batchStatus.setClientCode( batch.getClientCode( ) );
         batchStatus.setUser( batch.getUser( ) );
         batchStatus.setComment( batch.getComment( ) );
         batchStatus.setCreationDate( batch.getDate( ) );

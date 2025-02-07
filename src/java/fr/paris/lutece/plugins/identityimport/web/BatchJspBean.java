@@ -683,7 +683,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
         // keep original order
         return listBatch.stream( )
-                        .filter(b -> RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, String.valueOf(b.getAppCode()), AccessImportBatchResource.PERMISSION_READ, (User) getUser()))
+                        .filter(b -> RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, String.valueOf(b.getClientCode()), AccessImportBatchResource.PERMISSION_READ, (User) getUser()))
                         .sorted(Comparator.comparingInt(notif -> listIds.indexOf(notif.getId())))
                         .map(b -> {
                             final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean( b, b.getId( ), getUser( ) );
