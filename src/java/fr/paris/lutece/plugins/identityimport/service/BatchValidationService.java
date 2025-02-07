@@ -104,7 +104,7 @@ public class BatchValidationService
         validateIdentities(batch);
         ServiceContractService.instance().validateImportAuthorization(batch.getClientCode());
         for(final IdentityDto identity : batch.getIdentities( ) ) {
-            ServiceContractService.instance( ).validateIdentityAgainstServiceContract(identity, batch.getAppCode());
+            ServiceContractService.instance( ).validateIdentityAgainstServiceContract(identity, batch.getClientCode());
         }
     }
 
