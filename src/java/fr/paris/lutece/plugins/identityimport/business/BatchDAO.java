@@ -384,12 +384,8 @@ public final class BatchDAO implements IBatchDAO
                 query += " AND " + SQL_QUERY_SELECTALL_ID_BY_CLIENT_CODE.replace( "${client_code}", filterClientCode );
             }
         }
+        query += SQL_ORDER_BY_DATE_DESC;
 
-
-        if( batchStateId != null && batchStateId == 13)
-        {
-            query += SQL_ORDER_BY_DATE_DESC;
-        }
         try ( final DAOUtil daoUtil = new DAOUtil( query, plugin ) )
         {
             daoUtil.executeQuery( );
@@ -441,7 +437,7 @@ public final class BatchDAO implements IBatchDAO
             }
 
             final String placeHolders = builder.deleteCharAt( builder.length( ) - 1 ).toString( );
-            final String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ")";
+            final String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ") ORDER BY DATE DESC, id_batch DESC";
 
             try ( final DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
             {
