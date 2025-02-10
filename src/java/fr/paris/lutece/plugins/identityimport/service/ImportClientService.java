@@ -5,6 +5,7 @@ import fr.paris.lutece.plugins.identityimport.business.ClientHome;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,6 +67,20 @@ public class ImportClientService {
             } else {
                 throw new IdentityStoreException("No client found for provided client_code.");
             }
+        }
+    }
+
+    public List<Client> getClients() {
+        return ClientHome.getClientsList();
+    }
+
+    public Client getClient( final int clientId ) throws IdentityStoreException {
+        final List<Client> clientsListByIds = ClientHome.getClientsListByIds( Collections.singletonList( clientId ) );
+        if ( clientsListByIds == null || clientsListByIds.size( ) != 1 )
+        {
+            throw new IdentityStoreException("No client found for provided client id.");
+        } else {
+            return clientsListByIds.get( 0 );
         }
     }
 }

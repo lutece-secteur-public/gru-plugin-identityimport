@@ -40,10 +40,12 @@ import fr.paris.lutece.plugins.identityimport.business.CandidateIdentity;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttribute;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityAttributeHome;
 import fr.paris.lutece.plugins.identityimport.business.CandidateIdentityHome;
+import fr.paris.lutece.plugins.identityimport.business.Client;
 import fr.paris.lutece.plugins.identityimport.business.ResourceState;
 import fr.paris.lutece.plugins.identityimport.rbac.AccessImportBatchResource;
 import fr.paris.lutece.plugins.identityimport.service.BatchService;
 import fr.paris.lutece.plugins.identityimport.service.CandidateIdentityService;
+import fr.paris.lutece.plugins.identityimport.service.ImportClientService;
 import fr.paris.lutece.plugins.identityimport.service.ServiceContractService;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBean;
 import fr.paris.lutece.plugins.identityimport.wf.WorkflowBeanService;
@@ -104,6 +106,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String JSP_MANAGE_CANDIDATEIDENTITIES = "jsp/admin/plugins/identityimport/ManageBatchs.jsp";
 
     // Parameters
+    private static final String PARAMETER_ID_CLIENT = "selected_client";
     private static final String PARAMETER_ID_BATCH = "id_batch";
     private static final String PARAMETER_ID_CANDIDATEIDENTITY = "id_identity";
     private static final String PARAMETER_SELECTED_CUSTOMER_ID = "selected_customer_id";
@@ -136,6 +139,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String MARK_IDENTITY_LIST = "identity_list";
     private static final String MARK_BATCH = "batch";
     private static final String MARK_NEW_IMPORT = "newImport";
+    private static final String MARK_AVAILABLE_CLIENTS = "available_clients";
     private static final String MARK_BATCH_STATE_LIST = "batch_state_list";
     private static final String MARK_CURRENT_BATCH_STATE = "current_batch_state";
     private static final String MARK_BATCH_TOTAL_PAGES = "batch_total_pages";
@@ -177,6 +181,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
+    private static final String IMPORT_BATCH_VALIDATION_ERROR_MSG = "import_batch.validation.error.msg";
+    private static final String IMPORT_BATCH_MISSING_CLIENT_ERROR_MSG = "import_batch.missing.client.error.msg";
 
     // Workflow
     private static final String BATCH_WFBEANSERVICE = "identityimport.batch.wfbeanservice";
@@ -206,6 +212,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private CandidateIdentity _candidateidentity;
     private WorkflowBean<CandidateIdentity> _wfCandidateIdentityBean;
     private Integer _currentIdentityId;
+    private List<Client> _availableClients = new ArrayList<>( );
 
     // Services
     private final IdentityQualityService identityQualityService = SpringContextService.getBean( "identityimport.qualityService.rest" );
@@ -433,9 +440,11 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         }
         this.registerFeed( );
         _batch = new Batch( );
+        _availableClients = ImportClientService.instance().getClients();
 
         final Map<String, Object> model = getModel( );
         model.put( MARK_NEW_IMPORT, true );
+        model.put( MARK_AVAILABLE_CLIENTS, _availableClients );
         model.put( MARK_BATCH, _batch );
         model.put( MARK_FEED_TOKEN, _feedToken );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_BATCH ) );
@@ -462,11 +471,23 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             throw new AccessDeniedException( "Invalid security token" );
         }
 
-        int batchId;
+        int batchId = 0;
+        int batchStateId = 0;
 
         try
         {
             this.populate( _batch, request, getLocale( ) );
+            final String clientIdStr = request.getParameter( PARAMETER_ID_CLIENT );
+            if( clientIdStr == null )
+            {
+                this.addError( IMPORT_BATCH_MISSING_CLIENT_ERROR_MSG, request.getLocale( ) );
+                return redirectView( request, VIEW_IMPORT_BATCH );
+            }
+
+            final Client selectedClient = ImportClientService.instance( ).getClient( Integer.parseInt( clientIdStr ) );
+            _batch.setClientCode( selectedClient.getClientCode( ) );
+            _batch.setAppCode( selectedClient.getAppCode( ) );
+
             final MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
             final FileItem fileItem = multipartRequest.getFile( PARAMETER_CSV_FILE );
 
@@ -480,13 +501,21 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             // Check constraints
             if ( !validateBean( _batch, VALIDATION_ATTRIBUTES_PREFIX ) )
             {
-                return redirectView( request, VIEW_CREATE_BATCH );
+                this.addError( IMPORT_BATCH_VALIDATION_ERROR_MSG, request.getLocale( ) );
+                return redirectView( request, VIEW_IMPORT_BATCH );
             }
 
             batchId = BatchService.instance( ).importBatchFromIhm(batchDto, getUser(), _feedToken);
 
-            this.addInfo( INFO_BATCH_CREATED, getLocale( ) );
-            this.resetListId( );
+            final Batch batch = BatchHome.getBatch( batchId ).orElse( null );
+            if( batch != null )
+            {
+                final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean(batch, batch.getId(), getUser());
+                batchStateId = workflowBean.getState().getId();
+                this.addInfo( INFO_BATCH_CREATED, getLocale( ) );
+                this.resetListId( );
+            }
+
         }
         catch( final IdentityStoreException | IOException e )
         {
@@ -501,7 +530,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             return redirectView( request, VIEW_IMPORT_BATCH );
         }
 
-        return redirect( request, VIEW_MANAGE_BATCHS, PARAMETER_ID_BATCH, batchId );
+        return redirect( request, VIEW_MANAGE_IDENTITIES, PARAMETER_ID_BATCH, batchId, PARAMETER_ID_BATCH_STATE, batchStateId );
     }
 
     /**
@@ -683,13 +712,13 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
         // keep original order
         return listBatch.stream( )
-                        .filter(b -> RBACService.isAuthorized(AccessImportBatchResource.RESOURCE_TYPE, String.valueOf(b.getClientCode()), AccessImportBatchResource.PERMISSION_READ, (User) getUser()))
-                        .sorted(Comparator.comparingInt(notif -> listIds.indexOf(notif.getId())))
-                        .map(b -> {
-                            final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean( b, b.getId( ), getUser( ) );
-                            _wfBatchBeanService.countSubResources( workflowBean );
-                            return workflowBean;
-                        }).collect( Collectors.toList( ) );
+            .filter( b -> RBACService.isAuthorized( AccessImportBatchResource.RESOURCE_TYPE, String.valueOf( b.getClientCode( ) ), AccessImportBatchResource.PERMISSION_READ, ( User ) getUser( ) ) )
+            .map(b -> {
+                final WorkflowBean<Batch> workflowBean = _wfBatchBeanService.createWorkflowBean( b, b.getId( ), getUser( ) );
+                _wfBatchBeanService.countSubResources( workflowBean );
+                return workflowBean;
+            })
+            .collect( Collectors.toList( ) );
     }
 
     protected List<WorkflowBean<CandidateIdentity>> getIdentitiesFromIds( final List<Integer> listIds, final HttpServletRequest request )
@@ -699,7 +728,6 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         // keep original order
         return listCandidateIdentity.stream( )
                 .peek( candidateIdentity -> candidateIdentity.setAttributes( CandidateIdentityAttributeHome.getCandidateIdentityAttributesList( candidateIdentity.getId( ) ) ) )
-                .sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) )
                 .map( candidateIdentity -> _wfIdentitiesBeanService.createWorkflowBean( candidateIdentity, candidateIdentity.getId( ), candidateIdentity.getIdBatch( ), getUser( ) ) )
                 .peek( workflowBean -> _wfIdentitiesBeanService.addHistory( workflowBean, request, getLocale( ) ) )
                 .collect( Collectors.toList( ) );

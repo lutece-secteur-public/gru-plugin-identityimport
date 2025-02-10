@@ -11,8 +11,13 @@
 		<@formGroup labelFor='user' labelKey='#i18n{identityimport.modify_batch.labelUser}' mandatory=true>
 			<@input type='text' id='user' name='user'  maxlength=255 value='${batch.user!\'\'}' tabIndex='2' disabled=(!newImport) />
 		</@formGroup>
-		<@formGroup labelFor='app_code' labelKey='#i18n{identityimport.modify_batch.labelAppCode}' mandatory=true>
-			<@input type='text' id='app_code' name='app_code'  maxlength=50 value='${batch.appCode!\'\'}' tabIndex='3' disabled=(!newImport) />
+		<@formGroup labelFor='client_id' labelKey='#i18n{identityimport.modify_batch.labelClient}' mandatory=true>
+			<select class="form-select" id="client_id" multiple data-allow-clear="true" data-clear-label="Clear" name="selected_client" data-suggestions-threshold="0">
+				<#list available_clients as client >
+					<option value="${client.id!''}">${client.appCode!''} - ${client.clientCode!''}  - ${client.name!''}</option>
+				</#list>
+			</select>
+			<div class="invalid-feedback">Please select a valid tag.</div>
 		</@formGroup>
 		<@formGroup labelFor='comment' labelKey='#i18n{identityimport.modify_batch.labelComment}' mandatory=true>
 			<@input type='text' id='comment' name='comment'  value='${batch.comment!\'\'}' tabIndex='4' disabled=(!newImport) />
@@ -30,4 +35,9 @@
 	</@boxBody>
 </@box>
 
+<!-- See https://www.cssscript.com/tags-input-bootstrap-5/ -->
+<script type="module">
+	import Tags from "./js/admin/plugins/identityimport/tags.js";
+	Tags.init("#client_id", {max: 1});
+</script>
 

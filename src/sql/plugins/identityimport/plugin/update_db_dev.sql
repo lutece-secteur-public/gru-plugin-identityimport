@@ -23,3 +23,4 @@ ALTER TABLE identityimport_client ADD UNIQUE (token);
 ALTER TABLE identityimport_client ADD UNIQUE (app_code);
 ALTER TABLE identityimport_client ADD client_code varchar(50) default '' NOT NULL;
 ALTER TABLE identityimport_client ADD UNIQUE (client_code);
+ALTER TABLE identityimport_client DROP CONSTRAINT app_code;
