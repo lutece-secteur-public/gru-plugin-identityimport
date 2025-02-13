@@ -605,6 +605,9 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
             final Map<String, String> params = new HashMap<>( );
             params.put( PARAMETER_ID_BATCH_STATE, String.valueOf( _wfBatchBean.getState( ).getId( ) ) );
             params.put( PARAMETER_ID_BATCH, String.valueOf( batchId ) );
+            params.put( PARAMETER_IDENTITY_OR_BATCH_TAB, "identities_tab");
+            params.put( PARAMETER_BATCH_PAGE, "1" );
+            params.put( PARAMETER_IDENTITIES_PAGE, "1" );
 
             return redirect( request, VIEW_MANAGE_IDENTITIES, params );
         }
