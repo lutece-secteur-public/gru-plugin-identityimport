@@ -181,8 +181,8 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
-    private static final String IMPORT_BATCH_VALIDATION_ERROR_MSG = "import_batch.validation.error.msg";
-    private static final String IMPORT_BATCH_MISSING_CLIENT_ERROR_MSG = "import_batch.missing.client.error.msg";
+    private static final String IMPORT_BATCH_VALIDATION_ERROR_MSG = "identityimport.import_batch.validation.error.msg";
+    private static final String IMPORT_BATCH_MISSING_CLIENT_ERROR_MSG = "identityimport.import_batch.missing.client.error.msg";
 
     // Workflow
     private static final String BATCH_WFBEANSERVICE = "identityimport.batch.wfbeanservice";
