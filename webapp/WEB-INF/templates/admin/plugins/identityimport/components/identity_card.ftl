@@ -105,7 +105,19 @@
                                         <div class="fw-bold attribute-container">
                                             <h3 class="attribute-value mb-0 fw-bold <#if !attr.value?has_content>text-warning</#if> <#if ((!merge && index != 0) || (merge && index == 0)) && ( !(firstIdentityAttr.value?has_content) || firstIdentityAttr.value != attr.value )>text-danger</#if>">
                                                 <#if attr.value?? && attr.value?has_content>
-                                                    ${attr.value}
+                                                    <#if attr.key == 'gender'>
+                                                        <#if attr.value == '0'>
+                                                            #i18n{identityimport.select_identities.undefined}
+                                                        <#elseif attr.value == '1'>
+                                                            #i18n{identityimport.select_identities.female}
+                                                        <#elseif attr.value == '2'>
+                                                            #i18n{identityimport.select_identities.male}
+                                                        <#else>
+                                                            ${attr.value}
+                                                        </#if>
+                                                    <#else>
+                                                        ${attr.value}
+                                                    </#if>
                                                 <#else>
                                                     Vide
                                                 </#if>
