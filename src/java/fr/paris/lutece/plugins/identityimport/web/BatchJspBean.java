@@ -256,7 +256,6 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         idBatchOpt.ifPresent( idBatch -> {
             _currentBatchId = Integer.parseInt( idBatch );
             _identitiesCurrentPage = Optional.ofNullable( request.getParameter(PARAMETER_IDENTITIES_PAGE) ).map( Integer::parseInt ).orElse( 1 );
-            // .filter( workflowBean -> Optional.ofNullable(request.getParameter(PARAMETER_IDENTITIES_STATE_ID)).map(state -> state.equals(String.valueOf(workflowBean.getState().getId()))).orElse(true))
             _listIdCandidateIdentities = CandidateIdentityHome.getIdCandidateIdentitiesList( _currentBatchId, Optional.ofNullable( request.getParameter( PARAMETER_IDENTITIES_STATE_ID ) ).map( Integer::parseInt ).orElse( null ) );
             final int totalRecords = _listIdCandidateIdentities.size( );
             _identitiesTotalPages = (int) Math.ceil( (double) totalRecords / NB_ITEMS_PER_PAGES );

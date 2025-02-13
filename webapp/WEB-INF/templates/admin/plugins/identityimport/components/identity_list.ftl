@@ -1,10 +1,10 @@
 <div class="lutece-compare-item-container border-start border-end p-3 position-relative border-top border-bottom border-dark-subtle">
     <div id="candidate-identity-list">
+        <div class='ms-3 me-2 my-2 d-none d-lg-block'>
+            <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}&client_code=${client_code!}&identities_state_id=7&identity_batch_tab=identities_tab" title="#i18n{identityimport.manage_candidateidentities.filter.identities.to.process}" buttonIcon='filter'/>
+            <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}&client_code=${client_code!}&identity_batch_tab=identities_tab" title="#i18n{identityimport.manage_candidateidentities.filter.all.identities}" buttonIcon='eye'/>
+        </div>
         <#if identity_list?size gt 0>
-            <div class='ms-3 me-2 my-2 d-none d-lg-block'>
-                <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}&client_code=${client_code!}&identities_state_id=7&identity_batch_tab=identities_tab" title="#i18n{identityimport.manage_candidateidentities.filter.identities.to.process}" buttonIcon='filter'/>
-                <@aButton href="jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}&client_code=${client_code!}&identity_batch_tab=identities_tab" title="#i18n{identityimport.manage_candidateidentities.filter.all.identities}" buttonIcon='eye'/>
-            </div>
             <@table>
                 <tr>
                     <th>#i18n{identityimport.manage_candidateidentities.columnExternalCustomerId}</th>
@@ -35,9 +35,9 @@
                                 </@aButton>
                             </#if>
                             <#if candidateidentity.resource.attributes?? && candidateidentity.resource.attributes?size gt 0>
-                                <@customPageColumnBtn idPageColumn="candidateidentity-attribute-list-${candidateidentity.resource.externalCustomerId}" iconPrefix='fa fa-' iconStyle='list'/>
+                                <@customPageColumnBtn idPageColumn="candidateidentity-attribute-list-${candidateidentity.resource.externalCustomerId}" iconPrefix='fa fa-' iconStyle='list' title='#i18n{identityimport.manage_candidateidentity.labelAttributeList}'/>
                             </#if>
-                            <@customPageColumnBtn idPageColumn="candidateidentity-history-${candidateidentity.resource.externalCustomerId}" iconPrefix='fa fa-' iconStyle='clock-rotate-left'/>
+                            <@customPageColumnBtn idPageColumn="candidateidentity-history-${candidateidentity.resource.externalCustomerId}" iconPrefix='fa fa-' iconStyle='clock-rotate-left' title='#i18n{identityimport.manage_candidateidentity.labelHistory}'/>
                         </td>
                     </tr>
                 </#list>
