@@ -13,7 +13,19 @@
                     ${candidateidentityattribute.code!}
                 </td>
                 <td>
-                    ${candidateidentityattribute.value!}
+                    <#if candidateidentityattribute.code == 'gender'>
+                        <#if candidateidentityattribute.value == '0'>
+                            #i18n{identityimport.select_identities.undefined}
+                        <#elseif candidateidentityattribute.value == '1'>
+                            #i18n{identityimport.select_identities.female}
+                        <#elseif candidateidentityattribute.value == '2'>
+                            #i18n{identityimport.select_identities.male}
+                        <#else>
+                            ${candidateidentityattribute.value!}
+                        </#if>
+                    <#else>
+                        ${candidateidentityattribute.value!}
+                    </#if>
                 </td>
                 <td>
                     ${candidateidentityattribute.certProcess!}
