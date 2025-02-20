@@ -51,17 +51,17 @@ import java.util.Optional;
  */
 public final class BatchDAO implements IBatchDAO
 {
-    private static final String BATCH_SELECT_FIELDS = "batch.id_batch, batch.reference, batch.date, batch.user, batch.app_code, batch.client_code, batch.comment";
+    private static final String BATCH_SELECT_FIELDS = "batch.id_batch, batch.reference, batch.date_create, batch.user, batch.app_code, batch.client_code, batch.comment";
 
     // Constants
     private static final String SQL_QUERY_SELECT = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch WHERE id_batch = ?";
     private static final String SQL_QUERY_SELECT_EXPIRED_BATCHES = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch"
             + " JOIN identityimport_client client ON client.client_code = batch.client_code JOIN workflow_resource_workflow r ON r.id_resource = batch.id_batch AND r.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE'"
-            + " WHERE DATE_ADD(batch.date, INTERVAL client.data_retention_period_in_months MONTH ) < CURRENT_DATE AND r.id_state = 3";
+            + " WHERE DATE_ADD(batch.date_create, INTERVAL client.data_retention_period_in_months MONTH ) < CURRENT_DATE AND r.id_state = 3";
     private static final String SQL_QUERY_SELECT_BY_REFERENCE = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch WHERE reference = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_batch ( reference, date, user, app_code, client_code, comment ) VALUES ( ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO identityimport_batch ( reference, date_create, user, app_code, client_code, comment ) VALUES ( ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM identityimport_batch WHERE id_batch = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_batch SET reference = ?, date = ?, user = ?, app_code = ?, client_code = ?, comment = ? WHERE id_batch = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE identityimport_batch SET reference = ?, date_create = ?, user = ?, app_code = ?, client_code = ?, comment = ? WHERE id_batch = ?";
     private static final String SQL_QUERY_PURGE = "";
     private static final String SQL_QUERY_SELECTSTATES = "SELECT ws.id_state, ws.name, ws.description, COUNT(wr.id_resource) as batch_count, ws.display_order FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' WHERE ws.id_workflow = 1 GROUP BY ws.id_state, ws.name, ws.description";
     private static final String SQL_QUERY_SELECTSTATES_BY_APP_OR_CLIENT_CODE = "SELECT ws.id_state, ws.name, ws.description, COUNT(wr.id_resource) as batch_count, ws.display_order FROM workflow_state ws LEFT JOIN workflow_resource_workflow wr ON wr.id_state = ws.id_state AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' JOIN identityimport_batch b ON b.id_batch = wr.id_resource ${filters} WHERE ws.id_workflow = 1 GROUP BY ws.id_state, ws.name, ws.description";
@@ -75,7 +75,7 @@ public final class BatchDAO implements IBatchDAO
     private static final String SQL_QUERY_SELECTALL_ID_BY_CLIENT_CODE = "lower(b.client_code) = lower('${client_code}')";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch WHERE id_batch IN (  ";
     private static final String SQL_QUERY_COUNT_IDENTITIES = "SELECT count(identity.id_resource) FROM workflow_resource_workflow identity WHERE identity.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' and identity.id_external_parent = ?";
-    private static final String SQL_ORDER_BY_DATE_DESC = " ORDER BY b.date DESC ";
+    private static final String SQL_ORDER_BY_DATE_DESC = " ORDER BY b.date_create DESC ";
 
     private static final String SQL_QUERY_SELECT_BATCH_HISTORY = "SELECT a.name, a.description, h.creation_date, h.user_access_code FROM workflow_resource_history h JOIN workflow_action a ON a.id_action = h.id_action WHERE h.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' AND h.id_resource = ?";
 
@@ -97,7 +97,7 @@ public final class BatchDAO implements IBatchDAO
         {
             int nIndex = 1;
             daoUtil.setString( nIndex++, batch.getReference( ) );
-            daoUtil.setDate( nIndex++, batch.getDate( ) );
+            daoUtil.setTimestamp( nIndex++, batch.getCreationDate( ) );
             daoUtil.setString( nIndex++, batch.getUser( ) );
             daoUtil.setString( nIndex++, batch.getAppCode( ) );
             daoUtil.setString( nIndex++, batch.getClientCode( ) );
@@ -156,7 +156,7 @@ public final class BatchDAO implements IBatchDAO
             int nIndex = 1;
 
             daoUtil.setString( nIndex++, batch.getReference( ) );
-            daoUtil.setDate( nIndex++, batch.getDate( ) );
+            daoUtil.setTimestamp( nIndex++, batch.getCreationDate( ) );
             daoUtil.setString( nIndex++, batch.getUser( ) );
             daoUtil.setString( nIndex++, batch.getAppCode( ) );
             daoUtil.setString( nIndex++, batch.getClientCode( ) );
@@ -437,7 +437,7 @@ public final class BatchDAO implements IBatchDAO
             }
 
             final String placeHolders = builder.deleteCharAt( builder.length( ) - 1 ).toString( );
-            final String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ") ORDER BY DATE DESC, id_batch DESC";
+            final String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ") ORDER BY date_create DESC, id_batch DESC";
 
             try ( final DAOUtil daoUtil = new DAOUtil( stmt, plugin ) )
             {
@@ -523,7 +523,7 @@ public final class BatchDAO implements IBatchDAO
         int nIndex = 1;
         batch.setId( daoUtil.getInt( nIndex++ ) );
         batch.setReference( daoUtil.getString( nIndex++ ) );
-        batch.setDate( daoUtil.getDate( nIndex++ ) );
+        batch.setCreationDate( daoUtil.getTimestamp( nIndex++ ) );
         batch.setUser( daoUtil.getString( nIndex++ ) );
         batch.setAppCode( daoUtil.getString( nIndex++ ) );
         batch.setClientCode( daoUtil.getString( nIndex++ ) );

@@ -34,10 +34,9 @@
 package fr.paris.lutece.plugins.identityimport.business;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  * This is the business class for the object Batch
@@ -51,7 +50,7 @@ public class Batch implements Serializable
     // Variables declarations
     private int _nId;
     private String _strReference;
-    private Date _dateDate;
+    private Timestamp _dateCreationDate;
 
     @NotEmpty( message = "#i18n{identityimport.validation.batch.User.notEmpty}" )
     @Size( max = 255, message = "#i18n{identityimport.validation.batch.User.size}" )
@@ -86,24 +85,24 @@ public class Batch implements Serializable
     }
 
     /**
-     * Returns the Date
+     * Returns the creation date
      * 
-     * @return The Date
+     * @return The creation Date
      */
-    public Date getDate( )
+    public Timestamp getCreationDate( )
     {
-        return _dateDate;
+        return _dateCreationDate;
     }
 
     /**
      * Sets the Date
      * 
-     * @param dateDate
-     *            The Date
+     * @param creationDate
+     *            The creation Date
      */
-    public void setDate( Date dateDate )
+    public void setCreationDate(Timestamp creationDate )
     {
-        _dateDate = dateDate;
+        _dateCreationDate = creationDate;
     }
 
     /**
@@ -200,7 +199,7 @@ public class Batch implements Serializable
 
     public String toLog( )
     {
-        return "[ID : " + getId( ) + "]" + "[REFERENCE : " + getReference( ) + "]" + "[DATE : " + getDate( ) + "]" + "[USER : " + getUser( ) + "]"
+        return "[ID : " + getId( ) + "]" + "[REFERENCE : " + getReference( ) + "]" + "[CREATION DATE : " + getCreationDate( ) + "]" + "[USER : " + getUser( ) + "]"
                 + "[APP CODE : " + getAppCode( ) + "]" + "[CLIENT CODE : " + getClientCode( ) + "]";
     }
 }

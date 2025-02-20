@@ -33,11 +33,10 @@
  */
 package fr.paris.lutece.plugins.identityimport.business;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.sql.Date;
-
-import javax.validation.constraints.NotEmpty;
+import java.sql.Timestamp;
 
 /**
  * This is the business class for the object CandidateIdentityAttribute
@@ -59,7 +58,7 @@ public class CandidateIdentityAttribute implements Serializable
 
     @Size( max = 255, message = "#i18n{identityimport.validation.candidateidentityattribute.CertProcess.size}" )
     private String _strCertProcess;
-    private Date _dateCertDate;
+    private Timestamp _dateCertDate;
 
     /**
      * Returns the Id
@@ -150,7 +149,7 @@ public class CandidateIdentityAttribute implements Serializable
      * 
      * @return The CertDate
      */
-    public Date getCertDate( )
+    public Timestamp getCertDate( )
     {
         return _dateCertDate;
     }
@@ -161,7 +160,7 @@ public class CandidateIdentityAttribute implements Serializable
      * @param dateCertDate
      *            The CertDate
      */
-    public void setCertDate( Date dateCertDate )
+    public void setCertDate( Timestamp dateCertDate )
     {
         _dateCertDate = dateCertDate;
     }

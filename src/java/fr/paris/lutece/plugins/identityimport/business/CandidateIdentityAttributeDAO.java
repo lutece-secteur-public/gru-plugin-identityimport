@@ -38,7 +38,6 @@ import fr.paris.lutece.util.sql.DAOUtil;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Statement;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +73,7 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getCode( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getValue( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getCertProcess( ) );
-            daoUtil.setDate( nIndex, candidateIdentityAttribute.getCertDate( ) );
+            daoUtil.setTimestamp( nIndex, candidateIdentityAttribute.getCertDate( ) );
 
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )
@@ -107,7 +106,7 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
                 candidateIdentityAttribute.setCode( daoUtil.getString( nIndex++ ) );
                 candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
                 candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex++ ) );
-                candidateIdentityAttribute.setCertDate( daoUtil.getDate( nIndex ) );
+                candidateIdentityAttribute.setCertDate( daoUtil.getTimestamp( nIndex ) );
             }
 
             return Optional.ofNullable( candidateIdentityAttribute );
@@ -156,7 +155,7 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getCode( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getValue( ) );
             daoUtil.setString( nIndex++, candidateIdentityAttribute.getCertProcess( ) );
-            daoUtil.setDate( nIndex++, candidateIdentityAttribute.getCertDate( ) );
+            daoUtil.setTimestamp( nIndex++, candidateIdentityAttribute.getCertDate( ) );
             daoUtil.setInt( nIndex, candidateIdentityAttribute.getId( ) );
 
             daoUtil.executeUpdate( );
@@ -185,7 +184,7 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
                 candidateIdentityAttribute.setCode( daoUtil.getString( nIndex++ ) );
                 candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
                 candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex++ ) );
-                candidateIdentityAttribute.setCertDate( daoUtil.getDate( nIndex ) );
+                candidateIdentityAttribute.setCertDate( daoUtil.getTimestamp( nIndex ) );
 
                 candidateIdentityAttributeList.add( candidateIdentityAttribute );
             }
@@ -253,7 +252,7 @@ public final class CandidateIdentityAttributeDAO implements ICandidateIdentityAt
                     candidateIdentityAttribute.setIdIdentity( daoUtil.getInt( nIndex++ ) );
                     candidateIdentityAttribute.setCode( daoUtil.getString( nIndex++ ) );
                     candidateIdentityAttribute.setValue( daoUtil.getString( nIndex++ ) );
-                    candidateIdentityAttribute.setCertDate( daoUtil.getDate( nIndex++ ) );
+                    candidateIdentityAttribute.setCertDate( daoUtil.getTimestamp( nIndex++ ) );
                     candidateIdentityAttribute.setCertProcess( daoUtil.getString( nIndex ) );
 
                     candidateIdentityAttributeList.add( candidateIdentityAttribute );

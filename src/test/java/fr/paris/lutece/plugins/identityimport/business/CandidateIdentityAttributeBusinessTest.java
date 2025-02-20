@@ -35,9 +35,9 @@ package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.test.LuteceTestCase;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
-
-import java.sql.Date;
 
 /**
  * This is the business class test for the object CandidateIdentityAttribute
@@ -50,8 +50,8 @@ public class CandidateIdentityAttributeBusinessTest extends LuteceTestCase
     private static final String VALUE2 = "Value2";
     private static final String CERTPROCESS1 = "CertProcess1";
     private static final String CERTPROCESS2 = "CertProcess2";
-    private static final Date CERTDATE1 = new Date( 1000000L );
-    private static final Date CERTDATE2 = new Date( 2000000L );
+    private static final Timestamp CERTDATE1 = Timestamp.from( Instant.now( ) );
+    private static final Timestamp CERTDATE2 = Timestamp.from( Instant.now( ) );
 
     /**
      * test CandidateIdentityAttribute
