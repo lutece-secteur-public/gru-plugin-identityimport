@@ -35,17 +35,17 @@ package fr.paris.lutece.plugins.identityimport.business;
 
 import fr.paris.lutece.test.LuteceTestCase;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
-
-import java.sql.Date;
 
 /**
  * This is the business class test for the object Batch
  */
 public class BatchBusinessTest extends LuteceTestCase
 {
-    private static final Date DATE1 = new Date( 1000000L );
-    private static final Date DATE2 = new Date( 2000000L );
+    private static final Timestamp DATE1 = Timestamp.from( Instant.now( ) );
+    private static final Timestamp DATE2 = Timestamp.from( Instant.now( ) );
     private static final String USER1 = "User1";
     private static final String USER2 = "User2";
     private static final String APPCODE1 = "AppCode1";
@@ -60,7 +60,7 @@ public class BatchBusinessTest extends LuteceTestCase
     {
         // Initialize an object
         Batch batch = new Batch( );
-        batch.setDate( DATE1 );
+        batch.setCreationDate( DATE1 );
         batch.setUser( USER1 );
         batch.setAppCode( APPCODE1 );
         batch.setClientCode( APPCODE1 );
@@ -70,13 +70,13 @@ public class BatchBusinessTest extends LuteceTestCase
         BatchHome.create( batch );
         Optional<Batch> optBatchStored = BatchHome.findByPrimaryKey( batch.getId( ) );
         Batch batchStored = optBatchStored.orElse( new Batch( ) );
-        assertEquals( batchStored.getDate( ).toString( ), batch.getDate( ).toString( ) );
+        assertEquals( batchStored.getCreationDate( ).toString( ), batch.getCreationDate( ).toString( ) );
         assertEquals( batchStored.getUser( ), batch.getUser( ) );
         assertEquals( batchStored.getAppCode( ), batch.getAppCode( ) );
         assertEquals( batchStored.getComment( ), batch.getComment( ) );
 
         // Update test
-        batch.setDate( DATE2 );
+        batch.setCreationDate( DATE2 );
         batch.setUser( USER2 );
         batch.setAppCode( APPCODE2 );
         batch.setClientCode( APPCODE2 );
@@ -85,7 +85,7 @@ public class BatchBusinessTest extends LuteceTestCase
         optBatchStored = BatchHome.findByPrimaryKey( batch.getId( ) );
         batchStored = optBatchStored.orElse( new Batch( ) );
 
-        assertEquals( batchStored.getDate( ).toString( ), batch.getDate( ).toString( ) );
+        assertEquals( batchStored.getCreationDate( ).toString( ), batch.getCreationDate( ).toString( ) );
         assertEquals( batchStored.getUser( ), batch.getUser( ) );
         assertEquals( batchStored.getAppCode( ), batch.getAppCode( ) );
         assertEquals( batchStored.getComment( ), batch.getComment( ) );

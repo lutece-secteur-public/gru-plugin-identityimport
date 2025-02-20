@@ -67,6 +67,8 @@ import fr.paris.lutece.util.sql.TransactionManager;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -135,7 +137,7 @@ public class BatchService
                 throw new IdentityStoreException( "A batch already exists with this reference.", MESSAGE_KEY_BATCH_EXISTS_WITH_SAME_REFERENCE );
             }
             final Batch bean = this.getBean( batch );
-            bean.setDate( new Date( System.currentTimeMillis( ) ) );
+            bean.setCreationDate( Timestamp.from( Instant.now( ) ) );
             BatchHome.create( bean );
 
             // Init workflow resource
@@ -168,7 +170,7 @@ public class BatchService
                     candidateAttribute.setIdIdentity( candidateIdentity.getId( ) );
                     candidateAttribute.setCode( importedAttribute.getKey( ) );
                     candidateAttribute.setValue( importedAttribute.getValue( ) );
-                    candidateAttribute.setCertDate( new Date( importedAttribute.getCertificationDate( ).getTime( ) ) );
+                    candidateAttribute.setCertDate( Timestamp.from( importedAttribute.getCertificationDate( ).toInstant( ) ) );
                     candidateAttribute.setCertProcess( importedAttribute.getCertifier( ) );
                     CandidateIdentityAttributeHome.create( candidateAttribute );
                 }
@@ -345,7 +347,7 @@ public class BatchService
         final Batch bean = new Batch( );
         bean.setReference( batch.getReference( ) );
         bean.setComment( batch.getComment( ) );
-        bean.setDate( batch.getDate( ) );
+        bean.setCreationDate( batch.getCreationDate( ) );
         bean.setUser( batch.getUser( ) );
         bean.setAppCode( batch.getAppCode( ) );
         bean.setClientCode( batch.getClientCode( ) );
@@ -357,7 +359,7 @@ public class BatchService
         final BatchDto dto = new BatchDto( );
         dto.setReference( batch.getReference( ) );
         dto.setComment( batch.getComment( ) );
-        dto.setDate( batch.getDate( ) );
+        dto.setCreationDate( batch.getCreationDate( ) );
         dto.setUser( batch.getUser( ) );
         dto.setAppCode( batch.getAppCode( ) );
         dto.setClientCode( batch.getClientCode( ) );
@@ -388,7 +390,7 @@ public class BatchService
         batchStatus.setClientCode( batch.getClientCode( ) );
         batchStatus.setUser( batch.getUser( ) );
         batchStatus.setComment( batch.getComment( ) );
-        batchStatus.setCreationDate( batch.getDate( ) );
+        batchStatus.setCreationDate( batch.getCreationDate( ) );
         batchStatus.setStatus( batchState.getName( ) );
         batchStatus.setStatusDescription( batchState.getDescription( ) );
 

@@ -25,8 +25,9 @@
                     <a href='jsp/admin/plugins/identityimport/ManageBatchs.jsp?view=manageIdentities&id_state=${current_batch_state.id}&id_batch=${batch.resource.id}&batch_page=${batch_current_page}&application_code=${application_code!}&client_code=${client_code!}'
                        class="list-group-item list-group-item-action px-4 py-3 ${selectedClasses} <#if isCurrent>text-primary</#if>">
                         <#assign reference = batch.resource.reference!{}>
-                        <#assign date = batch.resource.date!{}>
-                        <#assign app = batch.resource.appCode!{}>
+                        <#assign date = batch.resource.creationDate!{}>
+                        <#assign appCode = batch.resource.appCode!{}>
+                        <#assign clientCode = batch.resource.clientCode!{}>
                         <#assign comment = batch.resource.comment!{}>
                         <div class="d-flex w-100 justify-content-between">
                             <h3 class="mb-1 title mt-1 text-break fw-bold">
@@ -36,7 +37,7 @@
                                 <@tag color="primary"><strong>${batch.nbSubResource}</strong> #i18n{identityimport.manage_batchs.identitiesLabel}</@tag>
                             </div>
                         </div>
-                        <div>${date!''} - ${app!''}</div>
+                        <div>${date!''} - ${appCode!''} - ${clientCode!''}</div>
                         <div>${comment!''}</div>
                     </a>
                 </#list>

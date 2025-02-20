@@ -39,7 +39,7 @@
                                     </div>
                                     <div class="fw-bold">
                                         <h3 class="mb-0 fw-bold">
-                                            ${batch.resource.date}
+                                            ${batch.resource.creationDate}
                                         </h3>
                                     </div>
                                 </div>
