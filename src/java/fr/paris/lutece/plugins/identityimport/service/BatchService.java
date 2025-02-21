@@ -111,7 +111,7 @@ public class BatchService
         try
         {
             final Batch bean = this.getBean( batch );
-            bean.setDate( new Date( System.currentTimeMillis( ) ) );
+            bean.setCreationDate( Timestamp.from( Instant.now( ) ) );
             BatchHome.create( bean );
 
             // Init workflow resource
@@ -135,7 +135,7 @@ public class BatchService
                     candidateAttribute.setIdIdentity( candidateIdentity.getId( ) );
                     candidateAttribute.setCode( importedAttribute.getKey( ) );
                     candidateAttribute.setValue( importedAttribute.getValue( ) );
-                    candidateAttribute.setCertDate( new Date( importedAttribute.getCertificationDate( ).getTime( ) ) );
+                    candidateAttribute.setCertDate( Timestamp.from( importedAttribute.getCertificationDate( ).toInstant( ) ) );
                     candidateAttribute.setCertProcess( importedAttribute.getCertifier( ) );
                     CandidateIdentityAttributeHome.create( candidateAttribute );
                 }
