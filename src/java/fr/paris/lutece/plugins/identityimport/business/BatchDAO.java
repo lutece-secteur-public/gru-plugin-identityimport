@@ -73,6 +73,7 @@ public final class BatchDAO implements IBatchDAO
     private static final String SQL_QUERY_SELECTALL_ID_BY_STATE = "JOIN workflow_resource_workflow wr ON wr.id_resource = b.id_batch AND wr.resource_type = 'IDENTITYIMPORT_BATCH_RESOURCE' WHERE wr.id_state = ${id_state} ";
     private static final String SQL_QUERY_SELECTALL_ID_BY_APP_CODE = "lower(b.app_code) = lower('${app_code}')";
     private static final String SQL_QUERY_SELECTALL_ID_BY_CLIENT_CODE = "lower(b.client_code) = lower('${client_code}')";
+    private static final String SQL_QUERY_SELECTALL_ID_BY_REFERENCE = "lower(b.reference) LIKE lower('%${reference}%')";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT " + BATCH_SELECT_FIELDS + " FROM identityimport_batch batch WHERE id_batch IN (  ";
     private static final String SQL_QUERY_COUNT_IDENTITIES = "SELECT count(identity.id_resource) FROM workflow_resource_workflow identity WHERE identity.resource_type = 'IDENTITYIMPORT_CANDIDATE_RESOURCE' and identity.id_external_parent = ?";
     private static final String SQL_ORDER_BY_DATE_DESC = " ORDER BY b.date_create DESC ";
@@ -353,7 +354,7 @@ public final class BatchDAO implements IBatchDAO
      * {@inheritDoc }
      */
     @Override
-    public List<Integer> selectIdBatchsList( final Integer batchStateId, final String filterAppCode, final String filterClientCode, Plugin plugin )
+    public List<Integer> selectIdBatchsList( final Integer batchStateId, final String filterAppCode, final String filterClientCode, final String filterReference, Plugin plugin )
     {
         final List<Integer> batchList = new ArrayList<>( );
         String query = SQL_QUERY_SELECTALL_ID;
@@ -369,6 +370,10 @@ public final class BatchDAO implements IBatchDAO
             {
                 query += " AND " + SQL_QUERY_SELECTALL_ID_BY_CLIENT_CODE.replace( "${client_code}", filterClientCode );
             }
+            if ( StringUtils.isNotBlank( filterReference ) )
+            {
+                query += " AND " + SQL_QUERY_SELECTALL_ID_BY_REFERENCE.replace( "${reference}", filterReference );
+            }
         }
         else
         {
@@ -382,6 +387,12 @@ public final class BatchDAO implements IBatchDAO
             {
                 query += hasWhere ? " AND " : " WHERE ";
                 query += " AND " + SQL_QUERY_SELECTALL_ID_BY_CLIENT_CODE.replace( "${client_code}", filterClientCode );
+                hasWhere = true;
+            }
+            if ( StringUtils.isNotBlank( filterReference ) )
+            {
+                query += hasWhere ? " AND " : " WHERE ";
+                query += " AND " + SQL_QUERY_SELECTALL_ID_BY_REFERENCE.replace( "${reference}", filterReference );
             }
         }
         query += SQL_ORDER_BY_DATE_DESC;

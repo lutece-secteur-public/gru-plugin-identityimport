@@ -67,6 +67,9 @@
                         <@formGroup labelKey='#i18n{identityimport.manage_batchs.columnClientCode}' labelFor='client_code' hideLabel=['all'] rows=2>
                             <@input type='text' id='client_code' name='client_code' value='${client_code!""}' placeHolder='#i18n{identityimport.manage_batchs.columnClientCode}' size='' />
                         </@formGroup>
+                        <@formGroup labelKey='#i18n{identityimport.modify_batch.labelReference}' labelFor='reference' hideLabel=['all'] rows=2>
+                            <@input type='text' id='reference' name='reference' value='${reference!""}' placeHolder='#i18n{identityimport.modify_batch.labelReference}' size='' />
+                        </@formGroup>
                         <@formGroup rows=2>
                             <@button type='submit' style='w-100' buttonIcon='search' title='#i18n{portal.util.labelSearch}' color='primary' size='' />
                         </@formGroup>

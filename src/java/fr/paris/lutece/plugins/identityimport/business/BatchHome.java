@@ -125,9 +125,9 @@ public final class BatchHome
      *
      * @return the list which contains the id of all the batch objects
      */
-    public static List<Integer> getIdBatchsList( final ResourceState resourceState, final String filterAppCode, final String filterClientCode )
+    public static List<Integer> getIdBatchsList( final ResourceState resourceState, final String filterAppCode, final String filterClientCode, final String filterReference )
     {
-        return _dao.selectIdBatchsList( resourceState.getId( ), filterAppCode, filterClientCode, _plugin );
+        return _dao.selectIdBatchsList( resourceState.getId( ), filterAppCode, filterClientCode, filterReference, _plugin );
     }
 
     /**

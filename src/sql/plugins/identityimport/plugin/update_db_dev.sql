@@ -2,6 +2,7 @@
 ALTER TABLE identityimport_batch DROP COLUMN reference;
 ALTER TABLE identityimport_batch ADD COLUMN reference VARCHAR(255);
 ALTER TABLE identityimport_batch ADD UNIQUE (reference);
+ALTER TABLE identityimport_batch ADD client_code varchar(50) default '' NOT NULL;
 UPDATE identityimport_batch SET reference = CONCAT('REF-', id_batch) WHERE reference IS NULL;
 ALTER TABLE identityimport_batch MODIFY COLUMN reference VARCHAR(255) NOT NULL;
 

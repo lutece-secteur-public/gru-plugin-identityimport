@@ -10,6 +10,7 @@ reference VARCHAR(255) NOT NULL UNIQUE,
 date_create TIMESTAMP(3) NOT NULL,
 user varchar(255) default '' NOT NULL,
 app_code varchar(50) default '' NOT NULL,
+client_code varchar(50) default '' NOT NULL,
 comment long varchar,
 PRIMARY KEY (id_batch)
 );

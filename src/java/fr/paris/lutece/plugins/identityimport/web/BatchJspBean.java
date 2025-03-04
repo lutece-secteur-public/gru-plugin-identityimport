@@ -117,6 +117,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String PARAMETER_REFERENCE = "reference";
     private static final String PARAMETER_FILTER_APP_CODE = "application_code";
     private static final String PARAMETER_FILTER_CLIENT_CODE = "client_code";
+    private static final String PARAMETER_FILTER_REFERENCE = "reference";
     private static final String PARAMETER_FROM_PAGINATION = "from_pagination";
     private final static String PARAMETER_BATCH_PAGE = "batch_page";
     private final static String PARAMETER_IDENTITIES_STATE_ID = "identities_state_id";
@@ -148,6 +149,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private static final String MARK_CURRENT_IDENTITIES_PAGE = "identities_current_page";
     private static final String MARK_FILTER_APP_CODE = "application_code";
     private static final String MARK_FILTER_CLIENT_CODE = "client_code";
+    private static final String MARK_FILTER_REFERENCE = "reference";
     private static final String MARK_CANDIDATE_IDENTITY_DUPLICATE_LIST = "duplicate_list";
     private static final String MARK_CANDIDATE_IDENTITY = "identity";
     private static final String MARK_CANDIDATE_IDENTITY_WORKFLOW = "identity_workflow";
@@ -198,6 +200,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
     private Batch _batch;
     private String _filterAppCode;
     private String _filterClientCode;
+    private String _filterReference;
     private ResourceState _current_batch_state;
     private Integer _batchCurrentPage;
     private Integer _batchTotalPages;
@@ -654,6 +657,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
         _listIdCandidateIdentities = new ArrayList<>( );
         _filterAppCode = request.getParameter( PARAMETER_FILTER_APP_CODE );
         _filterClientCode = request.getParameter( PARAMETER_FILTER_CLIENT_CODE );
+        _filterReference = request.getParameter( PARAMETER_FILTER_REFERENCE );
         _batchStates = BatchHome.getBatchStates( _filterAppCode, _filterClientCode);
         _batchStates.sort( Comparator.comparingInt( ResourceState::getOrder ) );
 
@@ -665,7 +669,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
             if ( _current_batch_state != null && _current_batch_state.getResourceCount( ) > 0 )
             {
-                _listIdBatchs = BatchHome.getIdBatchsList( _current_batch_state, _filterAppCode, _filterClientCode );
+                _listIdBatchs = BatchHome.getIdBatchsList( _current_batch_state, _filterAppCode, _filterClientCode, _filterReference );
                 final int totalRecords = _listIdBatchs.size( );
                 _batchTotalPages = (int) Math.ceil( (double) totalRecords / NB_ITEMS_PER_PAGES );
                 if ( _batchTotalPages == 0 )
@@ -697,6 +701,7 @@ public class BatchJspBean extends AbstractManageItemsJspBean<Integer, WorkflowBe
 
         model.put( MARK_FILTER_APP_CODE, _filterAppCode );
         model.put( MARK_FILTER_CLIENT_CODE, _filterClientCode );
+        model.put( MARK_FILTER_REFERENCE, _filterReference );
         model.put( MARK_IDENTITY_OR_BATCH_TAB, request.getParameter( PARAMETER_IDENTITY_OR_BATCH_TAB ) );
         return model;
     }

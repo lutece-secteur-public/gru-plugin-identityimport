@@ -112,7 +112,7 @@ public class BatchJspBeanTest extends LuteceTestCase
         request.addParameter( "app_code", APPCODE1 );
         request.addParameter( "client_code", APPCODE1 );
         request.addParameter( "comment", COMMENT1 );
-        List<Integer> listIds = BatchHome.getIdBatchsList( null, null, null );
+        List<Integer> listIds = BatchHome.getIdBatchsList( null, null, null, null );
         assertFalse( listIds.isEmpty( ) );
         request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
         jspbean = new BatchJspBean( );
