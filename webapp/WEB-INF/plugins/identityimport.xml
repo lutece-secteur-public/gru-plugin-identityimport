@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<plug-in>
+<?xml version="1.0" encoding="UTF-8"?><plug-in>
     <name>identityimport</name>
     <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
-    <version>1.0.0-SNAPSHOT</version>
-    <documentation></documentation>
-    <installation></installation>
-    <changes></changes>
-    <user-guide></user-guide>
+    <version>1.0.0</version>
+    <documentation/>
+    <installation/>
+    <changes/>
+    <user-guide/>
     <description>identityimport.plugin.description</description>
     <provider>identityimport.plugin.provider</provider>
     <provider-url>https://lutece.paris.fr</provider-url>
@@ -27,7 +26,7 @@
             <feature-description>identityimport.adminFeature.ManageBatchs.description</feature-description>
             <feature-level>0</feature-level>
             <feature-url>jsp/admin/plugins/identityimport/ManageBatchs.jsp</feature-url>
-            <feature-icon-url></feature-icon-url>
+            <feature-icon-url/>
         </admin-feature>
         <admin-feature>
             <feature-id>IDENTITYIMPORT_CLIENT_MANAGEMENT</feature-id>
@@ -35,7 +34,7 @@
             <feature-description>identityimport.adminFeature.ManageClients.description</feature-description>
             <feature-level>0</feature-level>
             <feature-url>jsp/admin/plugins/identityimport/ManageClients.jsp</feature-url>
-            <feature-icon-url></feature-icon-url>
+            <feature-icon-url/>
         </admin-feature>
     </admin-features>
 
