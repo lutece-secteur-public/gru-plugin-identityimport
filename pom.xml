@@ -12,7 +12,7 @@
     <artifactId>plugin-identityimport</artifactId>
     <packaging>lutece-plugin</packaging>
     
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>Lutece identityimport plugin</name>
 
     <repositories>
@@ -74,7 +74,7 @@
         <connection>scm:git:https://github.com/lutece-secteur-public/gru-plugin-identityimport.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-secteur-public/gru-plugin-identityimport.git</developerConnection>
         <url>https://github.com/lutece-secteur-public/gru-plugin-identityimport.git</url>
-      <tag>plugin-identityimport-1.0.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
 </project>
